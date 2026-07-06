@@ -1,3 +1,8 @@
+package cinemax;
+
+import cinemax.Users.Cliente;
+import cinemax.Users.Utente;
+
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDate;
@@ -55,13 +60,13 @@ public class FileManager {
                 String domicilio = token[5];
                 String tipo = token[6];
 
-                // Ricostruiamo la sottoclasse esatta (visto che Utente è astratta)
+                // Ricostruiamo la sottoclasse esatta (visto che cinemax.Users.Utente è astratta)
                 if (tipo.equals("CLIENTE")) {
-                    utenti.add(new Cliente(username, passHash, nome, cognome, dataNascita, domicilio, true));
+                    utenti.add(new Cliente(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 } else if (tipo.equals("BIGLIETTAIO")) {
-                    utenti.add(new Bigliettaio(username, passHash, nome, cognome, dataNascita, domicilio, true));
+                    utenti.add(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 } else if (tipo.equals("PROIEZIONISTA")) {
-                    utenti.add(new Proiezionista(username, passHash, nome, cognome, dataNascita, domicilio, true));
+                    utenti.add(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 }
             }
         }
@@ -72,25 +77,22 @@ public class FileManager {
     // LETTURA E SCRITTURA PALINSESTO (Mappa 200 Posti compressa)
     // ========================================================
 
-    public static void salvaPalinsesto(List<Film> palinsesto) throws IOException {
+    public static void salvaPalinsesto(List<Proiezione> palinsesto) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_PALINSESTO))) {
-            for (Film f : palinsesto) {
-                // Convertiamo l'array boolean[200] in una stringa di '0' e '1'
-                StringBuilder mappaStr = new StringBuilder();
-                for (boolean postoOccupato : f.getMappaPosti()) {
-                    mappaStr.append(postoOccupato ? '1' : '0');
-                }
+            for (Proiezione p : palinsesto) {
 
-                String riga = f.getIdProiezione() + SEPARATORE +
-                        f.getDataOraProiezione().format(FORMATO_DATA_ORA) + SEPARATORE +
-                        f.getTitoloFilm() + SEPARATORE +
+                Film f = p.getFilm();
+
+                String riga = p.getIdProiezione() + SEPARATORE +
+                        p.getDataOraProiezione() + SEPARATORE +
+                        f.getTitolo() + SEPARATORE +
                         f.getGenere() + SEPARATORE +
                         f.getRegista() + SEPARATORE +
                         f.getAnno() + SEPARATORE +
-                        f.getDurataMinuti() + SEPARATORE +
-                        f.getEtaMinima() + SEPARATORE +
-                        f.getPrezzoBiglietto() + SEPARATORE +
-                        mappaStr.toString();
+                        f.getDurata() + SEPARATORE +
+                        f.getEta_minima() + SEPARATORE +
+                        p.getPrezzoBiglietto() + SEPARATORE +
+                        p.getPostiDisponibili();
                 writer.write(riga);
                 writer.newLine();
             }
@@ -109,24 +111,23 @@ public class FileManager {
                 String[] token = riga.split(SEPARATORE);
 
                 Film film = new Film(
-                        token[0], // idProiezione
-                        LocalDateTime.parse(token[1], FORMATO_DATA_ORA),
                         token[2], // titolo
                         token[3], // genere
                         token[4], // regista
                         Integer.parseInt(token[5]),
                         Integer.parseInt(token[6]), // durata
-                        Integer.parseInt(token[7]), // eta minima
-                        Double.parseDouble(token[8]) // prezzo
+                        Integer.parseInt(token[7]) // eta minima
                 );
 
-                // Ripristiniamo lo stato dei 200 posti leggendo i singoli caratteri '0'/'1'
-                String mappaStr = token[9];
-                boolean[] mappa = new boolean[200];
-                for (int i = 0; i < 200; i++) {
-                    mappa[i] = (mappaStr.charAt(i) == '1');
-                }
-                film.setMappaPosti(mappa);
+                Proiezione proiezione = new Proiezione(
+                        token[0],                     // idProiezione (String)
+                        token[1],                     // dataOraProiezione (String)
+                        Double.parseDouble(token[8]), // prezzoBiglietto (double)
+                        film                          // Passiamo l'oggetto Film appena istanziato
+                );
+
+                int postiRimasti = Integer.parseInt(token[9]);
+                proiezione.setPostiDisponibili(postiRimasti);
 
                 palinsesto.add(film);
             }

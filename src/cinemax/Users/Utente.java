@@ -1,3 +1,5 @@
+package cinemax.Users;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -25,9 +27,20 @@ public abstract class Utente {
         this.luogoDomicilio = luogoDomicilio;
     }
 
+    public Utente(String username, String passwordHash, String nome, String cognome,
+                  LocalDate dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
+
+        this.username = username;
+        this.passwordHash = passwordHash; // Viene assegnata direttamente dal file senza ricalcolare l'hash[cite: 1]
+        this.nome = nome;
+        this.cognome = cognome;
+        this.dataNascita = dataNascita;
+        this.luogoDomicilio = luogoDomicilio;
+    }
+
     public abstract void mostraMenu() ;
 
-
+    // da spostare nella classe MenuPrincipale
     private String generaPasswordHash(String password) {
         try {
             byte[] salt = "SaltSegretoCinema2026".getBytes();
