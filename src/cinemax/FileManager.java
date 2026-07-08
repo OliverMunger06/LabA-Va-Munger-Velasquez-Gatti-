@@ -4,10 +4,17 @@ import cinemax.Users.Cliente;
 import cinemax.Users.Proiezionista;
 import cinemax.Users.Utente;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.io.*;
 import java.nio.file.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class FileManager {
@@ -51,21 +58,23 @@ public class FileManager {
                 if (riga.trim().isEmpty()) continue;
                 String[] token = riga.split(SEPARATORE);
 
-                String username = token[0];
-                String passHash = token[1];
-                String nome = token[2];
-                String cognome = token[3];
-                String dataNascita = token[4].equals("null") ? null : token[4];
-                String domicilio = token[5];
-                String tipo = token[6];
+                // Lettura speculare a come hai salvato in salvaUtenti
+                String nome       = token[0];
+                String cognome    = token[1];
+                String username   = token[2];
+                String passHash   = token[3];
+                String dataNascita = token[4].equals("null") ? null : token[4]; // Rimane String
+                String domicilio  = token[5];
+                String tipo       = token[6];
 
-                // Ricostruiamo la sottoclasse esatta (visto che cinemax.Users.Utente è astratta)
+                // Ricostruiamo la sottoclasse esatta passando la String dataNascita
                 if (tipo.equals("CLIENTE")) {
                     utenti.add(new Cliente(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 } else if (tipo.equals("BIGLIETTAIO")) {
                     utenti.add(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 } else if (tipo.equals("PROIEZIONISTA")) {
-                    utenti.add(new Proiezionista(username, passHash, nome, cognome, dataNascita, domicilio, true));
+                    // Allineato l'ordine dei parametri (nome, cognome, username...) come gli altri
+                    utenti.add(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 }
             }
         }
@@ -79,11 +88,18 @@ public class FileManager {
     public static void salvaPalinsesto(List<Proiezione> palinsesto) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_PALINSESTO))) {
             for (Proiezione p : palinsesto) {
-
                 Film f = p.getFilm();
 
+                // Dividiamo la stringa "yyyy-MM-dd HH:mm" in due parti
+                String dataOraCompleta = p.getDataOraProiezione();
+                String[] partiDataOra = dataOraCompleta.split(" ");
+                String soloData = partiDataOra[0];
+                String soloOra = partiDataOra[1];
+
+                // Ora scriviamo soloData e soloOra come campi separati nel CSV
                 String riga = p.getIdProiezione() + SEPARATORE +
-                        p.getDataOraProiezione() + SEPARATORE +
+                        soloData + SEPARATORE +
+                        soloOra + SEPARATORE +
                         f.getTitolo() + SEPARATORE +
                         f.getGenere() + SEPARATORE +
                         f.getRegista() + SEPARATORE +
@@ -98,8 +114,8 @@ public class FileManager {
         }
     }
 
-    public static List<Film> caricaPalinsesto() throws IOException {
-        List<Film> palinsesto = new ArrayList<>();
+    public static List<Proiezione> caricaPalinsesto() throws IOException {
+        List<Proiezione> palinsesto = new ArrayList<>();
         Path path = Paths.get(FILE_PALINSESTO);
         if (!Files.exists(path)) return palinsesto;
 
@@ -109,29 +125,53 @@ public class FileManager {
                 if (riga.trim().isEmpty()) continue;
                 String[] token = riga.split(SEPARATORE);
 
+                // Recuperiamo data e ora separate dal file
+                String data = token[1];
+                String ora = token[2];
+                // Le uniamo di nuovo in un'unica stringa come richiesto dal costruttore di Proiezione
+                String dataOraRicostruita = data + " " + ora;
+
+                // Gli indici del Film sono scalati di +1 perché ora data e ora occupano due colonne differenti
                 Film film = new Film(
-                        token[2], // titolo
-                        token[3], // genere
-                        token[4], // regista
-                        Integer.parseInt(token[5]),
-                        Integer.parseInt(token[6]), // durata
-                        Integer.parseInt(token[7]) // eta minima
+                        token[3], // titolo
+                        token[4], // genere
+                        token[5], // regista
+                        Integer.parseInt(token[6]), // anno
+                        Integer.parseInt(token[7]), // durata
+                        Integer.parseInt(token[8])  // eta minima
                 );
 
                 Proiezione p = new Proiezione(
-                        0,                   // idProiezione (String)
-                        token[1],                       // dataProiezione (String)
-                        token[2],                       // oraProiezione(String)
-                        3,                       // prezzoBiglietto (Double)
-                        film                            // Passiamo l'oggetto Film appena istanziato
+                        token[0],                     // idProiezione
+                        dataOraRicostruita,           // dataOraProiezione (stringa unita)
+                        Double.parseDouble(token[9]), // prezzoBiglietto
+                        film
                 );
 
-                int postiRimasti = Integer.parseInt(token[9]);
+                int postiRimasti = Integer.parseInt(token[10]);
                 p.setPostiDisponibili(postiRimasti);
 
-                palinsesto.add(film);
+                // CORREZIONE: Aggiungiamo la proiezione 'p' alla lista del palinsesto, non il film
+                palinsesto.add(p);
             }
         }
         return palinsesto;
+
+
+
+    public static String generaPasswordHash(String password) {
+        try {
+            byte[] salt = "SaltSegretoCinema2026".getBytes();
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            byte[] hash = factory.generateSecret(spec).getEncoded();
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException("Errore nella cifratura", e);
+        }
+    }
+
+    public boolean verificaPassword(String passwordDaVerificare) {
+        return Utente.getPasswordHash().equals(generaPasswordHash(passwordDaVerificare));
     }
 }
