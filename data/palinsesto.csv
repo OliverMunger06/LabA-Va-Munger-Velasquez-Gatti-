@@ -1,1 +1,1 @@
-id_proiezione,data_ora_proiezione,titolo_film,genere,regista,anno,durata_minuti,eta_minima,prezzo_biglietto,posti
+id_proiezione, data_proiezione, ora_proiezione, titolo_film, genere, regista, anno, durata_minuti, eta_minima, prezzo_biglietto, posti

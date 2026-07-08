@@ -28,57 +28,106 @@ public class Proiezionista extends Utente {
      */
     public boolean aggiungiProiezione(List<Proiezione> palinsesto, Proiezione nuovaProiezione) {
         for (Proiezione p : palinsesto) {
-            // Controllo basilare: stessa data e stessa ora (espandibile calcolando la durata del film)
-            if (p.getDataOraProiezione().equals(nuovaProiezione.getDataOraProiezione())) {
-                System.out.println("Errore: Esiste già una proiezione pianificata per questo orario!");
+            // CORRETTO: Controllo basato sui nuovi campi separati
+            if (p.getDataProiezione().equals(nuovaProiezione.getDataProiezione()) &&
+                    p.getOraProiezione().equals(nuovaProiezione.getOraProiezione())) {
+
+                System.out.println("❌ Errore: Esiste già una proiezione pianificata per questa data e orario!");
                 return false;
             }
         }
         palinsesto.add(nuovaProiezione);
-        System.out.println("Proiezione aggiunta con successo al palinsesto.");
+        System.out.println("✅ Proiezione aggiunta con successo al palinsesto.");
         return true;
     }
 
     /**
-     * Modifica la data e l'ora di una proiezione esistente cercandola per titolo del film e vecchia data.
+     * b. Funzionalità di modifica di una proiezione
+     * Vincolo: A patto che NON ci siano prenotazioni per quella proiezione (posti disponibili deve essere 200)
      */
-    public boolean modificaProiezione(List<Proiezione> palinsesto, String titoloFilm, String vecchiaDataStr, String nuovaDataStr) {
-        try {
-            String vecchiaData = vecchiaDataStr;
-            String nuovaData = nuovaDataStr;
+    public boolean modificaProiezione(List<Proiezione> palinsesto, String titoloFilm,
+                                      String vecchiaData, String vecchiaOra,
+                                      String nuovaData, String nuovaOra) {
 
-            for (Proiezione p : palinsesto) {
-                if (p.getFilm().getTitolo().equalsIgnoreCase(titoloFilm) && p.getDataOraProiezione().equals(vecchiaData)) {
-                    p.setDataOraProiezione(nuovaData);
-                    System.out.println("Orario della proiezione modificato con successo.");
-                    return true;
+        for (Proiezione p : palinsesto) {
+            if (p.getFilm().getTitolo().equalsIgnoreCase(titoloFilm) &&
+                    p.getDataProiezione().equals(vecchiaData) &&
+                    p.getOraProiezione().equals(vecchiaOra)) {
+
+                // AGGIUNTO VINCOLO DA SPECIFICA: controllo prenotazioni esistenti
+                if (p.getPostiDisponibili() < 200) {
+                    System.out.println("❌ Errore: Impossibile modificare. Ci sono già delle prenotazioni per questa proiezione!");
+                    return false;
                 }
+
+                p.setDataProiezione(nuovaData);
+                p.setOraProiezione(nuovaOra);
+
+                System.out.println("✅ Data e orario della proiezione modificati con successo.");
+                return true;
             }
-        } catch (DateTimeParseException e) {
-            System.out.println("Errore: Formato data non valido. Usa 'yyyy-MM-dd HH:mm'.");
-            return false;
         }
 
-        System.out.println("Errore: Nessuna proiezione trovata per il film \"" + titoloFilm + "\" in data " + vecchiaDataStr);
+        System.out.println("❌ Errore: Nessuna proiezione trovata per il film \"" + titoloFilm + "\" in data " + vecchiaData);
         return false;
     }
 
     /**
-     * Elimina una proiezione dal palinsesto.
+     * c. Funzionalità di cancellazione di una proiezione
+     * Vincolo: A patto che NON ci siano prenotazioni per quella proiezione (posti disponibili deve essere 200)
      */
-    public boolean eliminaProiezione(List<Proiezione> palinsesto, String titoloFilm, String dataOraStr) {
-        try {
-            LocalDateTime dataOra = LocalDateTime.parse(dataOraStr, FORMATO_DATA_ORA);
+    public boolean eliminaProiezione(List<Proiezione> palinsesto, String titoloFilm, String dataStr, String oraStr) {
+        java.util.Iterator<Proiezione> iterator = palinsesto.iterator();
 
-            for (Proiezione p : palinsesto) {
+        while (iterator.hasNext()) {
+            Proiezione p = iterator.next();
+
+            if (p.getFilm().getTitolo().equalsIgnoreCase(titoloFilm) &&
+                    p.getDataProiezione().equals(dataStr) &&
+                    p.getOraProiezione().equals(oraStr)) {
+
+                // AGGIUNTO VINCOLO DA SPECIFICA: controllo prenotazioni esistenti
+                if (p.getPostiDisponibili() < 200) {
+                    System.out.println("❌ Errore: Impossibile eliminare. Ci sono già delle prenotazioni per questa proiezione!");
+                    return false;
+                }
+
+                iterator.remove();
+                System.out.println("✅ Proiezione eliminata con successo.");
+                return true;
             }
-        } catch (DateTimeParseException e) {
-            System.out.println("Errore: Formato data non valido.");
-            return false;
         }
 
-        System.out.println("Errore: Proiezione non trovata.");
+        System.out.println("❌ Errore: Nessuna proiezione trovata per il film \"" + titoloFilm + "\" in data " + dataStr);
         return false;
+    }
+
+    private String generaIdUnivocoProiezione(List<Proiezione> palinsesto) {
+        String caratteri = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        java.util.Random random = new java.util.Random();
+        String idGenerato = "";
+        boolean duplicato = true;
+
+        // Continua a rigenerare finché non ne trova uno veramente libero
+        while (duplicato) {
+            StringBuilder sb = new StringBuilder(8);
+            for (int i = 0; i < 8; i++) {
+                int index = random.nextInt(caratteri.length());
+                sb.append(caratteri.charAt(index));
+            }
+            idGenerato = sb.toString();
+
+            // Verifica se l'ID è già presente nella lista globale
+            duplicato = false;
+            for (Proiezione p : palinsesto) {
+                if (p.getIdProiezione().equalsIgnoreCase(idGenerato)) {
+                    duplicato = true; // Trovata collisione, il ciclo while continuerà
+                    break;
+                }
+            }
+        }
+
+        return idGenerato;
     }
 
     // ========================================================
@@ -88,89 +137,96 @@ public class Proiezionista extends Utente {
     @Override
     public void mostraMenu() {
         System.out.println("\n=== AREA PERSONALE PROIEZIONISTA: " + getNome().toUpperCase() + " ===");
-        System.out.println("1. Visualizza Palinsesto Completo");
-        System.out.println("2. Inserisci Nuova Proiezione");
-        System.out.println("3. Modifica Orario Proiezione");
-        System.out.println("4. Elimina Proiezione");
-        System.out.println("5. Logout");
+        System.out.println("1. Inserisci una nuova proiezione ");
+        System.out.println("2. Modifica data e ora di una proiezione");
+        System.out.println("3. Elimina una proiezione dal palinsesto");
+        System.out.println("4. Logout");
     }
 
-    /**
-     * Gestisce le azioni del menu (da invocare nel tuo Main Loop passandogli il palinsesto globale)
-     */
-    public void gestisciAzioni(int scelta, List<Proiezione> palinsesto) {
+    public void eseguiAzione(int scelta, List<Proiezione> palinsesto) {
         Scanner scanner = new Scanner(System.in);
 
         switch (scelta) {
             case 1:
-                System.out.println("\n--- PALINSESTO ATTUALE ---");
-                if (palinsesto.isEmpty()) {
-                    System.out.println("Il palinsesto è vuoto.");
-                } else {
-                    for (Proiezione p : palinsesto) {
-                        System.out.println(p); // Sfrutta il toString() di Proiezione
+                System.out.println("\n--- INSERIMENTO NUOVA PROIEZIONE ---");
+
+                // 1. GENERAZIONE AUTOMATICA DELL'ID A 8 CARATTERI (Privo di bug e controllato)
+                String id = generaIdUnivocoProiezione(palinsesto);
+                System.out.println("ID Proiezione generato automaticamente: " + id);
+
+                System.out.print("Data (aaaa-mm-gg): ");
+                String dataStr = scanner.nextLine().trim();
+                System.out.print("Ora (hh:mm): ");
+                String oraStr = scanner.nextLine().trim();
+
+                // Un piccolo controllo per evitare crash se l'utente sbaglia a digitare il prezzo
+                double prezzo = 0.0;
+                while (true) {
+                    System.out.print("Prezzo Biglietto (€): ");
+                    try {
+                        prezzo = Double.parseDouble(scanner.nextLine().trim());
+                        if (prezzo >= 0) break;
+                        System.out.println("❌ Il prezzo non può essere negativo.");
+                    } catch (NumberFormatException e) {
+                        System.out.println("❌ Errore: Inserisci un prezzo numerico valido (es. 7.50).");
                     }
                 }
-                break;
 
-            case 2:
-                System.out.println("\n--- INSERIMENTO NUOVA PROIEZIONE ---");
-                System.out.print("ID Proiezione univoco: ");
-                String id = scanner.nextLine();
-                System.out.print("Data e Ora (aaaa-mm-gg hh:mm): ");
-                String dataStr = scanner.nextLine();
-                System.out.print("Prezzo Biglietto (€): ");
-                double prezzo = Double.parseDouble(scanner.nextLine());
-
-                // Dati del Film associato
                 System.out.print("Titolo Film: ");
-                String titolo = scanner.nextLine();
+                String titolo = scanner.nextLine().trim();
                 System.out.print("Genere: ");
-                String genere = scanner.nextLine();
+                String genere = scanner.nextLine().trim();
                 System.out.print("Regista: ");
-                String regista = scanner.nextLine();
-                System.out.print("Anno di uscita: ");
-                int anno = Integer.parseInt(scanner.nextLine());
-                System.out.print("Durata (in minuti): ");
-                int durata = Integer.parseInt(scanner.nextLine());
-                System.out.print("Età minima consigliata: ");
-                int etaMin = Integer.parseInt(scanner.nextLine());
+                String regista = scanner.nextLine().trim();
 
+                // Gestione robusta per i numeri interi del film
+                int anno = 0, durata = 0, etaMin = 0;
                 try {
-                    String dataOra = dataStr;
-                    Film nuovoFilm = new Film(titolo, genere, regista, anno, durata, etaMin);
-                    Proiezione nuovaProiezione = new Proiezione(id, dataOra, prezzo, nuovoFilm);
-
-                    aggiungiProiezione(palinsesto, nuovaProiezione);
-                } catch (DateTimeParseException e) {
-                    System.out.println("Errore: Impossibile convertire la data. Operazione annullata.");
+                    System.out.print("Anno di uscita: ");
+                    anno = Integer.parseInt(scanner.nextLine().trim());
+                    System.out.print("Durata (in minuti): ");
+                    durata = Integer.parseInt(scanner.nextLine().trim());
+                    System.out.print("Età minima consigliata: ");
+                    etaMin = Integer.parseInt(scanner.nextLine().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("❌ Errore nei dati numerici del film. Impostati valori di default (0).");
                 }
+
+                Film nuovoFilm = new Film(titolo, genere, regista, anno, durata, etaMin);
+                Proiezione nuovaProiezione = new Proiezione(id, dataStr, oraStr, prezzo, nuovoFilm);
+
+                this.aggiungiProiezione(palinsesto, nuovaProiezione);
+                break;
+            case 2:
+                System.out.println("\n--- MODIFICA DATA E ORARIO PROIEZIONE ---");
+                System.out.print("Titolo del Film da modificare: ");
+                String tMod = scanner.nextLine().trim();
+                System.out.print("Vecchia Data (aaaa-mm-gg): ");
+                String vecchiaData = scanner.nextLine().trim();
+                System.out.print("Vecchia Ora (hh:mm): ");
+                String vecchiaOra = scanner.nextLine().trim();
+                System.out.print("Nuova Data (aaaa-mm-gg): ");
+                String nuovaData = scanner.nextLine().trim();
+                System.out.print("Nuova Ora (hh:mm): ");
+                String nuovaOra = scanner.nextLine().trim();
+
+                this.modificaProiezione(palinsesto, tMod, vecchiaData, vecchiaOra, nuovaData, nuovaOra);
                 break;
 
             case 3:
-                System.out.println("\n--- MODIFICA ORARIO PROIEZIONE ---");
-                System.out.print("Titolo del Film da modificare: ");
-                String tMod = scanner.nextLine();
-                System.out.print("Vecchia Data e Ora (aaaa-mm-gg hh:mm): ");
-                String vecchiaData = scanner.nextLine();
-                System.out.print("Nuova Data e Ora (aaaa-mm-gg hh:mm): ");
-                String nuovaData = scanner.nextLine();
+                System.out.println("\n--- ELIMINA PROIEZIONE ---");
+                System.out.print("Titolo del Film da eliminare: ");
+                String tElimina = scanner.nextLine().trim();
+                System.out.print("Data della proiezione (aaaa-mm-gg): ");
+                String dataElimina = scanner.nextLine().trim();
+                System.out.print("Ora della proiezione (hh:mm): ");
+                String oraElimina = scanner.nextLine().trim();
 
-                modificaProiezione(palinsesto, tMod, vecchiaData, nuovaData);
+                this.eliminaProiezione(palinsesto, tElimina, dataElimina, oraElimina);
                 break;
 
             case 4:
-                System.out.println("\n--- ELIMINA PROIEZIONE ---");
-                System.out.print("Titolo del Film da eliminare: ");
-                String tElimina = scanner.nextLine();
-                System.out.print("Data e Ora della proiezione (aaaa-mm-gg hh:mm): ");
-                String dataElimina = scanner.nextLine();
-
-                eliminaProiezione(palinsesto, tElimina, dataElimina);
-                break;
-
-            case 5:
-                System.out.println("Disconnessione in corso...");
+                System.out.println("Disconnessione proiezionista in corso...");
                 break;
 
             default:
@@ -178,3 +234,6 @@ public class Proiezionista extends Utente {
         }
     }
 }
+
+
+

@@ -1,5 +1,6 @@
 package cinemax;
 
+import cinemax.Users.Bigliettaio;
 import cinemax.Users.Cliente;
 import cinemax.Users.Proiezionista;
 import cinemax.Users.Utente;
@@ -11,8 +12,6 @@ import java.nio.file.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -22,17 +21,16 @@ public class FileManager {
     private static final String FILE_PALINSESTO = "palinsesto.csv";
     private static final String FILE_PRENOTAZIONI = "prenotazioni.csv";
     private static final String SEPARATORE = ",";
-    private static final DateTimeFormatter FORMATO_DATA_ORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     // ========================================================
-    // LENTURA E SCRITTURA UTENTI (Gestione del Polimorfismo)
+    // LETTURA E SCRITTURA UTENTI (Gestione del Polimorfismo)
     // ========================================================
 
     public static void salvaUtenti(List<Utente> utenti) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_UTENTI))) {
             for (Utente u : utenti) {
-                String tipo = u.getClass().getSimpleName().toUpperCase(); // CLIENTE, BIGLIETTAIO, ecc.
-                String dataNascitaStr = (u.getDataNascita() != null) ? u.getDataNascita().toString() : "null";
+                String tipo = u.getClass().getSimpleName().toUpperCase(); // CLIENTE, PROIEZIONISTA, BIGLIETTAIO
+                String dataNascitaStr = (u.getDataNascita() != null && !u.getDataNascita().trim().isEmpty()) ? u.getDataNascita() : "null";
 
                 String riga =  u.getNome()  + SEPARATORE +
                         u.getCognome()  + SEPARATORE +
@@ -40,7 +38,7 @@ public class FileManager {
                         u.getPasswordHash() + SEPARATORE +
                         dataNascitaStr + SEPARATORE +
                         u.getLuogoDomicilio() + SEPARATORE +
-                         tipo ;
+                        tipo;
                 writer.write(riga);
                 writer.newLine();
             }
@@ -58,22 +56,19 @@ public class FileManager {
                 if (riga.trim().isEmpty()) continue;
                 String[] token = riga.split(SEPARATORE);
 
-                // Lettura speculare a come hai salvato in salvaUtenti
-                String nome       = token[0];
-                String cognome    = token[1];
-                String username   = token[2];
-                String passHash   = token[3];
-                String dataNascita = token[4].equals("null") ? null : token[4]; // Rimane String
-                String domicilio  = token[5];
-                String tipo       = token[6];
+                String nome       = token[0].trim();
+                String cognome    = token[1].trim();
+                String username   = token[2].trim();
+                String passHash   = token[3].trim();
+                String dataNascita = token[4].trim().equals("null") ? null : token[4].trim();
+                String domicilio  = token[5].trim();
+                String tipo       = token[6].trim().toUpperCase();
 
-                // Ricostruiamo la sottoclasse esatta passando la String dataNascita
                 if (tipo.equals("CLIENTE")) {
                     utenti.add(new Cliente(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 } else if (tipo.equals("BIGLIETTAIO")) {
                     utenti.add(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 } else if (tipo.equals("PROIEZIONISTA")) {
-                    // Allineato l'ordine dei parametri (nome, cognome, username...) come gli altri
                     utenti.add(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 }
             }
@@ -82,7 +77,7 @@ public class FileManager {
     }
 
     // ========================================================
-    // LETTURA E SCRITTURA PALINSESTO (Mappa 200 Posti compressa)
+    // LETTURA E SCRITTURA PALINSESTO (Data e Ora Separate)
     // ========================================================
 
     public static void salvaPalinsesto(List<Proiezione> palinsesto) throws IOException {
@@ -90,13 +85,9 @@ public class FileManager {
             for (Proiezione p : palinsesto) {
                 Film f = p.getFilm();
 
-                // Dividiamo la stringa "yyyy-MM-dd HH:mm" in due parti
-                String dataOraCompleta = p.getDataOraProiezione();
-                String[] partiDataOra = dataOraCompleta.split(" ");
-                String soloData = partiDataOra[0];
-                String soloOra = partiDataOra[1];
+                String soloData = p.getDataProiezione();
+                String soloOra = p.getOraProiezione();
 
-                // Ora scriviamo soloData e soloOra come campi separati nel CSV
                 String riga = p.getIdProiezione() + SEPARATORE +
                         soloData + SEPARATORE +
                         soloOra + SEPARATORE +
@@ -125,39 +116,99 @@ public class FileManager {
                 if (riga.trim().isEmpty()) continue;
                 String[] token = riga.split(SEPARATORE);
 
-                // Recuperiamo data e ora separate dal file
-                String data = token[1];
-                String ora = token[2];
-                // Le uniamo di nuovo in un'unica stringa come richiesto dal costruttore di Proiezione
-                String dataOraRicostruita = data + " " + ora;
+                String idProiezione = token[0].trim();
+                String soloData     = token[1].trim();
+                String soloOra      = token[2].trim();
+                String titolo       = token[3].trim();
+                String genere       = token[4].trim();
+                String regista      = token[5].trim();
+                int anno            = Integer.parseInt(token[6].trim());
+                int durata          = Integer.parseInt(token[7].trim());
+                int etaMinima       = Integer.parseInt(token[8].trim());
+                double prezzo       = Double.parseDouble(token[9].trim());
+                int postiRimasti    = Integer.parseInt(token[10].trim());
 
-                // Gli indici del Film sono scalati di +1 perché ora data e ora occupano due colonne differenti
-                Film film = new Film(
-                        token[3], // titolo
-                        token[4], // genere
-                        token[5], // regista
-                        Integer.parseInt(token[6]), // anno
-                        Integer.parseInt(token[7]), // durata
-                        Integer.parseInt(token[8])  // eta minima
-                );
+                Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
 
-                Proiezione p = new Proiezione(
-                        token[0],                     // idProiezione
-                        dataOraRicostruita,           // dataOraProiezione (stringa unita)
-                        Double.parseDouble(token[9]), // prezzoBiglietto
-                        film
-                );
+                // Se hai implementato il secondo costruttore a 6 parametri che accetta i postiRimasti:
+                // Proiezione p = new Proiezione(idProiezione, soloData, soloOra, prezzo, film, postiRimasti);
 
-                int postiRimasti = Integer.parseInt(token[10]);
+                // Altrimenti usiamo il primo costruttore e aggiorniamo i posti subito dopo:
+                Proiezione p = new Proiezione(idProiezione, soloData, soloOra, prezzo, film);
                 p.setPostiDisponibili(postiRimasti);
 
-                // CORREZIONE: Aggiungiamo la proiezione 'p' alla lista del palinsesto, non il film
                 palinsesto.add(p);
             }
         }
         return palinsesto;
+    }
 
+    public static void salvaPrenotazioni(List<Prenotazione> prenotazioni) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_PRENOTAZIONI))) {
+            for (Prenotazione p : prenotazioni) {
+                // Ordine richiesto: id_Prenotazione, username_Cliente, id_Proiezione, numero_Posto, codice_Biglietto
+                String riga = p.getIdPrenotazione() + SEPARATORE +
+                        p.getUsernameCliente() + SEPARATORE +
+                        p.getFilmProiezione().getIdProiezione() + SEPARATORE +
+                        p.getNumeroPosto() + SEPARATORE +
+                        p.getCodiceBiglietto();
 
+                writer.write(riga);
+                writer.newLine();
+            }
+        }
+    }
+
+    /**
+     * Carica le prenotazioni dal file e le ricostruisce legandole agli oggetti Proiezione esistenti.
+     * Riceve il palinsesto per poter cercare la proiezione corretta tramite l'id_Proiezione.
+     */
+    public static List<Prenotazione> caricaPrenotazioni(List<Proiezione> palinsesto) throws IOException {
+        List<Prenotazione> prenotazioni = new ArrayList<>();
+        Path path = Paths.get(FILE_PRENOTAZIONI);
+        if (!Files.exists(path)) return prenotazioni;
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String riga;
+            while ((riga = reader.readLine()) != null) {
+                if (riga.trim().isEmpty()) continue;
+                String[] token = riga.split(SEPARATORE);
+
+                // Mappatura secondo l'ordine esatto del file
+                String idPrenotazione  = token[0].trim();
+                String usernameCliente = token[1].trim();
+                String idProiezione    = token[2].trim();
+                int numeroPosto        = Integer.parseInt(token[3].trim());
+                String codiceBiglietto = token[4].trim();
+
+                // COSTRUTTORE DI COLLEGAMENTO (Risoluzione del riferimento a Proiezione)
+                Proiezione proiezioneTrovata = null;
+                for (Proiezione proj : palinsesto) {
+                    if (proj.getIdProiezione().equalsIgnoreCase(idProiezione)) {
+                        proiezioneTrovata = proj;
+                        break;
+                    }
+                }
+
+                // Se la proiezione esiste ancora a palinsesto, ricostruiamo l'oggetto Prenotazione
+                if (proiezioneTrovata != null) {
+                    Prenotazione p = new Prenotazione(
+                            idPrenotazione,
+                            usernameCliente,
+                            proiezioneTrovata,
+                            codiceBiglietto,
+                            numeroPosto
+                    );
+                    prenotazioni.add(p);
+                }
+            }
+        }
+        return prenotazioni;
+    }
+
+    // ========================================================
+    // SICUREZZA & PASSWORD
+    // ========================================================
 
     public static String generaPasswordHash(String password) {
         try {
@@ -171,7 +222,10 @@ public class FileManager {
         }
     }
 
-    public boolean verificaPassword(String passwordDaVerificare) {
-        return Utente.getPasswordHash().equals(generaPasswordHash(passwordDaVerificare));
+    /**
+     * MODIFICATO: Aggiunto 'static' per consentire la chiamata diretta senza istanziare FileManager.
+     */
+    public static boolean verificaPassword(Utente utente, String passwordDaVerificare) {
+        return utente.getPasswordHash().equals(generaPasswordHash(passwordDaVerificare));
     }
 }

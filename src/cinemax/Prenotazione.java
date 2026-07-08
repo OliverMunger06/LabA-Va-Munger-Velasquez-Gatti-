@@ -82,10 +82,18 @@ public class Prenotazione {
         return "Film Non Disponibile";
     }
 
-    // Delegazione: Chiede la data alla proiezione e la formatta a dovere
-    public String getDataOraStr() {
-        if (filmProiezione != null && filmProiezione.getDataOraProiezione() != null) {
-            return filmProiezione.getDataOraProiezione();
+    // Delegazione: Chiede la DATA alla proiezione
+    public String getDataStr() {
+        if (filmProiezione != null && filmProiezione.getDataProiezione() != null) {
+            return filmProiezione.getDataProiezione();
+        }
+        return "N/D";
+    }
+
+    // Delegazione: Chiede l'ORA alla proiezione
+    public String getOraStr() {
+        if (filmProiezione != null && filmProiezione.getOraProiezione() != null) {
+            return filmProiezione.getOraProiezione();
         }
         return "N/D";
     }
@@ -97,9 +105,10 @@ public class Prenotazione {
     @Override
     public String toString() {
         return "Prenotazione ID: [" + idPrenotazione + "] | Utente: @" + usernameCliente +
-                "\n  Film: " + getTitoloFilm() +
-                "\n  Data/Ora: " + getDataOraStr() +
-                "\n  Posto Numero: " + (numeroPosto + 1) +
-                "\n  Codice QR: " + codiceBiglietto;
+                "\n  Film:        " + getTitoloFilm() +
+                "\n  Data:        " + getDataStr() +
+                "\n  Ora:         " + getOraStr() + " (Inizio spettacolo)" +
+                "\n  Posto Num:   " + numeroPosto +
+                "\n  Codice QR:   " + codiceBiglietto;
     }
 }
