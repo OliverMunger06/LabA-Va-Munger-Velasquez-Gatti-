@@ -1,48 +1,55 @@
 package cinemax;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 public class Proiezione {
-    private final String idProiezione;
-    private String dataOraProiezione;
-    private double prezzoBiglietto;
-    private Film film; // Il collegamento al film
+    // CAMPI
+    private final int idProiezione;
+    private String dataOraProiezione; // Unico campo stringa
+    private final double prezzoBiglietto;
+    private Film film;
     private int postiDisponibili = 200;
 
-    private static final DateTimeFormatter FORMATO_DATA_ORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-    public Proiezione(String idProiezione, String dataOraProiezione, double prezzoBiglietto, Film film) {
+    // COSTRUTTORE MODIFICATO: accetta data e ora separate
+    public Proiezione(int idProiezione, String data, String ora, double prezzoBiglietto, Film film) {
         this.idProiezione = idProiezione;
-        this.dataOraProiezione = dataOraProiezione;
+        // Uniamo data e ora in un'unica stringa (es. "2026-07-08 20:30")
+        this.dataOraProiezione = data + " " + ora;
         this.prezzoBiglietto = prezzoBiglietto;
         this.film = film;
     }
 
-
-
-
-    // Altri Getter
-    public String getIdProiezione() { return idProiezione; }
+    // METODI
+    public int getIdProiezione() { return idProiezione; }
     public String getDataOraProiezione() { return dataOraProiezione; }
     public double getPrezzoBiglietto() { return prezzoBiglietto; }
     public Film getFilm() { return film; }
     public int getPostiDisponibili() { return postiDisponibili; }
     public void setPostiDisponibili(int postiDisponibili) { this.postiDisponibili = postiDisponibili; }
-    public void setDataOraProiezione(String dataOraProiezione) { this.dataOraProiezione = dataOraProiezione;}
+
+    // Setter modificato per accettare data e ora separate se si vuole aggiornare
+    public void setDataOraProiezione(String data, String ora) {
+        this.dataOraProiezione = data + " " + ora;
+    }
+
+    // Se nel main vuoi riprendere SOLO la data o SOLO l'ora, usiamo lo split:
+    public String getData() {
+        return this.dataOraProiezione.split(" ")[0];
+    }
+
+    public String getOra() {
+        return this.dataOraProiezione.split(" ")[1];
+    }
 
     public boolean prenotaPosto() {
         if (this.postiDisponibili > 0) {
-            this.postiDisponibili--; // Un posto in meno
-            return true; // Prenotazione riuscita
+            this.postiDisponibili--;
+            return true;
         }
-        return false; // Sala piena
+        return false;
     }
-
 
     public void liberaPosto() {
         if (this.postiDisponibili < 200) {
-            this.postiDisponibili++; // Un posto in più
+            this.postiDisponibili++;
         }
     }
 }

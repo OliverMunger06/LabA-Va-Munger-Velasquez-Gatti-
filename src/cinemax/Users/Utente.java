@@ -22,7 +22,7 @@ public abstract class Utente {
     public Utente(String username, String passwordInChiaro, String nome, String cognome,
                   String dataNascita, String luogoDomicilio) {
         this.username = username;
-        this.passwordHash = FileManager.generaPasswordHash(passwordInChiaro);
+        this.passwordHash = passwordHash;
         this.nome = nome;
         this.cognome = cognome;
         this.dataNascita = dataNascita;

@@ -1,6 +1,5 @@
 package cinemax;
 
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class Prenotazione {
@@ -9,8 +8,6 @@ public class Prenotazione {
     private String idPrenotazione;
     private String codiceBiglietto;
     private int numeroPosto;
-
-    private static final DateTimeFormatter FORMATO_DATA_ORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     /**
      * COSTRUTTORE 1: Usato per il caricamento da FILE (FileManager).

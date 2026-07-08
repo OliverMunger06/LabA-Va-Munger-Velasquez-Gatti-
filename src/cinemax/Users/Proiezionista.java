@@ -3,7 +3,6 @@ package cinemax.Users;
 import cinemax.Proiezione;
 import cinemax.Film;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
