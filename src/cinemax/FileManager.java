@@ -57,7 +57,7 @@ public class FileManager {
                 String passHash = token[1];
                 String nome = token[2];
                 String cognome = token[3];
-                LocalDate dataNascita = token[4].equals("null") ? null : LocalDate.parse(token[4]);;
+                String dataNascita = token[4].equals("null") ? null : token[4];
                 String domicilio = token[5];
                 String tipo = token[6];
 

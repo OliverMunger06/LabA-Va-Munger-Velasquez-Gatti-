@@ -28,7 +28,7 @@ public abstract class Utente {
     }
 
     public Utente(String username, String passwordHash, String nome, String cognome,
-                  LocalDate dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
+                  String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
 
         this.username = username;
         this.passwordHash = passwordHash; // Viene assegnata direttamente dal file senza ricalcolare l'hash[cite: 1]

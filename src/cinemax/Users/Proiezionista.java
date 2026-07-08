@@ -16,7 +16,7 @@ public class Proiezionista extends Utente {
 
     // Costruttore coordinato con FileManager e la classe madre Utente
     public Proiezionista(String username, String passwordHash, String nome, String cognome,
-                         LocalDate dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
+                         String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
         super(username, passwordHash, nome, cognome, dataNascita, luogoDomicilio, isAlreadyHashed);
     }
 
@@ -45,8 +45,8 @@ public class Proiezionista extends Utente {
      */
     public boolean modificaProiezione(List<Proiezione> palinsesto, String titoloFilm, String vecchiaDataStr, String nuovaDataStr) {
         try {
-            LocalDateTime vecchiaData = LocalDateTime.parse(vecchiaDataStr, FORMATO_DATA_ORA);
-            LocalDateTime nuovaData = LocalDateTime.parse(nuovaDataStr, FORMATO_DATA_ORA);
+            String vecchiaData = vecchiaDataStr;
+            String nuovaData = nuovaDataStr;
 
             for (Proiezione p : palinsesto) {
                 if (p.getFilm().getTitolo().equalsIgnoreCase(titoloFilm) && p.getDataOraProiezione().equals(vecchiaData)) {
@@ -72,11 +72,6 @@ public class Proiezionista extends Utente {
             LocalDateTime dataOra = LocalDateTime.parse(dataOraStr, FORMATO_DATA_ORA);
 
             for (Proiezione p : palinsesto) {
-                if (p.getFilm().getTitolo().equalsIgnoreCase(titoloFilm) && p.getDataOraProiezione().equals(dataOra)) {
-                    palinsesto.remove(p);
-                    System.out.println("Proiezione eliminata dal palinsesto.");
-                    return true;
-                }
             }
         } catch (DateTimeParseException e) {
             System.out.println("Errore: Formato data non valido.");
@@ -143,7 +138,7 @@ public class Proiezionista extends Utente {
                 int etaMin = Integer.parseInt(scanner.nextLine());
 
                 try {
-                    LocalDateTime dataOra = LocalDateTime.parse(dataStr, FORMATO_DATA_ORA);
+                    String dataOra = dataStr;
                     Film nuovoFilm = new Film(titolo, genere, regista, anno, durata, etaMin);
                     Proiezione nuovaProiezione = new Proiezione(id, dataOra, prezzo, nuovoFilm);
 
