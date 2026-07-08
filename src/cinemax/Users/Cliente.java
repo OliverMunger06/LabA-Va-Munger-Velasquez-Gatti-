@@ -1,9 +1,9 @@
 package cinemax.Users;
 
 
-import cinemax.Prenotazione;
 import cinemax.Proiezione;
 import cinemax.Film;
+import cinemax.Prenotazione;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.List;
          * Prende la password in chiaro e la cifra attraverso il meccanismo della classe madre.
          */
         public Cliente(String username, String passwordInChiaro, String nome, String cognome,
-                       LocalDate dataNascita, String luogoDomicilio) {
+                       String dataNascita, String luogoDomicilio) {
             // super(...) chiama il costruttore della classe astratta Utente che effettua l'hashing
             super(username, passwordInChiaro, nome, cognome, dataNascita, luogoDomicilio);
         }
@@ -30,7 +30,7 @@ import java.util.List;
          * Prende la password che è GIÀ un hash memorizzato nel file, senza ricifrarla.
          */
         public Cliente(String username, String passwordHash, String nome, String cognome,
-                       LocalDate dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
+                       String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
             // Chiama un costruttore secondario di Utente (che memorizza l'hash direttamente)
             super(username, passwordHash, nome, cognome, dataNascita, luogoDomicilio, isAlreadyHashed);
         }
