@@ -4,6 +4,9 @@ import cinemax.Users.Cliente;
 import cinemax.Users.Proiezionista;
 import cinemax.Users.Utente;
 
+
+
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.io.*;
@@ -11,7 +14,6 @@ import java.nio.file.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -156,7 +158,7 @@ public class FileManager {
             }
         }
         return palinsesto;
-
+    }
 
 
     public static String generaPasswordHash(String password) {
