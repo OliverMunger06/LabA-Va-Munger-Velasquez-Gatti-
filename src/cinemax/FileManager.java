@@ -1,6 +1,7 @@
 package cinemax;
 
 import cinemax.Users.Cliente;
+import cinemax.Users.Proiezionista;
 import cinemax.Users.Utente;
 
 import java.io.*;
@@ -52,10 +53,10 @@ public class FileManager {
                 if (riga.trim().isEmpty()) continue;
                 String[] token = riga.split(SEPARATORE);
 
-                String nome = token[0];
-                String cognome = token[1];
-                String username = token[2];
-                String passHash = token[3];
+                String username = token[0];
+                String passHash = token[1];
+                String nome = token[2];
+                String cognome = token[3];
                 LocalDate dataNascita = token[4].equals("null") ? null : LocalDate.parse(token[4]);;
                 String domicilio = token[5];
                 String tipo = token[6];
@@ -66,7 +67,7 @@ public class FileManager {
                 } else if (tipo.equals("BIGLIETTAIO")) {
                     utenti.add(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio, true));
                 } else if (tipo.equals("PROIEZIONISTA")) {
-                    utenti.add(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                    utenti.add(new Proiezionista(username, passHash, nome, cognome, dataNascita, domicilio, true));
                 }
             }
         }
@@ -119,7 +120,7 @@ public class FileManager {
                         Integer.parseInt(token[7]) // eta minima
                 );
 
-                Proiezione proiezione = new Proiezione(
+                Proiezione p = new Proiezione(
                         token[0],                     // idProiezione (String)
                         token[1],                     // dataOraProiezione (String)
                         Double.parseDouble(token[8]), // prezzoBiglietto (double)
@@ -127,7 +128,7 @@ public class FileManager {
                 );
 
                 int postiRimasti = Integer.parseInt(token[9]);
-                proiezione.setPostiDisponibili(postiRimasti);
+                p.setPostiDisponibili(postiRimasti);
 
                 palinsesto.add(film);
             }

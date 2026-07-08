@@ -1,6 +1,7 @@
 package cinemax.Users;
 
 
+import cinemax.Prenotazione;
 import cinemax.Proiezione;
 import cinemax.Film;
 
