@@ -1,41 +1,58 @@
 package cinemax;
 
+import cinemax.Users.Utente;
+
 import java.util.UUID;
 
 public class Prenotazione {
-    private String usernameCliente;
-    private Proiezione filmProiezione;
     private String idPrenotazione;
-    private String codiceBiglietto;
-    private int numeroPosto;
+    private String nomeCliente;   // oliver
+    private String cognomeCliente;// Rossi (AGGIUNTO)
+    private String usernameCliente;// olly06
+    private String passwordHash;  // hnxuBQYpvUZ...
+    private Proiezione filmProiezione; // Gestito tramite ID P-C6014BBC
+    private int numeroPosto;      // 0
+    private String codiceBiglietto;// QR-7ECE8
+
 
     /**
-     * COSTRUTTORE 1: Usato per il caricamento da FILE (FileManager).
-     * Riceve già tutti i campi compilati e l'oggetto Proiezione reale.
+     * COSTRUTTORE 1: Usato dal FileManager per il caricamento da FILE CSV (Ora a 8 parametri)
      */
-    public Prenotazione(String idPrenotazione, String usernameCliente, Proiezione filmProiezione, String codiceBiglietto, int numeroPosto) {
+    public Prenotazione(String idPrenotazione, String nomeCliente, String cognomeCliente, String usernameCliente,
+                        String passwordHash, Proiezione filmProiezione, int numeroPosto, String codiceBiglietto) {
         this.idPrenotazione = idPrenotazione;
+        this.nomeCliente = nomeCliente;
+        this.cognomeCliente = cognomeCliente;
         this.usernameCliente = usernameCliente;
+        this.passwordHash = passwordHash;
         this.filmProiezione = filmProiezione;
+        setNumeroPosto(numeroPosto);
         this.codiceBiglietto = codiceBiglietto;
-        setNumeroPosto(numeroPosto); // Sfrutta il controllo di validità del setter
     }
 
     /**
-     * COSTRUTTORE 2: Usato quando un CLIENTE effettua una NUOVA prenotazione da terminale.
-     * Genera automaticamente gli ID e i codici QR.
+     * COSTRUTTORE 2: Usato quando un CLIENTE effettua una NUOVA prenotazione da terminale
      */
-    public Prenotazione(String usernameCliente, Proiezione proiezione) {
-        this.usernameCliente = usernameCliente;
-        this.filmProiezione = proiezione;
+    public Prenotazione(Utente cliente, Proiezione proiezione) {
         this.idPrenotazione = UUID.randomUUID().toString().substring(0, 8);
+        this.nomeCliente = cliente.getNome();
+        this.cognomeCliente = cliente.getCognome();
+        this.usernameCliente = cliente.getUsername();
+        this.passwordHash = cliente.getPasswordHash(); // Mantiene la persistenza dei dati utente nella prenotazione
+        this.filmProiezione = proiezione;
+        this.numeroPosto = 200 - proiezione.getPostiDisponibili();
         this.codiceBiglietto = "QR-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
-        this.numeroPosto = 0; // Posto di default (o gestito successivamente)
     }
 
     // ========================================================
     // GETTER E SETTER (Puliti e Coerenti)
     // ========================================================
+
+    public String getNomeCliente() { return nomeCliente; }
+
+    public String getCognomeCliente() { return cognomeCliente; }
+
+    public String getPasswordHash() { return passwordHash; }
 
     public String getUsernameCliente() {
         return this.usernameCliente;
@@ -104,11 +121,16 @@ public class Prenotazione {
 
     @Override
     public String toString() {
-        return "Prenotazione ID: [" + idPrenotazione + "] | Utente: @" + usernameCliente +
-                "\n  Film:        " + getTitoloFilm() +
-                "\n  Data:        " + getDataStr() +
-                "\n  Ora:         " + getOraStr() + " (Inizio spettacolo)" +
-                "\n  Posto Num:   " + numeroPosto +
-                "\n  Codice QR:   " + codiceBiglietto;
+        double prezzo = (filmProiezione != null) ? filmProiezione.getPrezzoBiglietto() : 0.0;
+
+        return " BIGLIETTO CINEMAX \n" +
+                "▪️ ID Prenotazione: " + idPrenotazione + "\n" +
+                "▪️ Codice QR:        " + codiceBiglietto + "\n" +
+                "▪️ Cliente:          " + nomeCliente + " " + cognomeCliente + " (@" + usernameCliente + ")\n" +
+                "▪️ Film:             " + getTitoloFilm() + "\n" +
+                "▪️ Data e Ora:       " + getDataStr() + " ore " + getOraStr() + "\n" +
+                "▪️ Biglietto N.:     " + numeroPosto + "\n" +
+                "▪️ Prezzo:           " + String.format("%.2f", prezzo) + " €\n" +
+                "---------------------------------------------";
     }
 }

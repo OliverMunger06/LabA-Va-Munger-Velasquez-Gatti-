@@ -13,10 +13,10 @@ public class Proiezionista extends Utente {
 
     private static final DateTimeFormatter FORMATO_DATA_ORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    // Costruttore coordinato con FileManager e la classe madre Utente
-    public Proiezionista(String username, String passwordHash, String nome, String cognome,
+    // 🔥 COSTRUTTORE CORRETTO: Allineato alla sequenza (nome, cognome, username...)
+    public Proiezionista(String nome, String cognome, String username, String passwordHash,
                          String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
-        super(username, passwordHash, nome, cognome, dataNascita, luogoDomicilio, isAlreadyHashed);
+        super(nome, cognome, username, passwordHash, dataNascita, luogoDomicilio, isAlreadyHashed);
     }
 
     // ========================================================
@@ -32,12 +32,12 @@ public class Proiezionista extends Utente {
             if (p.getDataProiezione().equals(nuovaProiezione.getDataProiezione()) &&
                     p.getOraProiezione().equals(nuovaProiezione.getOraProiezione())) {
 
-                System.out.println("❌ Errore: Esiste già una proiezione pianificata per questa data e orario!");
+                System.out.println(" Errore: Esiste già una proiezione pianificata per questa data e orario!");
                 return false;
             }
         }
         palinsesto.add(nuovaProiezione);
-        System.out.println("✅ Proiezione aggiunta con successo al palinsesto.");
+        System.out.println(" Proiezione aggiunta con successo al palinsesto.");
         return true;
     }
 
@@ -56,19 +56,19 @@ public class Proiezionista extends Utente {
 
                 // AGGIUNTO VINCOLO DA SPECIFICA: controllo prenotazioni esistenti
                 if (p.getPostiDisponibili() < 200) {
-                    System.out.println("❌ Errore: Impossibile modificare. Ci sono già delle prenotazioni per questa proiezione!");
+                    System.out.println(" Errore: Impossibile modificare. Ci sono già delle prenotazioni per questa proiezione!");
                     return false;
                 }
 
                 p.setDataProiezione(nuovaData);
                 p.setOraProiezione(nuovaOra);
 
-                System.out.println("✅ Data e orario della proiezione modificati con successo.");
+                System.out.println(" Data e orario della proiezione modificati con successo.");
                 return true;
             }
         }
 
-        System.out.println("❌ Errore: Nessuna proiezione trovata per il film \"" + titoloFilm + "\" in data " + vecchiaData);
+        System.out.println(" Errore: Nessuna proiezione trovata per il film \"" + titoloFilm + "\" in data " + vecchiaData);
         return false;
     }
 
@@ -88,17 +88,17 @@ public class Proiezionista extends Utente {
 
                 // AGGIUNTO VINCOLO DA SPECIFICA: controllo prenotazioni esistenti
                 if (p.getPostiDisponibili() < 200) {
-                    System.out.println("❌ Errore: Impossibile eliminare. Ci sono già delle prenotazioni per questa proiezione!");
+                    System.out.println(" Errore: Impossibile eliminare. Ci sono già delle prenotazioni per questa proiezione!");
                     return false;
                 }
 
                 iterator.remove();
-                System.out.println("✅ Proiezione eliminata con successo.");
+                System.out.println(" Proiezione eliminata con successo.");
                 return true;
             }
         }
 
-        System.out.println("❌ Errore: Nessuna proiezione trovata per il film \"" + titoloFilm + "\" in data " + dataStr);
+        System.out.println(" Errore: Nessuna proiezione trovata per il film \"" + titoloFilm + "\" in data " + dataStr);
         return false;
     }
 
@@ -150,25 +150,21 @@ public class Proiezionista extends Utente {
             case 1:
                 System.out.println("\n--- INSERIMENTO NUOVA PROIEZIONE ---");
 
-                // 1. GENERAZIONE AUTOMATICA DELL'ID A 8 CARATTERI (Privo di bug e controllato)
-                String id = generaIdUnivocoProiezione(palinsesto);
-                System.out.println("ID Proiezione generato automaticamente: " + id);
-
                 System.out.print("Data (aaaa-mm-gg): ");
                 String dataStr = scanner.nextLine().trim();
                 System.out.print("Ora (hh:mm): ");
                 String oraStr = scanner.nextLine().trim();
 
-                // Un piccolo controllo per evitare crash se l'utente sbaglia a digitare il prezzo
+                // Gestione robusta del prezzo del biglietto
                 double prezzo = 0.0;
                 while (true) {
                     System.out.print("Prezzo Biglietto (€): ");
                     try {
                         prezzo = Double.parseDouble(scanner.nextLine().trim());
                         if (prezzo >= 0) break;
-                        System.out.println("❌ Il prezzo non può essere negativo.");
+                        System.out.println(" Il prezzo non può essere negativo.");
                     } catch (NumberFormatException e) {
-                        System.out.println("❌ Errore: Inserisci un prezzo numerico valido (es. 7.50).");
+                        System.out.println(" Errore: Inserisci un prezzo numerico valido (es. 7.50).");
                     }
                 }
 
@@ -189,13 +185,17 @@ public class Proiezionista extends Utente {
                     System.out.print("Età minima consigliata: ");
                     etaMin = Integer.parseInt(scanner.nextLine().trim());
                 } catch (NumberFormatException e) {
-                    System.out.println("❌ Errore nei dati numerici del film. Impostati valori di default (0).");
+                    System.out.println(" Errore nei dati numerici del film. Impostati valori di default (0).");
                 }
 
                 Film nuovoFilm = new Film(titolo, genere, regista, anno, durata, etaMin);
-                Proiezione nuovaProiezione = new Proiezione(id, dataStr, oraStr, prezzo, nuovoFilm);
 
-                this.aggiungiProiezione(palinsesto, nuovaProiezione);
+                //  L'ID viene generato da solo internamente qui dentro!
+                Proiezione nuovaProiezione = new Proiezione(dataStr, oraStr, prezzo, nuovoFilm);
+
+                if (this.aggiungiProiezione(palinsesto, nuovaProiezione)) {
+                    System.out.println("ID Spettacolo assegnato dal sistema: " + nuovaProiezione.getIdProiezione());
+                }
                 break;
             case 2:
                 System.out.println("\n--- MODIFICA DATA E ORARIO PROIEZIONE ---");

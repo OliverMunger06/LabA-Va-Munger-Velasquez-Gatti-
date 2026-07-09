@@ -8,7 +8,6 @@ import java.util.List;
 
 public abstract class Utente {
     private String username;
-    // CORRETTO: rimosso 'static' altrimenti tutti gli utenti condividono la stessa password!
     private String passwordHash;
     private String nome;
     private String cognome;
@@ -16,35 +15,34 @@ public abstract class Utente {
     private String luogoDomicilio;
 
     /**
-     * COSTRUTTORE 1: Registrazione nuovo utente
+     * COSTRUTTORE 1: Registrazione nuovo utente (ALLINEATO AL FILE CSV)
      */
-    public Utente(String username, String passwordInChiaro, String nome, String cognome,
+    public Utente(String nome, String cognome, String username, String passwordInChiaro,
                   String dataNascita, String luogoDomicilio) {
-        this.username = username;
-        // CORRETTO: assegna il parametro corretto (se hai un metodo di hashing, usalo qui, es: FileManager.generaHash(passwordInChiaro))
-        this.passwordHash = passwordInChiaro;
         this.nome = nome;
         this.cognome = cognome;
+        this.username = username;
+        this.passwordHash = passwordInChiaro;
         this.dataNascita = dataNascita;
         this.luogoDomicilio = luogoDomicilio;
     }
 
     /**
-     * COSTRUTTORE 2: Caricamento da file CSV
+     * COSTRUTTORE 2: Caricamento da file CSV (ALLINEATO AL FILE CSV)
      */
-    public Utente(String username, String passwordHash, String nome, String cognome,
+    public Utente(String nome, String cognome, String username, String passwordHash,
                   String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
-        this.username = username;
-        this.passwordHash = passwordHash;
         this.nome = nome;
         this.cognome = cognome;
+        this.username = username;
+        this.passwordHash = passwordHash;
         this.dataNascita = dataNascita;
         this.luogoDomicilio = luogoDomicilio;
     }
 
     public abstract void mostraMenu();
 
-    // GETTER (Rimosso static da getPasswordHash)
+    // GETTER
     public String getUsername() { return username; }
     public String getNome() { return nome; }
     public String getCognome() { return cognome; }
@@ -53,12 +51,9 @@ public abstract class Utente {
     public String getPasswordHash() { return passwordHash; }
 
     // ========================================================================
-    // METODI STATICI CONDIVISI (Accessibili da Guest, Cliente, Bigliettaio)
+    // METODI STATICI CONDIVISI
     // ========================================================================
 
-    /**
-     * Funzionalità di ricerca filtri combinati (Specifica a)
-     */
     public static List<Proiezione> cercaProiezione(List<Proiezione> palinsesto,
                                                    String titolo, String genere,
                                                    LocalDate dataInizio, LocalDate dataFine,
@@ -68,17 +63,14 @@ public abstract class Utente {
         for (Proiezione p : palinsesto) {
             Film f = p.getFilm();
 
-            // 1. Filtro Titolo (parziale, case-insensitive e ignora i vuoti)
             if (titolo != null && !titolo.trim().isEmpty() && !f.getTitolo().toLowerCase().contains(titolo.toLowerCase())) {
                 continue;
             }
 
-            // 2. Filtro Tipologia / Genere
             if (genere != null && !genere.trim().isEmpty() && !f.getGenere().equalsIgnoreCase(genere)) {
                 continue;
             }
 
-            // 3. CORRETTO: Filtro date basato sui nuovi metodi ad hoc senza split manuali
             String dataStringa = p.getDataProiezione();
             if (dataStringa != null && !dataStringa.isEmpty()) {
                 LocalDate dataP = LocalDate.parse(dataStringa);
@@ -90,7 +82,6 @@ public abstract class Utente {
                 }
             }
 
-            // 4. Filtro Costo del Biglietto
             double prezzo = p.getPrezzoBiglietto();
             if (prezzoMin != null && prezzo < prezzoMin) {
                 continue;
@@ -105,9 +96,6 @@ public abstract class Utente {
         return risultati;
     }
 
-    /**
-     * Funzionalità di visualizzazione dettagliata (Specifica b)
-     */
     public static void visualizzaProiezione(Proiezione p) {
         Film f = p.getFilm();
         String data = p.getDataProiezione();

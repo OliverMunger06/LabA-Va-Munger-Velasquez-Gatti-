@@ -1,5 +1,7 @@
 package cinemax;
 
+import java.util.UUID;
+
 public class Proiezione {
     // CAMPI
     private final String idProiezione;
@@ -7,14 +9,15 @@ public class Proiezione {
     private String oraProiezione;
     private final double prezzoBiglietto;
     private Film film;
-    private int postiDisponibili; // Inizializzato dentro i singoli costruttori
+    private int postiDisponibili;
 
     /**
      * COSTRUTTORE 1: Usato dal Proiezionista (Crea un NUOVO spettacolo da zero)
-     * Imposta automaticamente i posti al massimo della capacità (200)
+     * Genera AUTOMATICAMENTE l'ID univoco e imposta i posti a 200
      */
-    public Proiezione(String idProiezione, String data, String ora, double prezzoBiglietto, Film film) {
-        this.idProiezione = idProiezione != null ? idProiezione.trim() : "";
+    public Proiezione(String data, String ora, double prezzoBiglietto, Film film) {
+        // Genera un ID compatto del tipo "P-A1B2C3D4"
+        this.idProiezione = "P-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         this.dataProiezione = data != null ? data.trim() : "";
         this.oraProiezione = ora != null ? ora.trim() : "";
         this.prezzoBiglietto = prezzoBiglietto;
@@ -24,7 +27,7 @@ public class Proiezione {
 
     /**
      * COSTRUTTORE 2: Usato dal FileManager (Ripristina uno spettacolo esistente da File)
-     * Accetta il numero di posti rimasti letto direttamente dal file CSV
+     * Accetta l'ID e il numero di posti rimasti letti direttamente dal file CSV
      */
     public Proiezione(String idProiezione, String data, String ora, double prezzoBiglietto, Film film, int postiDisponibili) {
         this.idProiezione = idProiezione != null ? idProiezione.trim() : "";
@@ -69,8 +72,13 @@ public class Proiezione {
 
     @Override
     public String toString() {
+        // 1. Definiamo le stringhe sicure controllando se l'oggetto film esiste
+        String titoloFilm = (film != null) ? film.getTitolo() : "Film non specificato";
+        String genereFilm = (film != null) ? film.getGenere() : "N/D";
+
+        // 2. Usiamo le variabili sicure nella stringa finale
         return "ID Proiezione: " + idProiezione +
-                "\nFilm: " + film.getTitolo() + " | Genere: " + film.getGenere() +
+                "\nFilm: " + titoloFilm + " | Genere: " + genereFilm +
                 "\nData: " + dataProiezione + " | Ora: " + oraProiezione +
                 "\nPrezzo: " + String.format("%.2f€", prezzoBiglietto) + " | Posti Liberi: " + postiDisponibili + "/200";
     }

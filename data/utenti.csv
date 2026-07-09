@@ -1,1 +1,7 @@
-nome,cognome,username,passwordhash,data_di_nascita,luogo_del_domicilio,ruolo
+Marco,Rossi,marco.pro,18uM6B4gGzMhUj9l1vW0bA==,12/04/1985,Milano,PROIEZIONISTA
+Luca,Bianchi,luca.pro,18uM6B4gGzMhUj9l1vW0bA==,23/08/1990,Varese,PROIEZIONISTA
+Anna,Verdi,anna.biglietti,18uM6B4gGzMhUj9l1vW0bA==,05/11/1995,Como,BIGLIETTAIO
+Sara,Neri,sara.biglietti,18uM6B4gGzMhUj9l1vW0bA==,19/02/1988,Gallarate,BIGLIETTAIO
+Paolo,Gialli,paolo.biglietti,18uM6B4gGzMhUj9l1vW0bA==,30/07/1992,Busto Arsizio,BIGLIETTAIO
+Elena,Russo,elena.biglietti,18uM6B4gGzMhUj9l1vW0bA==,14/01/1997,Varese,BIGLIETTAIO
+Giorgio,Viola,giorgio.biglietti,18uM6B4gGzMhUj9l1vW0bA==,25/05/1993,Legnano,BIGLIETTAIO
