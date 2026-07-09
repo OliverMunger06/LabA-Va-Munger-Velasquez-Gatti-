@@ -14,6 +14,9 @@ public abstract class Utente {
     private String dataNascita;
     private String luogoDomicilio;
 
+    protected static final java.time.format.DateTimeFormatter FMT_ITA =
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     /**
      * COSTRUTTORE 1: Registrazione nuovo utente (ALLINEATO AL FILE CSV)
      */
@@ -73,11 +76,18 @@ public abstract class Utente {
 
             String dataStringa = p.getDataProiezione();
             if (dataStringa != null && !dataStringa.isEmpty()) {
-                LocalDate dataP = LocalDate.parse(dataStringa);
-                if (dataInizio != null && dataP.isBefore(dataInizio)) {
-                    continue;
-                }
-                if (dataFine != null && dataP.isAfter(dataFine)) {
+                try {
+                    // Creiamo il formattatore italiano coerente con il CSV
+                    LocalDate dataP = LocalDate.parse(dataStringa, FMT_ITA);
+
+                    if (dataInizio != null && dataP.isBefore(dataInizio)) {
+                        continue;
+                    }
+                    if (dataFine != null && dataP.isAfter(dataFine)) {
+                        continue;
+                    }
+                } catch (java.time.format.DateTimeParseException e) {
+                    // Protezione contro eventuali stringhe corrotte nel palinsesto ("N/D")
                     continue;
                 }
             }

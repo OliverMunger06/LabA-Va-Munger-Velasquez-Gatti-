@@ -149,12 +149,12 @@ public class FileManager {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_PRENOTAZIONI), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
             for (Prenotazione p : prenotazioni) {
 
-                // ✅ Sfrutta i campi nativi interni senza fare cicli for superflui
+                //  Sfrutta i campi nativi interni senza fare cicli for superflui
                 String nome = (p.getNomeCliente() != null) ? p.getNomeCliente() : "N/D";
                 String cognome = (p.getCognomeCliente() != null) ? p.getCognomeCliente() : "N/D";
                 String passHash = (p.getPasswordHash() != null) ? p.getPasswordHash() : "N/D";
 
-                // ✅ Ordine coerente con lo standard a 8 colonne del file
+                //  Ordine coerente con lo standard a 8 colonne del file
                 String riga = p.getIdPrenotazione() + SEPARATORE +
                         nome + SEPARATORE +
                         cognome + SEPARATORE +
@@ -181,10 +181,10 @@ public class FileManager {
                 if (riga.trim().isEmpty()) continue;
                 String[] token = riga.split(SEPARATORE);
 
-                // ✅ Ora il controllo di sicurezza verifica la presenza di tutte e 8 le colonne
+                //  Ora il controllo di sicurezza verifica la presenza di tutte e 8 le colonne
                 if (token.length < 8) continue;
 
-                // ✅ Mappatura speculare degli indici basata sul salvataggio precedente
+                //  Mappatura speculare degli indici basata sul salvataggio precedente
                 String idPrenotazione  = token[0].trim();
                 String nomeCliente     = token[1].trim();
                 String cognomeCliente  = token[2].trim();
@@ -203,7 +203,7 @@ public class FileManager {
                 }
 
                 if (proiezioneTrovata != null) {
-                    // ✅ Invoca il Costruttore 1 di Prenotazione aggiornato a 8 parametri
+                    //  Invoca il Costruttore 1 di Prenotazione aggiornato a 8 parametri
                     Prenotazione p = new Prenotazione(
                             idPrenotazione,
                             nomeCliente,
@@ -241,3 +241,4 @@ public class FileManager {
         return utente.getPasswordHash().equals(generaPasswordHash(passwordDaVerificare));
     }
 }
+// password utenti già inseriti Cinema2026
