@@ -4,7 +4,6 @@ import cinemax.Users.Bigliettaio;
 import cinemax.Users.Cliente;
 import cinemax.Users.Proiezionista;
 import cinemax.Users.Utente;
-
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.io.*;
@@ -17,9 +16,12 @@ import java.util.Base64;
 import java.util.List;
 
 public class FileManager {
-    private static final String FILE_UTENTI = "data" + File.separator + "utenti.csv";
-    private static final String FILE_PALINSESTO = "data" + File.separator + "palinsesto.csv";
-    private static final String FILE_PRENOTAZIONI = "data" + File.separator + "prenotazioni.csv";
+    private static final String SEP = File.separator;
+    private static final String FILE_UTENTI = "." + SEP + "data" + SEP + "utenti.csv";
+    private static final String FILE_PALINSESTO ="." + SEP + "data" + SEP + "palinsesto.csv";
+    private static final String FILE_PRENOTAZIONI ="." + SEP + "data" + SEP + "prenotazioni.csv";
+    // costante definita cosi se la si vuola cambiare non bisogna cercare nel codice
+    private static final String CHIAVE_SEGRETA = "SaltSegretoCinema2026";
 
     private static final String SEPARATORE = ",";
 
@@ -56,25 +58,33 @@ public class FileManager {
             String riga;
             while ((riga = reader.readLine()) != null) {
                 if (riga.trim().isEmpty()) continue;
-                String[] token = riga.split(SEPARATORE);
+                String[] elementi = riga.split(SEPARATORE);
 
                 // Controllo di sicurezza per righe corrotte
-                if (token.length < 7) continue;
+                if (elementi.length < 7) continue;
 
-                String nome       = token[0].trim();
-                String cognome    = token[1].trim();
-                String username   = token[2].trim();
-                String passHash   = token[3].trim();
-                String dataNascita = token[4].trim().equals("N/D") ? null : token[4].trim();
-                String domicilio  = token[5].trim();
-                String tipo       = token[6].trim().toUpperCase();
+                String nome       = elementi[0].trim();
+                String cognome    = elementi[1].trim();
+                String username   = elementi[2].trim();
+                String passHash   = elementi[3].trim();
+                String dataNascita = elementi[4].trim().equals("N/D") ? null : elementi[4].trim();
+                String domicilio  = elementi[5].trim();
+                String tipo       = elementi[6].trim().toUpperCase();
 
-                if (tipo.equals("CLIENTE")) {
-                    utenti.add(new Cliente(nome, cognome, username, passHash, dataNascita, domicilio, true));
-                } else if (tipo.equals("BIGLIETTAIO")) {
-                    utenti.add(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio, true));
-                } else if (tipo.equals("PROIEZIONISTA")) {
-                    utenti.add(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                switch (tipo) {
+                    case "CLIENTE":
+                        utenti.add(new Cliente(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                        break;
+                    case "BIGLIETTAIO":
+                        utenti.add(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                        break;
+                    case "PROIEZIONISTA":
+                        utenti.add(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                        break;
+                    // serve se qualcuno modifica file utenti.csv o se il file si corrompe
+                    default:
+                        System.err.println("Ruolo sconosciuto saltato nel CSV: " + tipo);
+                        break;
                 }
             }
         }
@@ -116,21 +126,21 @@ public class FileManager {
             String riga;
             while ((riga = reader.readLine()) != null) {
                 if (riga.trim().isEmpty()) continue;
-                String[] token = riga.split(SEPARATORE);
+                String[] elementi = riga.split(SEPARATORE);
 
-                if (token.length < 11) continue;
+                if (elementi.length < 11) continue;
 
-                String idProiezione = token[0].trim();
-                String soloData     = token[1].trim();
-                String soloOra      = token[2].trim();
-                String titolo       = token[3].trim();
-                String genere       = token[4].trim();
-                String regista      = token[5].trim();
-                int anno            = Integer.parseInt(token[6].trim());
-                int durata          = Integer.parseInt(token[7].trim());
-                int etaMinima       = Integer.parseInt(token[8].trim());
-                double prezzo       = Double.parseDouble(token[9].trim());
-                int postiRimasti    = Integer.parseInt(token[10].trim());
+                String idProiezione = elementi[0].trim();
+                String soloData     = elementi[1].trim();
+                String soloOra      = elementi[2].trim();
+                String titolo       = elementi[3].trim();
+                String genere       = elementi[4].trim();
+                String regista      = elementi[5].trim();
+                int anno            = Integer.parseInt(elementi[6].trim());
+                int durata          = Integer.parseInt(elementi[7].trim());
+                int etaMinima       = Integer.parseInt(elementi[8].trim());
+                double prezzo       = Double.parseDouble(elementi[9].trim());
+                int postiRimasti    = Integer.parseInt(elementi[10].trim());
 
                 Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
                 Proiezione p = new Proiezione(idProiezione, soloData, soloOra, prezzo, film, postiRimasti);
@@ -179,20 +189,20 @@ public class FileManager {
             String riga;
             while ((riga = reader.readLine()) != null) {
                 if (riga.trim().isEmpty()) continue;
-                String[] token = riga.split(SEPARATORE);
+                String[] elementi = riga.split(SEPARATORE);
 
                 //  Ora il controllo di sicurezza verifica la presenza di tutte e 8 le colonne
-                if (token.length < 8) continue;
+                if (elementi.length < 8) continue;
 
                 //  Mappatura speculare degli indici basata sul salvataggio precedente
-                String idPrenotazione  = token[0].trim();
-                String nomeCliente     = token[1].trim();
-                String cognomeCliente  = token[2].trim();
-                String usernameCliente = token[3].trim();
-                String passwordHash    = token[4].trim();
-                String idProiezione    = token[5].trim();
-                int numeroPosto        = Integer.parseInt(token[6].trim());
-                String codiceBiglietto = token[7].trim();
+                String idPrenotazione  = elementi[0].trim();
+                String nomeCliente     = elementi[1].trim();
+                String cognomeCliente  = elementi[2].trim();
+                String usernameCliente = elementi[3].trim();
+                String passwordHash    = elementi[4].trim();
+                String idProiezione    = elementi[5].trim();
+                int numeroPosto        = Integer.parseInt(elementi[6].trim());
+                String codiceBiglietto = elementi[7].trim();
 
                 Proiezione proiezioneTrovata = null;
                 for (Proiezione proj : palinsesto) {
@@ -227,8 +237,8 @@ public class FileManager {
 
     public static String generaPasswordHash(String password) {
         try {
-            byte[] salt = "SaltSegretoCinema2026".getBytes();
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+            byte[] chiaveInByte = CHIAVE_SEGRETA.getBytes();
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), chiaveInByte, 65536, 128);
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             byte[] hash = factory.generateSecret(spec).getEncoded();
             return Base64.getEncoder().encodeToString(hash);
