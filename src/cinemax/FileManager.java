@@ -17,9 +17,9 @@ import java.util.Base64;
 import java.util.List;
 
 public class FileManager {
-    private static final String FILE_UTENTI = "data/utenti.csv";
-    private static final String FILE_PALINSESTO = "data/palinsesto.csv";
-    private static final String FILE_PRENOTAZIONI = "data/prenotazioni.csv";
+    private static final String FILE_UTENTI = "data" + File.separator + "utenti.csv";
+    private static final String FILE_PALINSESTO = "data" + File.separator + "palinsesto.csv";
+    private static final String FILE_PRENOTAZIONI = "data" + File.separator + "prenotazioni.csv";
 
     private static final String SEPARATORE = ",";
 
