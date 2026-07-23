@@ -14,6 +14,8 @@ import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 public class FileManager {
     private static final String SEP = File.separator;
@@ -21,7 +23,7 @@ public class FileManager {
     private static final String FILE_PALINSESTO ="." + SEP + "data" + SEP + "palinsesto.csv";
     private static final String FILE_PRENOTAZIONI ="." + SEP + "data" + SEP + "prenotazioni.csv";
     // costante definita cosi se la si vuola cambiare non bisogna cercare nel codice
-    private static final String CHIAVE_SEGRETA = "SaltSegretoCinema2026";
+    private static final String CHIAVE_SEGRETA = "c8f391b4a2e5d790f61284a37b9015e14d3f28e6c710a9f5d301b894e2a6c712";
 
     private static final String SEPARATORE = ",";
 
@@ -239,7 +241,7 @@ public class FileManager {
         try {
             byte[] chiaveInByte = CHIAVE_SEGRETA.getBytes();
             KeySpec spec = new PBEKeySpec(password.toCharArray(), chiaveInByte, 65536, 128);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256"); // Password-Based Key Derivation Function 2
             byte[] hash = factory.generateSecret(spec).getEncoded();
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -248,7 +250,17 @@ public class FileManager {
     }
 
     public static boolean verificaPassword(Utente utente, String passwordDaVerificare) {
-        return utente.getPasswordHash().equals(generaPasswordHash(passwordDaVerificare));
+        if (utente == null || utente.getPasswordHash() == null || passwordDaVerificare == null) {
+            return false;
+        }
+
+        String hashCalcolato = generaPasswordHash(passwordDaVerificare);
+
+        // Convertiamo in byte per il confronto a tempo costante
+        byte[] hashInDB = utente.getPasswordHash().getBytes(StandardCharsets.UTF_8);
+        byte[] hashGenerato = hashCalcolato.getBytes(StandardCharsets.UTF_8);
+
+        return MessageDigest.isEqual(hashInDB, hashGenerato);
     }
 }
 // password utenti già inseriti Cinema2026
