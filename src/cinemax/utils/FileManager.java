@@ -1,5 +1,8 @@
-package cinemax;
+package cinemax.utils;
 
+import cinemax.gestione.Film;
+import cinemax.gestione.Prenotazione;
+import cinemax.gestione.Proiezione;
 import cinemax.Users.Bigliettaio;
 import cinemax.Users.Cliente;
 import cinemax.Users.Proiezionista;

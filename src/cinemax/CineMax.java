@@ -5,9 +5,12 @@ import cinemax.Users.Bigliettaio;
 import cinemax.Users.Cliente;
 import cinemax.Users.Proiezionista;
 import cinemax.Users.Utente;
+import cinemax.utils.FileManager;
+import cinemax.gestione.Film;
+import cinemax.gestione.Prenotazione;
+import cinemax.gestione.Proiezione;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 

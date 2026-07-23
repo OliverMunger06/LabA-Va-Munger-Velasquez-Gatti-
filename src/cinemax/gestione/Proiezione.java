@@ -1,4 +1,4 @@
-package cinemax;
+package cinemax.gestione;
 
 import java.util.UUID;
 

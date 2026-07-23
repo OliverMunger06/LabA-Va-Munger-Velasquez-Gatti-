@@ -1,7 +1,7 @@
 package cinemax.Users;
 
-import cinemax.Proiezione;
-import cinemax.Film;
+import cinemax.gestione.Proiezione;
+import cinemax.gestione.Film;
 import java.util.List;
 import java.util.Scanner;
 

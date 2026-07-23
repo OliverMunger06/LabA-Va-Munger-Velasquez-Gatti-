@@ -1,12 +1,11 @@
 package cinemax.Users;
 
-import cinemax.FileManager;
-import cinemax.Proiezione;
-import cinemax.Film;
-import cinemax.Prenotazione;
+import cinemax.utils.FileManager;
+import cinemax.gestione.Proiezione;
+import cinemax.gestione.Film;
+import cinemax.gestione.Prenotazione;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;

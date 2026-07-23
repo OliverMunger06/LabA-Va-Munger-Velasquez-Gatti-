@@ -1,4 +1,4 @@
-package cinemax;
+package cinemax.gestione;
 
 import cinemax.Users.Utente;
 
