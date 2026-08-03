@@ -46,7 +46,7 @@ public class FileManager {
     /** Percorso relativo del file CSV delle prenotazioni. */
     private static final String FILE_PRENOTAZIONI = "." + SEP + "data" + SEP + "prenotazioni.csv";
 
-    /** Chiave segreta/Salt utilizzata per l'algoritmo di hashing delle password. */
+    /** Chiave segreta utilizzata per l'algoritmo di hashing delle password. */
     private static final String CHIAVE_SEGRETA = "c8f391b4a2e5d790f61284a37b9015e14d3f28e6c710a9f5d301b894e2a6c712";
 
     /** Separatore standard utilizzato per i file CSV. */
@@ -128,11 +128,11 @@ public class FileManager {
 
                     switch (tipo) {
                         case "CLIENTE":
-                            return Optional.of(new Cliente(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                            return Optional.of(new Cliente(nome, cognome, username, passHash, dataNascita, domicilio));
                         case "BIGLIETTAIO":
-                            return Optional.of(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                            return Optional.of(new Bigliettaio(nome, cognome, username, passHash, dataNascita, domicilio));
                         case "PROIEZIONISTA":
-                            return Optional.of(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio, true));
+                            return Optional.of(new Proiezionista(nome, cognome, username, passHash, dataNascita, domicilio));
                         default:
                             System.err.println("Ruolo sconosciuto saltato nel CSV: " + tipo);
                             return Optional.empty();
@@ -143,6 +143,58 @@ public class FileManager {
         return Optional.empty();
     }
 
+    /**
+     * Verifica se un determinato username è già presente all'interno del file CSV degli utenti.
+     * <p>
+     * La lettura viene effettuata "al volo" riga per riga per massimizzare le prestazioni:
+     * se l'username viene trovato, il flusso di lettura si interrompe immediatamente.
+     * </p>
+     *
+     * @param usernameDaCercare l'username di cui verificare la presenza
+     * @return {@code true} se l'username è già registrato,
+     *         {@code false} se è disponibile o se il file non esiste/non è leggibile
+     */
+    public static boolean isUsernameEsistenteSuFile(String usernameDaCercare) {
+        if (usernameDaCercare == null || usernameDaCercare.trim().isEmpty()) {
+            return false;
+        }
+
+        Path path = Paths.get(FILE_UTENTI);
+
+        // Se il file non esiste ancora (es. primo avvio dell'app), l'username è libero
+        if (!Files.exists(path)) {
+            return false;
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String riga;
+            while ((riga = reader.readLine()) != null) {
+                if (riga.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] campi = riga.split(SEPARATORE);
+                if (campi.length > 2) {
+                    String usernameNelFile = campi[2].trim();
+
+                    // Interrompe la lettura e restituisce true al primo match trovato
+                    if (usernameNelFile.equalsIgnoreCase(usernameDaCercare.trim())) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Errore durante la lettura del file utenti: " + e.getMessage());
+            return false;
+        }
+
+        return false; // Scansionato tutto il file senza trovare corrispondenze
+    }
+
+
+
+
+
     // ========================================================
     // LETTURA E SCRITTURA PALINSESTO (Preservazione ID e Posti)
     // ========================================================
@@ -151,9 +203,13 @@ public class FileManager {
      * Salva una nuova {@link Proiezione} accodandola nel file CSV del palinsesto.
      *
      * @param p La proiezione da salvare.
-     * @throws IOException Se si verifica un errore durante la scrittura su file.
+     * @return {@code true} se la proiezione è stata salvata con successo, {@code false} in caso di errore I/O.
      */
-    public static void salvaProiezione(Proiezione p) throws IOException {
+    public static boolean salvaProiezione(Proiezione p) {
+        if (p == null || p.getFilm() == null) {
+            return false;
+        }
+
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_PALINSESTO),
                 StandardOpenOption.CREATE,
                 StandardOpenOption.APPEND)) {
@@ -174,62 +230,212 @@ public class FileManager {
 
             writer.write(riga);
             writer.newLine();
+            return true;
+
+        } catch (IOException e) {
+            System.err.println("Errore durante il salvataggio della proiezione su file: " + e.getMessage());
+            return false;
         }
     }
 
     /**
-     * Ricerca e carica una {@link Proiezione} specifica dal file del palinsesto mediante il suo ID.
+     * Carica l'intero palinsesto delle proiezioni dal file CSV.
+     * <p>
+     * In caso di righe malformate o con errori nel formato numerico, la singola
+     * riga viene ignorata per non compromettere il caricamento delle altre proiezioni.
+     * </p>
      *
-     * @param idCercato L'identificatore unico della proiezione da cercare.
-     * @return Un {@link Optional} contenente la {@link Proiezione} trovata, o vuoto in caso contrario.
-     * @throws IOException Se si verifica un errore di I/O.
+     * @return Una {@link List} contenente tutte le {@link Proiezione} caricate da file.
+     *         Restituisce una lista vuota se il file non esiste o non contiene proiezioni valide.
+     * @throws IOException Se si verifica un errore durante la lettura del file.
      */
-    public static Optional<Proiezione> caricaProiezionePerId(String idCercato) throws IOException {
+    public static List<Proiezione> caricaPalinsesto() throws IOException {
+        List<Proiezione> palinsesto = new ArrayList<>();
         Path path = Paths.get(FILE_PALINSESTO);
-        if (!Files.exists(path)) return Optional.empty();
+
+        // Se il file non esiste ancora, restituisce una lista vuota
+        if (!Files.exists(path)) {
+            return palinsesto;
+        }
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String riga;
             while ((riga = reader.readLine()) != null) {
                 if (riga.trim().isEmpty()) continue;
-                String[] elementi = riga.split(SEPARATORE);
 
+                String[] elementi = riga.split(SEPARATORE);
                 if (elementi.length < 11) continue;
 
                 String idProiezione = elementi[0].trim();
+                String soloData     = elementi[1].trim();
+                String soloOra      = elementi[2].trim();
+                String titolo       = elementi[3].trim();
+                String genere       = elementi[4].trim();
+                String regista      = elementi[5].trim();
 
-                // Verifichiamo subito se l'ID corrisponde
-                if (idProiezione.equals(idCercato.trim())) {
-                    String soloData  = elementi[1].trim();
-                    String soloOra   = elementi[2].trim();
-                    String titolo    = elementi[3].trim();
-                    String genere    = elementi[4].trim();
-                    String regista   = elementi[5].trim();
+                try {
+                    int anno         = Integer.parseInt(elementi[6].trim());
+                    int durata       = Integer.parseInt(elementi[7].trim());
+                    int etaMinima    = Integer.parseInt(elementi[8].trim());
+                    double prezzo    = Double.parseDouble(elementi[9].trim());
+                    int postiRimasti = Integer.parseInt(elementi[10].trim());
 
-                    try {
-                        int anno         = Integer.parseInt(elementi[6].trim());
-                        int durata       = Integer.parseInt(elementi[7].trim());
-                        int etaMinima    = Integer.parseInt(elementi[8].trim());
-                        double prezzo    = Double.parseDouble(elementi[9].trim());
-                        int postiRimasti = Integer.parseInt(elementi[10].trim());
+                    Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
+                    Proiezione p = new Proiezione(idProiezione, soloData, soloOra, prezzo, film, postiRimasti);
 
-                        Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
-                        Proiezione p = new Proiezione(idProiezione, soloData, soloOra, prezzo, film, postiRimasti);
+                    // Aggiungiamo la proiezione alla lista anziché fare il return immediato
+                    palinsesto.add(p);
 
-                        return Optional.of(p); // Trovata! La restituiamo ed usciamo subito dal ciclo
-                    } catch (NumberFormatException e) {
-                        System.err.println("Errore nel formato numerico della proiezione ID " + idProiezione + ": " + e.getMessage());
-                        return Optional.empty();
-                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("Errore nel formato numerico della proiezione ID " + idProiezione + ": " + e.getMessage());
+                    // Non interrompiamo il ciclo: continuiamo a leggere le altre proiezioni valide
                 }
             }
         }
-        return Optional.empty(); // Nessuna proiezione trovata con questo ID
+
+        return palinsesto;
     }
 
-    // ========================================================
-    // LETTURA E SCRITTURA PRENOTAZIONI (Sincronizzato a 7 Campi)
-    // ========================================================
+    /**
+     * Modifica la data e l'ora di una proiezione nel file CSV.
+     * <p>
+     * La modifica è consentita solo se la sala è completamente vuota (200 posti disponibili).
+     * </p>
+     *
+     * @param titoloFilm  Il titolo del film proiettato.
+     * @param vecchiaData La data corrente dello spettacolo (gg/mm/aaaa).
+     * @param vecchiaOra  L'orario corrente dello spettacolo (hh:mm).
+     * @param nuovaData   La nuova data da assegnare.
+     * @param nuovaOra    Il nuovo orario da assegnare.
+     * @return {@code true} se la modifica è avvenuta con successo, {@code false} se ci sono prenotazioni o se la proiezione non esiste.
+     */
+    public static boolean modificaProiezione(String titoloFilm, String vecchiaData, String vecchiaOra,
+                                             String nuovaData, String nuovaOra) {
+        Path path = Paths.get(FILE_PALINSESTO);
+        if (!Files.exists(path)) {
+            System.err.println("Errore: Il file del palinsesto non esiste.");
+            return false;
+        }
+
+        boolean modificato = false;
+
+        try {
+            List<String> righe = Files.readAllLines(path);
+            List<String> nuoveRighe = new ArrayList<>();
+
+            for (String riga : righe) {
+                if (riga.trim().isEmpty()) continue;
+
+                String[] elementi = riga.split(SEPARATORE);
+                // Struttura attesa: ID, Data, Ora, Titolo, Genere, Regista, Anno, Durata, EtaMin, Prezzo, Posti
+                if (elementi.length >= 11) {
+                    String dataCorrente = elementi[1];
+                    String oraCorrente = elementi[2];
+                    String titoloCorrente = elementi[3];
+                    int postiDisponibili = Integer.parseInt(elementi[10]);
+
+                    if (titoloCorrente.equalsIgnoreCase(titoloFilm) &&
+                            dataCorrente.equals(vecchiaData) &&
+                            oraCorrente.equals(vecchiaOra)) {
+
+                        if (postiDisponibili < 200) {
+                            System.out.println("  Errore: Impossibile modificare. Ci sono già delle prenotazioni!");
+                            return false; // Interrompe subito l'operazione
+                        }
+
+                        // Aggiorna data e ora nella riga
+                        elementi[1] = nuovaData;
+                        elementi[2] = nuovaOra;
+                        riga = String.join(SEPARATORE, elementi);
+                        modificato = true;
+                    }
+                }
+                nuoveRighe.add(riga);
+            }
+
+            if (modificato) {
+                Files.write(path, nuoveRighe);
+                return true;
+            } else {
+                System.out.println("  Errore: Nessuna proiezione trovata con i parametri specificati.");
+                return false;
+            }
+
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Errore durante la modifica della proiezione: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Rimuove una proiezione dal file CSV del palinsesto.
+     * <p>
+     * L'eliminazione è consentita solo se non vi sono prenotazioni effettuate per tale spettacolo (200 posti disponibili).
+     * </p>
+     *
+     * @param titoloFilm Il titolo del film da eliminare.
+     * @param dataStr    La data della proiezione (gg/mm/aaaa).
+     * @param oraStr     L'orario della proiezione (hh:mm).
+     * @return {@code true} se la proiezione è stata eliminata, {@code false} se vi sono prenotazioni attive o se la proiezione non è stata trovata.
+     */
+    public static boolean eliminaProiezione(String titoloFilm, String dataStr, String oraStr) {
+        Path path = Paths.get(FILE_PALINSESTO);
+        if (!Files.exists(path)) {
+            System.err.println("Errore: Il file del palinsesto non esiste.");
+            return false;
+        }
+
+        boolean eliminato = false;
+
+        try {
+            List<String> righe = Files.readAllLines(path);
+            List<String> nuoveRighe = new ArrayList<>();
+
+            for (String riga : righe) {
+                if (riga.trim().isEmpty()) continue;
+
+                String[] elementi = riga.split(SEPARATORE);
+                if (elementi.length >= 11) {
+                    String dataCorrente = elementi[1];
+                    String oraCorrente = elementi[2];
+                    String titoloCorrente = elementi[3];
+                    int postiDisponibili = Integer.parseInt(elementi[10]);
+
+                    if (titoloCorrente.equalsIgnoreCase(titoloFilm) &&
+                            dataCorrente.equals(dataStr) &&
+                            oraCorrente.equals(oraStr)) {
+
+                        if (postiDisponibili < 200) {
+                            System.out.println("  Errore: Impossibile eliminare. Ci sono già delle prenotazioni!");
+                            return false; // Interrompe l'operazione
+                        }
+
+                        // Se i posti sono 200, segna come eliminato e NON aggiunge la riga
+                        eliminato = true;
+                        continue;
+                    }
+                }
+                nuoveRighe.add(riga);
+            }
+
+            if (eliminato) {
+                Files.write(path, nuoveRighe);
+                return true;
+            } else {
+                System.out.println("  Errore: Nessuna proiezione trovata con i parametri specificati.");
+                return false;
+            }
+
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Errore durante l'eliminazione della proiezione: " + e.getMessage());
+            return false;
+        }
+    }
+
+
+// ========================================================
+// LETTURA E SCRITTURA PRENOTAZIONI (Sincronizzato a 7 Campi)
+// ========================================================
 
     /**
      * Salva una singola prenotazione accodandola in fondo al file CSV.
@@ -267,63 +473,74 @@ public class FileManager {
         }
     }
 
+
     /**
-     * Cerca e carica una singola prenotazione dal file CSV tramite il suo ID.
+     * Legge dal file CSV tutte le prenotazioni registrate e le ricostruisce
+     * collegando ciascuna alla rispettiva proiezione presente nel palinsesto.
      *
-     * @param idPrenotazione L'ID unico della prenotazione da cercare.
-     * @param palinsesto Il palinsesto delle proiezioni per riassociare l'oggetto Proiezione.
-     * @return L'oggetto {@link Prenotazione} se trovato, {@code null} altrimenti.
+     * @param palinsesto La lista delle proiezioni disponibili usata per associare la proiezione corretta.
+     * @return Una {@link List} contenente tutte le prenotazioni caricate da file.
      * @throws IOException Se si verifica un errore durante la lettura del file.
      */
-    public static Prenotazione caricaPrenotazioneDaId(String idPrenotazione, List<Proiezione> palinsesto) throws IOException {
+    public static List<Prenotazione> caricaPrenotazioni(List<Proiezione> palinsesto) throws IOException {
+        List<Prenotazione> listaPrenotazioni = new ArrayList<>();
         Path path = Paths.get(FILE_PRENOTAZIONI);
-        if (!Files.exists(path) || idPrenotazione == null) return null;
+
+        if (!Files.exists(path) || palinsesto == null || palinsesto.isEmpty()) {
+            return listaPrenotazioni; // Restituisce lista vuota se il file o il palinsesto non sono validi
+        }
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String riga;
             while ((riga = reader.readLine()) != null) {
                 if (riga.trim().isEmpty()) continue;
-                String[] elementi = riga.split(SEPARATORE);
 
+                String[] elementi = riga.split(SEPARATORE);
                 if (elementi.length < 8) continue;
 
-                String idLetto = elementi[0].trim();
+                String idLetto         = elementi[0].trim();
+                String nomeCliente     = elementi[1].trim();
+                String cognomeCliente  = elementi[2].trim();
+                String usernameCliente = elementi[3].trim();
+                String passwordHash    = elementi[4].trim();
+                String idProiezione    = elementi[5].trim();
 
-                // Confronta l'ID del file con quello cercato
-                if (idLetto.equalsIgnoreCase(idPrenotazione.trim())) {
-                    String nomeCliente     = elementi[1].trim();
-                    String cognomeCliente  = elementi[2].trim();
-                    String usernameCliente = elementi[3].trim();
-                    String passwordHash    = elementi[4].trim();
-                    String idProiezione    = elementi[5].trim();
-                    int numeroPosto        = Integer.parseInt(elementi[6].trim());
-                    String codiceBiglietto = elementi[7].trim();
+                int numeroPosto;
+                try {
+                    numeroPosto = Integer.parseInt(elementi[6].trim());
+                } catch (NumberFormatException e) {
+                    continue; // Salta righe con numero posto corrotto
+                }
 
-                    // Cerca la proiezione corrispondente nel palinsesto
-                    Proiezione proiezioneTrovata = null;
-                    for (Proiezione proj : palinsesto) {
-                        if (proj.getIdProiezione().equalsIgnoreCase(idProiezione)) {
-                            proiezioneTrovata = proj;
-                            break;
-                        }
+                String codiceBiglietto = elementi[7].trim();
+
+                // Cerca la proiezione corrispondente nel palinsesto
+                Proiezione proiezioneTrovata = null;
+                for (Proiezione proj : palinsesto) {
+                    if (proj.getIdProiezione().equalsIgnoreCase(idProiezione)) {
+                        proiezioneTrovata = proj;
+                        break;
                     }
+                }
 
-                    if (proiezioneTrovata != null) {
-                        return new Prenotazione(
-                                idLetto,
-                                nomeCliente,
-                                cognomeCliente,
-                                usernameCliente,
-                                passwordHash,
-                                proiezioneTrovata,
-                                numeroPosto,
-                                codiceBiglietto
-                        );
-                    }
+                // Se la proiezione esiste nel palinsesto, istanzia la prenotazione e la aggiunge alla lista
+                if (proiezioneTrovata != null) {
+                    Prenotazione pren = new Prenotazione(
+                            idLetto,
+                            nomeCliente,
+                            cognomeCliente,
+                            usernameCliente,
+                            passwordHash,
+                            proiezioneTrovata,
+                            numeroPosto,
+                            codiceBiglietto
+                    );
+                    listaPrenotazioni.add(pren);
                 }
             }
         }
-        return null; // Restituisce null se la prenotazione non viene trovata
+
+        return listaPrenotazioni;
     }
 
     /**
@@ -357,15 +574,15 @@ public class FileManager {
                     continue;
                 }
 
-                String[] campi = riga.split(";");
-                if (campi.length >= 3) {
-                    String id = campi[0].trim();
-                    String user = campi[1].trim();
+                String[] elementi = riga.split(SEPARATORE);
+                if (elementi.length >= 6) { // Verifichiamo di avere abbastanza elementi
+                    String id = elementi[0].trim();
+                    String user = elementi[3].trim(); // Indice 3 = usernameCliente nel formato standard
 
                     // Se trovi la riga corrispondente all'ID e all'Utente
-                    if (id.equals(idPrenotazione) && user.equalsIgnoreCase(usernameUtente)) {
-                        campi[2] = idNuovaProiezione; // Aggiorna l'ID proiezione
-                        riga = String.join(";", campi);
+                    if (id.equalsIgnoreCase(idPrenotazione.trim()) && user.equalsIgnoreCase(usernameUtente.trim())) {
+                        elementi[5] = idNuovaProiezione; // Indice 5 = idProiezione nel formato standard
+                        riga = String.join(SEPARATORE, elementi);
                         trovato = true;
                     }
                 }
@@ -433,16 +650,16 @@ public class FileManager {
                     continue;
                 }
 
-                String[] campi = riga.split(";");
+                String[] elementi = riga.split(SEPARATORE);
 
-                if (campi.length >= 8) {
-                    String idPrenotazione = campi[0].trim();
-                    String nome = campi[1].trim();
-                    String cognome = campi[2].trim();
-                    String username = campi[3].trim();
-                    String idProiezione = campi[5].trim();
-                    String numeroPosto = campi[6].trim();
-                    String codiceBiglietto = campi[7].trim();
+                if (elementi.length >= 8) {
+                    String idPrenotazione = elementi[0].trim();
+                    String nome = elementi[1].trim();
+                    String cognome = elementi[2].trim();
+                    String username = elementi[3].trim();
+                    String idProiezione = elementi[5].trim();
+                    String numeroPosto = elementi[6].trim();
+                    String codiceBiglietto = elementi[7].trim();
 
                     // Verifica se la prenotazione appartiene all'utente specificato
                     if (username.equalsIgnoreCase(usernameUtente)) {
@@ -457,12 +674,12 @@ public class FileManager {
                         System.out.println("  ▪️ Posto N.        : " + numeroPosto);
                         System.out.println(" ----------------------------------------------");
                     }
-                } else if (campi.length >= 4) {
+                } else if (elementi.length >= 4) {
                     // Formato fallback semplificato
-                    String idPrenotazione = campi[0].trim();
-                    String username = campi[1].trim();
-                    String idProiezione = campi[2].trim();
-                    String codiceBiglietto = campi[3].trim();
+                    String idPrenotazione = elementi[0].trim();
+                    String username = elementi[1].trim();
+                    String idProiezione = elementi[2].trim();
+                    String codiceBiglietto = elementi[3].trim();
 
                     if (username.equalsIgnoreCase(usernameUtente)) {
                         contatore++;
@@ -519,21 +736,21 @@ public class FileManager {
                     continue;
                 }
 
-                String[] campi = riga.split(";");
+                String[] elementi = riga.split(SEPARATORE);
 
-                // Verifica formato completo (8 campi) o ridotto
-                if (campi.length >= 8) {
-                    String id = campi[0].trim();
-                    String username = campi[3].trim(); // Indice 3 = usernameCliente
+                // Verifica formato completo (8 elementi) o ridotto
+                if (elementi.length >= 8) {
+                    String id = elementi[0].trim();
+                    String username = elementi[3].trim(); // Indice 3 = usernameCliente
 
                     if (id.equalsIgnoreCase(idPrenotazione) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;
                         continue; // Salta la scrittura sul file temp
                     }
-                } else if (campi.length >= 4) {
+                } else if (elementi.length >= 4) {
                     // Formato fallback
-                    String id = campi[0].trim();
-                    String username = campi[1].trim();
+                    String id = elementi[0].trim();
+                    String username = elementi[1].trim();
 
                     if (id.equalsIgnoreCase(idPrenotazione) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;
@@ -602,15 +819,15 @@ public class FileManager {
                     continue;
                 }
 
-                String[] campi = riga.split(";");
+                String[] elementi = riga.split(SEPARATORE);
 
-                if (campi.length >= 6) {
-                    String idLetto = campi[0].trim();
+                if (elementi.length >= 11) { // Nota: il formato Proiezione ha 11 campi (0..10)
+                    String idLetto = elementi[0].trim();
 
                     if (idLetto.equalsIgnoreCase(idProiezione.trim())) {
-                        // Modifica il campo dei posti disponibili (indice 5)
-                        campi[5] = String.valueOf(nuoviPostiDisp);
-                        riga = String.join(";", campi);
+                        // Modifica il campo dei posti disponibili (indice 10)
+                        elementi[10] = String.valueOf(nuoviPostiDisp);
+                        riga = String.join(SEPARATORE, elementi);
                         aggiornato = true;
                     }
                 }

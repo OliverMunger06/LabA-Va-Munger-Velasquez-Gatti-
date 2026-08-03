@@ -4,6 +4,8 @@ import cinemax.utils.FileManager;
 import cinemax.gestione.Proiezione;
 import cinemax.gestione.Film;
 import cinemax.gestione.Prenotazione;
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -42,22 +44,6 @@ public class Cliente extends Utente {
         super(nome, cognome, username, passwordInChiaro, dataNascita, luogoDomicilio);
     }
 
-    /**
-     * Costruisce un oggetto {@code Cliente} gia' esistente caricando l'hash della password.
-     *
-     * @param nome           Il nome del cliente.
-     * @param cognome        Il cognome del cliente.
-     * @param username       Lo username unico del cliente.
-     * @param passwordHash   L'hash della password gia' calcolato.
-     * @param dataNascita    La data di nascita nel formato gg/mm/aaaa.
-     * @param luogoDomicilio Il luogo di domicilio.
-     * @param isAlreadyHashed {@code true} se la password fornita e' gia' un hash.
-     */
-    public Cliente(String nome, String cognome, String username, String passwordHash,
-                   String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
-        super(nome, cognome, username, passwordHash, dataNascita, luogoDomicilio, isAlreadyHashed);
-    }
-
     // ------------------------------------------------------------------------
     // METODI OPERATIVI
     // ------------------------------------------------------------------------
@@ -90,28 +76,173 @@ public class Cliente extends Utente {
         }
     }
 
+
+    /**
+     * Modifica la proiezione associata a una prenotazione esistente del cliente.
+     * <p>
+     * Requisito fondamentale: sia la data della vecchia proiezione che la data
+     * della nuova proiezione scelta devono essere strettamente successive alla data odierna.
+     * </p>
+     *
+     * @param scanner Lo scanner attivo per la lettura dell'input da console.
+     */
+    public void modificaPrenotazione(Scanner scanner) {
+        try {
+            // 1. Chiede l'ID della prenotazione da modificare
+            System.out.print("Inserisci l'ID della prenotazione da modificare: ");
+            String idPrenotazione = scanner.nextLine().trim();
+
+            // 2. Recupera i dettagli della prenotazione (o verifica che esista e appartenga all'utente)
+            // Nota: Se FileManager restituisce le informazioni o la proiezione associata, puoi effettuare i controlli.
+            // Qui assumiamo di caricare il palinsesto e le prenotazioni per validare le date.
+
+            List<Proiezione> palinsesto = FileManager.caricaPalinsesto();
+            if (palinsesto.isEmpty()) {
+                System.out.println("  Errore: Impossibile accedere al palinsesto.");
+                return;
+            }
+
+            // 3. Mostra le proiezioni disponibili per il cambio
+            System.out.println("\nSpettacoli disponibili nel palinsesto:");
+            for (int i = 0; i < palinsesto.size(); i++) {
+                Proiezione p = palinsesto.get(i);
+                System.out.println((i + 1) + ". [ID: " + p.getIdProiezione() + "] " +
+                        p.getFilm().getTitolo() + " - Data: " + p.getDataProiezione() + " ore " + p.getOraProiezione());
+            }
+
+            System.out.print("\nInserisci l'ID della NUOVA proiezione su cui vuoi spostarti: ");
+            String idNuovaProiezione = scanner.nextLine().trim();
+
+            // 4. Ricerca della nuova proiezione nel palinsesto per controllarne la data
+            Proiezione nuovaProiezione = null;
+            for (Proiezione p : palinsesto) {
+                if (p.getIdProiezione().equalsIgnoreCase(idNuovaProiezione)) {
+                    nuovaProiezione = p;
+                    break;
+                }
+            }
+
+            if (nuovaProiezione == null) {
+                System.out.println("  Errore: La nuova proiezione con ID '" + idNuovaProiezione + "' non esiste.");
+                return;
+            }
+
+            LocalDate oggi = LocalDate.now();
+
+            // 5. Controllo data nuova proiezione: deve essere SUCCESSIVA ad oggi
+            LocalDate dataNuovaObj = LocalDate.parse(nuovaProiezione.getDataProiezione(), FMT_ITA);
+            if (!dataNuovaObj.isAfter(oggi)) {
+                System.out.println("  Errore: Impossibile effettuare la modifica.");
+                System.out.println("  Motivo: La nuova data (" + nuovaProiezione.getDataProiezione() +
+                        ") non è successiva alla data odierna (" + oggi.format(FMT_ITA) + ").");
+                return;
+            }
+
+            // 6. Esecuzione della modifica tramite FileManager (che verificherà anche la vecchia data se gestito a livello di persistenza,
+            //    oppure puoi delegare il controllo completo).
+            boolean modificato = FileManager.modificaProiezioneInPrenotazione(idPrenotazione, this.getUsername(), idNuovaProiezione);
+
+            if (modificato) {
+                System.out.println("  Prenotazione aggiornata con successo! Nuova data: " + nuovaProiezione.getDataProiezione());
+            } else {
+                System.out.println("  Impossibile modificare: ID prenotazione errato, non tuo, oppure la proiezione passata è già trascorsa.");
+            }
+
+        } catch (DateTimeParseException e) {
+            System.out.println("  Errore nel formato della data della proiezione.");
+        } catch (Exception e) {
+            System.out.println("  Errore durante l'elaborazione della modifica: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Visualizza a schermo l'elenco di tutte le prenotazioni attive effettuate
+     * dal cliente corrente, leggendole direttamente dal file di persistenza.
+     */
+    public void visualizzaPrenotazioni() {
+        System.out.println("\n==================================================");
+        System.out.println("          LE MIE PRENOTAZIONI - @" + getUsername().toUpperCase());
+        System.out.println("==================================================");
+
+        try {
+            // Sfrutta il metodo già esistente in FileManager per stampare o recuperare le prenotazioni
+            FileManager.stampaPrenotazioniUtente(this.getUsername());
+        } catch (Exception e) {
+            System.out.println("  Errore durante il recupero delle prenotazioni da file: " + e.getMessage());
+        }
+
+        System.out.println("==================================================\n");
+    }
+
+
     /**
      * Annulla una prenotazione appartenente al cliente corrente rimuovendola
      * direttamente dal file CSV di persistenza.
      *
      * @param idPrenotazione L'identificativo unico della prenotazione da eliminare.
      */
+    /**
+     * Annulla una prenotazione appartenente al cliente corrente rimuovendola
+     * direttamente dal file CSV, a patto che la data di proiezione sia strettamente
+     * successiva alla data odierna.
+     *
+     * @param idPrenotazione L'identificativo unico della prenotazione da eliminare.
+     */
     public void eliminaPrenotazione(String idPrenotazione) {
         try {
+            List<Proiezione> palinsesto = FileManager.caricaPalinsesto();
+            List<Prenotazione> prenotazioni = FileManager.caricaPrenotazioni(palinsesto);
+
+            Prenotazione target = null;
+            for (Prenotazione p : prenotazioni) {
+                if (p.getIdPrenotazione().equalsIgnoreCase(idPrenotazione.trim()) &&
+                        p.getUsernameCliente().equalsIgnoreCase(this.getUsername())) {
+                    target = p;
+                    break;
+                }
+            }
+
+            if (target == null) {
+                System.out.println("  Errore: Prenotazione non trovata o non associata al tuo account.");
+                return;
+            }
+
+            LocalDate oggi = LocalDate.now();
+            LocalDate dataProiezione = LocalDate.parse(target.getDataStr(), FMT_ITA);
+
+            if (!dataProiezione.isAfter(oggi)) {
+                System.out.println("  Errore: Impossibile cancellare la prenotazione. La data della proiezione (" + target.getDataStr() + ") deve essere successiva a quella odierna.");
+                return;
+            }
+
             boolean rimossa = FileManager.rimuoviPrenotazioneDaFile(idPrenotazione, this.getUsername());
             if (rimossa) {
                 System.out.println("  Prenotazione annullata con successo dal file CSV.");
             } else {
-                System.out.println("  Errore: Prenotazione non trovata o ID non valido per questo utente.");
+                System.out.println("  Errore durante la rimozione della prenotazione.");
             }
+
         } catch (Exception e) {
-            System.out.println("  Errore durante l'eliminazione della prenotazione dal file.");
+            System.out.println("  Errore durante l'elaborazione della cancellazione: " + e.getMessage());
         }
     }
 
     // ------------------------------------------------------------------------
     // INTERFACCIA UTENTE E MENU
     // ------------------------------------------------------------------------
+
+
+    /**
+     * Restituisce il valore numerico del menu corrispondente all'operazione di logout per il Cliente.
+     *
+     * @return L'intero {@code 6}, rappresentante l'opzione di disconnessione dal sistema.
+     */
+    @Override
+    public int getOpzioneLogout() {
+        return 6;
+    }
+
 
     /**
      * Stampa a schermo le opzioni disponibili nel menu dell'area personale del cliente.
@@ -128,17 +259,35 @@ public class Cliente extends Utente {
     }
 
     /**
-     * Gestisce la logica e le interazioni da riga di comando relative all'opzione selezionata dal cliente.
+     * Gestisce la logica di business e le interazioni da riga di comando per il Cliente.
+     * <p>
+     * Interagisce direttamente con l'utente tramite standard I/O e legge/aggiorna
+     * le proiezioni e le prenotazioni sui file mediante le utility di {@code FileManager}.
+     * </p>
      *
-     * @param scelta    L'opzione numerica selezionata dal menu.
-     * @param palinsesto La lista di proiezioni attualmente disponibili nel palinsesto.
+     * @param scelta L'opzione numerica selezionata dal menu.
      */
-    public void eseguiAzione(int scelta, List<Proiezione> palinsesto) {
+    @Override
+    public void eseguiAzione(int scelta) {
         Scanner scanner = new Scanner(System.in);
 
         switch (scelta) {
             case 1:
                 System.out.println("\n--- 1. RICERCA E VISUALIZZAZIONE PROIEZIONI ---");
+
+                // Caricamento del palinsesto aggiornato dal file CSV
+                List<Proiezione> palinsestoCaso1;
+                try {
+                    palinsestoCaso1 = FileManager.caricaPalinsesto();
+                } catch (IOException e) {
+                    System.err.println("  [ERRORE I/O] Impossibile caricare il palinsesto: " + e.getMessage());
+                    break;
+                }
+
+                if (palinsestoCaso1.isEmpty()) {
+                    System.out.println("  Nessuna proiezione presente in archivi.");
+                    break;
+                }
 
                 System.out.print("- Titolo film (INVIO per tutti): ");
                 String titolo = scanner.nextLine().trim();
@@ -186,7 +335,7 @@ public class Cliente extends Utente {
                 }
 
                 List<Proiezione> risultatiFiltrati = new ArrayList<>();
-                for (Proiezione p : palinsesto) {
+                for (Proiezione p : palinsestoCaso1) {
                     Film f = p.getFilm();
 
                     if (!titolo.isEmpty() && !f.getTitolo().toLowerCase().contains(titolo.toLowerCase())) {
@@ -246,11 +395,26 @@ public class Cliente extends Utente {
 
             case 2:
                 System.out.println("\n--- 2. INSERISCI UNA NUOVA PRENOTAZIONE ---");
+
+                // Caricamento del palinsesto aggiornato dal file CSV
+                List<Proiezione> palinsestoCaso2;
+                try {
+                    palinsestoCaso2 = FileManager.caricaPalinsesto();
+                } catch (IOException e) {
+                    System.err.println("  [ERRORE I/O] Impossibile accedere al palinsesto su file: " + e.getMessage());
+                    break;
+                }
+
+                if (palinsestoCaso2.isEmpty()) {
+                    System.out.println("  Impossibile effettuare prenotazioni: il palinsesto e' vuoto.");
+                    break;
+                }
+
                 System.out.print("Digita il titolo del film che vuoi prenotare (INVIO per vederli tutti): ");
                 String titoloCercato = scanner.nextLine().trim();
 
                 List<Proiezione> proiezioniTrovate = new ArrayList<>();
-                for (Proiezione p : palinsesto) {
+                for (Proiezione p : palinsestoCaso2) {
                     if (titoloCercato.isEmpty() || p.getFilm().getTitolo().toLowerCase().contains(titoloCercato.toLowerCase())) {
                         proiezioniTrovate.add(p);
                     }
@@ -321,31 +485,12 @@ public class Cliente extends Utente {
 
             case 3:
                 System.out.println("\n--- 3. LE TUE PRENOTAZIONI ---");
-                try {
-                    FileManager.stampaPrenotazioniUtente(this.getUsername());
-                } catch (Exception e) {
-                    System.out.println("  Errore durante la lettura delle prenotazioni.");
-                }
+                this.visualizzaPrenotazioni();
                 break;
 
             case 4:
                 System.out.println("\n--- 4. MODIFICA PRENOTAZIONE (CAMBIO DATA) ---");
-                System.out.print("Inserisci l'ID della prenotazione da spostare: ");
-                String idPrenotazioneMod = scanner.nextLine().trim();
-
-                System.out.print("Inserisci l'ID della NUOVA proiezione su cui vuoi spostarti: ");
-                String idNuovaProiezione = scanner.nextLine().trim();
-
-                try {
-                    boolean modificato = FileManager.modificaProiezioneInPrenotazione(idPrenotazioneMod, this.getUsername(), idNuovaProiezione);
-                    if (modificato) {
-                        System.out.println("  Prenotazione aggiornata con successo su file!");
-                    } else {
-                        System.out.println("  Impossibile modificare: ID prenotazione errato o non tuo.");
-                    }
-                } catch (Exception e) {
-                    System.out.println("  Errore durante la modifica del file CSV.");
-                }
+                this.modificaPrenotazione(scanner);
                 break;
 
             case 5:

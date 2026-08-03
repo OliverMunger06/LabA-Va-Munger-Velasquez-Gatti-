@@ -1,6 +1,10 @@
 package cinemax.Users;
 
 import cinemax.gestione.Prenotazione;
+import cinemax.gestione.Proiezione;
+import cinemax.utils.FileManager;
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -29,10 +33,9 @@ public class Bigliettaio extends Utente {
      * @param passwordHash   L'hash della password di sicurezza.
      * @param dataNascita    La data di nascita in formato testo.
      * @param luogoDomicilio Il luogo di domicilio.
-     * @param attivo         Lo stato di attivazione dell'account (true/false).
      */
-    public Bigliettaio(String nome, String cognome, String username, String passwordHash, String dataNascita, String luogoDomicilio, boolean attivo) {
-        super(nome, cognome, username, passwordHash, dataNascita, luogoDomicilio, attivo);
+    public Bigliettaio(String nome, String cognome, String username, String passwordHash, String dataNascita, String luogoDomicilio) {
+        super(nome, cognome, username, passwordHash, dataNascita, luogoDomicilio);
     }
 
     /**
@@ -147,6 +150,18 @@ public class Bigliettaio extends Utente {
     }
 
     /**
+     * Restituisce il valore numerico del menu corrispondente all'operazione di logout per il Bigliettaio.
+     *
+     * @return L'intero {@code 3}, rappresentante l'opzione di disconnessione dal sistema.
+     */
+    @Override
+    public int getOpzioneLogout() {
+        return 3;
+    }
+
+
+
+    /**
      * Mostra le opzioni disponibili nel menu testuale dell'area personale del bigliettaio.
      */
     @Override
@@ -158,13 +173,16 @@ public class Bigliettaio extends Utente {
     }
 
     /**
-     * Gestisce l'esecuzione dell'operazione scelta dall'utente a terminale.
-     *
-     * @param scelta               L'opzione numerica selezionata nel menu.
-     * @param databasePrenotazioni L'elenco complessivo delle prenotazioni registrate.
-     * @param databaseUtenti       L'elenco complessivo degli utenti del sistema.
+     * Gestisce le operazioni del Bigliettaio tramite riga di comando.
+     * <p>
+     * Interroga direttamente il file delle prenotazioni per recuperare la lista
+     * dei biglietti associati alla giornata corrente o filtri di ricerca mirati.
+     * </p>
+
+     * @param scelta L'opzione numerica selezionata dal menu.
      */
-    public void eseguiAzione(int scelta, List<Prenotazione> databasePrenotazioni, List<Utente> databaseUtenti) {
+    @Override
+    public void eseguiAzione(int scelta) {
         Scanner scanner = new Scanner(System.in);
 
         switch (scelta) {
@@ -175,22 +193,30 @@ public class Bigliettaio extends Utente {
 
                 System.out.println("Data odierna di sistema: " + oggiFormattato);
 
-                List<Prenotazione> prenotazioniOggi = new ArrayList<>();
-                for (Prenotazione p : databasePrenotazioni) {
-                    if (p.getDataStr().equals(oggiFormattato)) {
-                        prenotazioniOggi.add(p);
-                    }
-                }
+                try {
+                    // Carichiamo tutte le prenotazioni leggendo autonomamente il palinsesto e le prenotazioni da file
+                    List<Proiezione> palinsesto = FileManager.caricaPalinsesto();
+                    List<Prenotazione> tutteLePrenotazioni = FileManager.caricaPrenotazioni(palinsesto);
+                    List<Prenotazione> prenotazioniOggi = new ArrayList<>();
 
-                if (prenotazioniOggi.isEmpty()) {
-                    System.out.println("  Nessuna prenotazione trovata per la data odierna.");
-                } else {
-                    mostraEResettaSelezione(prenotazioniOggi, scanner);
+                    for (Prenotazione p : tutteLePrenotazioni) {
+                        if (p.getDataStr().equals(oggiFormattato)) {
+                            prenotazioniOggi.add(p);
+                        }
+                    }
+
+                    if (prenotazioniOggi.isEmpty()) {
+                        System.out.println("  Nessuna prenotazione trovata per la data odierna.");
+                    } else {
+                        mostraEResettaSelezione(prenotazioniOggi, scanner);
+                    }
+                } catch (IOException e) {
+                    System.err.println("  [ERRORE DI LETTURA] Impossibile accedere ai file dati: " + e.getMessage());
                 }
                 break;
 
             case 2:
-                List<Prenotazione> risultatiRicerca = cercaPrenotazione(databasePrenotazioni, databaseUtenti, scanner);
+                List<Prenotazione> risultatiRicerca = cercaPrenotazione(scanner);
                 if (risultatiRicerca != null && !risultatiRicerca.isEmpty()) {
                     mostraEResettaSelezione(risultatiRicerca, scanner);
                 }
@@ -207,13 +233,12 @@ public class Bigliettaio extends Utente {
 
     /**
      * Sottomenu guida per l'acquisizione dei criteri di ricerca forniti dall'operatore.
+     * Legge la lista delle prenotazioni aggiornata direttamente da file.
      *
-     * @param prenotazioni La lista completa delle prenotazioni da interrogare.
-     * @param utenti       La lista degli utenti del sistema.
-     * @param scanner      L'oggetto {@link Scanner} per la lettura dell'input.
-     * @return La lista delle prenotazioni corrispondenti al criterio scelto, oppure {@code null} in caso di errori di input.
+     * @param scanner L'oggetto {@link Scanner} per la lettura dell'input.
+     * @return La lista delle prenotazioni corrispondenti al criterio scelto, oppure {@code null} in caso di errori di input o di I/O.
      */
-    private List<Prenotazione> cercaPrenotazione(List<Prenotazione> prenotazioni, List<Utente> utenti, Scanner scanner) {
+    private List<Prenotazione> cercaPrenotazione(Scanner scanner) {
         System.out.println("\n--- 2. CERCA UNA PRENOTAZIONE ---");
         System.out.println("Seleziona il criterio di ricerca:");
         System.out.println("a. Per codice prenotazione");
@@ -223,7 +248,17 @@ public class Bigliettaio extends Utente {
         System.out.print("Scegli un'opzione (a-d): ");
         String criterio = scanner.nextLine().trim().toLowerCase();
 
+        List<Prenotazione> prenotazioni = new ArrayList<>();
         List<Prenotazione> risultati = new ArrayList<>();
+
+        // Gestione try-catch per la lettura da file CSV
+        try {
+            List<Proiezione> palinsesto = FileManager.caricaPalinsesto();
+            prenotazioni = FileManager.caricaPrenotazioni(palinsesto);
+        } catch (IOException e) {
+            System.err.println("  [ERRORE DI LETTURA] Impossibile caricare le prenotazioni da file: " + e.getMessage());
+            return null;
+        }
 
         switch (criterio) {
             case "a":
@@ -289,52 +324,42 @@ public class Bigliettaio extends Utente {
     }
 
     /**
-     * Metodo helper privato per reindirizzare al metodo di gestione selezione.
+     * Mostra la lista dei risultati di ricerca e consente all'operatore di selezionare
+     * una specifica prenotazione per visualizzarne il dettaglio fiscale completo.
      *
-     * @param risultati Lista dei risultati da mostrare.
-     * @param scanner   L'oggetto scanner.
+     * @param lista   La lista delle prenotazioni trovate.
+     * @param scanner L'oggetto {@link Scanner} per la lettura dell'input da console.
      */
-    private void montreEResettaSelezione(List<Prenotazione> risultati, Scanner scanner) {
-        mostraEResettaSelezione(risultati, scanner);
-    }
-
-    /**
-     * Mostra l'elenco numerato dei risultati filtrati e permette all'utente di selezionarne
-     * uno per visualizzarne il dettaglio fiscale.
-     *
-     * @param risultati Lista delle prenotazioni trovate.
-     * @param scanner   L'oggetto {@link Scanner} per la gestione dell'input da terminale.
-     */
-    private void mostraEResettaSelezione(List<Prenotazione> risultati, Scanner scanner) {
-        if (risultati.isEmpty()) {
-            System.out.println("Nessuna prenotazione da mostrare.");
-            return;
-        }
-
-        System.out.println("\n--- RISULTATI FILTRATI ---");
-        for (int i = 0; i < risultati.size(); i++) {
-            Prenotazione p = risultati.get(i);
-            System.out.println((i + 1) + ". ID: [" + p.getIdPrenotazione() + "] Film: " + p.getTitoloFilm() + " | Cliente: " + p.getNomeCliente() + " " + p.getCognomeCliente());
+    private void mostraEResettaSelezione(List<Prenotazione> lista, Scanner scanner) {
+        System.out.println("\n--- RISULTATI PRENOTAZIONI TROVATE ---");
+        for (int i = 0; i < lista.size(); i++) {
+            Prenotazione p = lista.get(i);
+            System.out.println((i + 1) + ". ID: " + p.getIdPrenotazione() +
+                    " | Cliente: " + p.getNomeCliente() + " " + p.getCognomeCliente() +
+                    " | Film: " + p.getTitoloFilm() +
+                    " | Data: " + p.getDataStr() + " ore " + p.getOraStr());
         }
         System.out.println("0. Torna al menu principale");
 
-        System.out.print("\nInserisci il numero della prenotazione per visualizzare il dettaglio fiscale: ");
+        System.out.print("\nSeleziona il numero della prenotazione per visualizzare il dettaglio (0 per uscire): ");
         try {
-            int indiceScelto = Integer.parseInt(scanner.nextLine().trim());
+            int sceltaIndice = Integer.parseInt(scanner.nextLine().trim());
 
-            if (indiceScelto == 0) {
-                System.out.println("Operazione annullata.");
-            } else if (indiceScelto > 0 && indiceScelto <= risultati.size()) {
-                Prenotazione selezionata = risultati.get(indiceScelto - 1);
-                this.visualizzaPrenotazione(selezionata);
+            if (sceltaIndice == 0) {
+                System.out.println("Operazione completata.");
+            } else if (sceltaIndice > 0 && sceltaIndice <= lista.size()) {
+                Prenotazione prenotazioneSelezionata = lista.get(sceltaIndice - 1);
+                // Richiama il metodo richiesto per la visualizzazione dettagliata/fiscale
+                this.visualizzaPrenotazione(prenotazioneSelezionata);
 
-                System.out.println("Premi INVIO per continuare...");
+                System.out.print("\nPremi INVIO per continuare...");
                 scanner.nextLine();
             } else {
-                System.out.println("  Selezione fuori range.");
+                System.out.println("  Numero di selezione non valido.");
             }
         } catch (NumberFormatException e) {
-            System.out.println("  Errore: Inserisci un indice numerico valido.");
+            System.out.println("  Errore: Inserisci un numero intero valido.");
         }
     }
+
 }

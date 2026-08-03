@@ -6,6 +6,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe astratta base che rappresenta un generico utente del sistema Cinemax.
+ * <p>
+ * Fornisce gli attributi anagrafici fondamentali, i metodi di accesso ai dati (getter),
+ * la firma per il menu specifico dell'utente, la gestione del logout polimorfico
+ * e i metodi statici condivisi per la ricerca e la visualizzazione delle proiezioni.
+ * </p>
+ *
+ * @author Cinemax System
+ * @version 1.1
+ */
 public abstract class Utente {
     private String username;
     private String passwordHash;
@@ -14,27 +25,24 @@ public abstract class Utente {
     private String dataNascita;
     private String luogoDomicilio;
 
+    /**
+     * Formattatore standard per le date nel formato italiano (dd/MM/yyyy).
+     */
     protected static final java.time.format.DateTimeFormatter FMT_ITA =
             java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     /**
-     * COSTRUTTORE 1: Registrazione nuovo utente (ALLINEATO AL FILE CSV)
-     */
-    public Utente(String nome, String cognome, String username, String passwordInChiaro,
-                  String dataNascita, String luogoDomicilio) {
-        this.nome = nome;
-        this.cognome = cognome;
-        this.username = username;
-        this.passwordHash = passwordInChiaro;
-        this.dataNascita = dataNascita;
-        this.luogoDomicilio = luogoDomicilio;
-    }
-
-    /**
-     * COSTRUTTORE 2: Caricamento da file CSV (ALLINEATO AL FILE CSV)
+     * Costruisce un nuovo oggetto {@code Utente} con le informazioni anagrafiche e le credenziali.
+     *
+     * @param nome           il nome dell'utente
+     * @param cognome        il cognome dell'utente
+     * @param username       l'username unico dell'utente
+     * @param passwordHash   l'hash della password già cifrata
+     * @param dataNascita    la data di nascita nel formato gg/mm/aaaa (o "N/D" se non specificata)
+     * @param luogoDomicilio il luogo di domicilio dell'utente
      */
     public Utente(String nome, String cognome, String username, String passwordHash,
-                  String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
+                  String dataNascita, String luogoDomicilio) {
         this.nome = nome;
         this.cognome = cognome;
         this.username = username;
@@ -43,20 +51,61 @@ public abstract class Utente {
         this.luogoDomicilio = luogoDomicilio;
     }
 
+    /**
+     * Mostra a schermo il menu principale specifico per il ruolo dell'utente corrente.
+     */
     public abstract void mostraMenu();
 
+    /**
+     * Gestisce l'interazione da riga di comando ed esegue l'operazione associata
+     * all'opzione selezionata dal menu.
+     *
+     * @param scelta L'opzione numerica selezionata dal menu.
+     */
+    public abstract void eseguiAzione(int scelta);
+
+    /**
+     * Restituisce l'opzione numerica associata al Logout nel menu dell'utente.
+     *
+     * @return L'intero corrispondente all'azione di logout (es. 3 per Bigliettaio, 4 per Proiezionista, 6 per Cliente).
+     */
+    public abstract int getOpzioneLogout();
+
+    // ========================================================================
     // GETTER
-    public String getUsername() { return username; }
-    public String getNome() { return nome; }
-    public String getCognome() { return cognome; }
-    public String getLuogoDomicilio() { return luogoDomicilio; }
-    public String getDataNascita() { return dataNascita; }
-    public String getPasswordHash() { return passwordHash; }
+    // ========================================================================
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCognome() {
+        return cognome;
+    }
+
+    public String getLuogoDomicilio() {
+        return luogoDomicilio;
+    }
+
+    public String getDataNascita() {
+        return dataNascita;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
 
     // ========================================================================
     // METODI STATICI CONDIVISI
     // ========================================================================
 
+    /**
+     * Filtra la lista del palinsesto in base a molteplici criteri di ricerca.
+     */
     public static List<Proiezione> cercaProiezione(List<Proiezione> palinsesto,
                                                    String titolo, String genere,
                                                    LocalDate dataInizio, LocalDate dataFine,
@@ -77,7 +126,6 @@ public abstract class Utente {
             String dataStringa = p.getDataProiezione();
             if (dataStringa != null && !dataStringa.isEmpty()) {
                 try {
-                    // Creiamo il formattatore italiano coerente con il CSV
                     LocalDate dataP = LocalDate.parse(dataStringa, FMT_ITA);
 
                     if (dataInizio != null && dataP.isBefore(dataInizio)) {
@@ -87,7 +135,6 @@ public abstract class Utente {
                         continue;
                     }
                 } catch (java.time.format.DateTimeParseException e) {
-                    // Protezione contro eventuali stringhe corrotte nel palinsesto ("N/D")
                     continue;
                 }
             }
@@ -106,10 +153,10 @@ public abstract class Utente {
         return risultati;
     }
 
-
-
-
-
+    /**
+     * Stampa a consolle una scheda formattata con la descrizione completa
+     * di una proiezione e del film associato.
+     */
     public static void visualizzaProiezione(Proiezione p) {
         Film f = p.getFilm();
         String data = p.getDataProiezione();
