@@ -48,8 +48,8 @@ public class FileManager {
                         dataNascitaStr + SEPARATORE +
                         u.getLuogoDomicilio() + SEPARATORE +
                         tipo;
-                writer.write(riga);
                 writer.newLine();
+                writer.write(riga);
             }
         }
     }
@@ -116,8 +116,8 @@ public class FileManager {
                         f.getEta_minima() + SEPARATORE +
                         p.getPrezzoBiglietto() + SEPARATORE +
                         p.getPostiDisponibili();
-                writer.write(riga);
                 writer.newLine();
+                writer.write(riga);
             }
         }
     }
@@ -178,9 +178,8 @@ public class FileManager {
                         p.getFilmProiezione().getIdProiezione() + SEPARATORE +
                         p.getNumeroPosto() + SEPARATORE +
                         p.getCodiceBiglietto();
-
-                writer.write(riga);
                 writer.newLine();
+                writer.write(riga);
             }
         }
     }

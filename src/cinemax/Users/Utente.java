@@ -106,6 +106,10 @@ public abstract class Utente {
         return risultati;
     }
 
+
+
+
+
     public static void visualizzaProiezione(Proiezione p) {
         Film f = p.getFilm();
         String data = p.getDataProiezione();
