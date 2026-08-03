@@ -18,7 +18,7 @@ public class CineMax {
 
     public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
-    List<Utente> utenti = new Li
+
 
     System.out.println("Benvenuto nell'applicazione CineMax");
     System.out.println("1. Registrati ");
@@ -43,7 +43,7 @@ public class CineMax {
         System.out.println("Inserisci il luogo di domicilio");
         String domicilio = sc.nextLine();
 
-        Cliente nuovo_cliente = new Cliente(nome,cognome, nome_utente,password,data_nascita,domicilio);
+
 
     }
 

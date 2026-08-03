@@ -7,16 +7,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Rappresenta l'operatore di cassa/biglietteria all'interno del sistema Cinemax.
+ * <p>
+ * Estende la classe {@link Utente} fornendo le funzionalita' necessarie per la ricerca
+ * e la verifica delle prenotazioni tramite molteplici criteri (codice, cliente, film, date)
+ * e la visualizzazione del relativo dettaglio fiscale.
+ * </p>
+ *
+ * @author Cinemax Team
+ * @version 1.0
+ */
 public class Bigliettaio extends Utente {
 
-    
-
+    /**
+     * Costruisce un nuovo operatore {@code Bigliettaio} con i dati anagrafici e le credenziali specificate.
+     *
+     * @param nome           Il nome del bigliettaio.
+     * @param cognome        Il cognome del bigliettaio.
+     * @param username       Lo username per l'accesso al sistema.
+     * @param passwordHash   L'hash della password di sicurezza.
+     * @param dataNascita    La data di nascita in formato testo.
+     * @param luogoDomicilio Il luogo di domicilio.
+     * @param attivo         Lo stato di attivazione dell'account (true/false).
+     */
     public Bigliettaio(String nome, String cognome, String username, String passwordHash, String dataNascita, String luogoDomicilio, boolean attivo) {
         super(nome, cognome, username, passwordHash, dataNascita, luogoDomicilio, attivo);
     }
 
     /**
-     * Ricerca per Codice Prenotazione (ID)
+     * Ricerca le prenotazioni corrispondenti a uno specifico codice univoco (ID).
+     *
+     * @param prenotazioni La lista di prenotazioni in cui effettuare la ricerca.
+     * @param codice       L'ID della prenotazione da cercare.
+     * @return Una lista di {@link Prenotazione} contenente i match trovati.
      */
     public List<Prenotazione> cercaPerCodice(List<Prenotazione> prenotazioni, String codice) {
         List<Prenotazione> risultati = new ArrayList<>();
@@ -29,7 +53,12 @@ public class Bigliettaio extends Utente {
     }
 
     /**
-     * Ricerca diretta sui campi interni di Prenotazione (Senza cicli su lista Utenti)
+     * Ricerca le prenotazioni filtrate in base al nome e cognome del cliente intestatario.
+     *
+     * @param prenotazioni La lista di prenotazioni in cui effettuare la ricerca.
+     * @param nome         Il nome (o parte del nome) del cliente.
+     * @param cognome      Il cognome (o parte del cognome) del cliente.
+     * @return Una lista di {@link Prenotazione} corrispondenti al cliente.
      */
     public List<Prenotazione> cercaPerNomeCognome(List<Prenotazione> prenotazioni, String nome, String cognome) {
         List<Prenotazione> risultati = new ArrayList<>();
@@ -48,7 +77,11 @@ public class Bigliettaio extends Utente {
     }
 
     /**
-     * Ricerca per Titolo del Film (anche parziale)
+     * Ricerca le prenotazioni filtrando per titolo (anche parziale) del film.
+     *
+     * @param prenotazioni   La lista delle prenotazioni da filtrare.
+     * @param titoloParziale La stringa da cercare all'interno dei titoli dei film.
+     * @return Una lista di {@link Prenotazione} associate al film ricercato.
      */
     public List<Prenotazione> cercaPerTitoloFilm(List<Prenotazione> prenotazioni, String titoloParziale) {
         List<Prenotazione> risultati = new ArrayList<>();
@@ -61,7 +94,12 @@ public class Bigliettaio extends Utente {
     }
 
     /**
-     * Ricerca per Intervallo di Date (Usa la costante di classe FMT_ITA)
+     * Ricerca le prenotazioni comprese all'interno di un determinato intervallo temporale.
+     *
+     * @param prenotazioni La lista delle prenotazioni da filtrare.
+     * @param inizio       La data iniziale dell'intervallo (se {@code null}, include tutte le date passate).
+     * @param fine         La data finale dell'intervallo (se {@code null}, include tutte le date future).
+     * @return Una lista di {@link Prenotazione} ricadenti nell'intervallo indicato.
      */
     public List<Prenotazione> cercaPerIntervalloDate(List<Prenotazione> prenotazioni, LocalDate inizio, LocalDate fine) {
         List<Prenotazione> risultati = new ArrayList<>();
@@ -86,7 +124,9 @@ public class Bigliettaio extends Utente {
     }
 
     /**
-     * Visualizzazione Dettaglio Fiscale della prenotazione
+     * Stampa a schermo il prospetto ed il dettaglio fiscale di una specifica prenotazione.
+     *
+     * @param p La {@link Prenotazione} di cui mostrare i dettagli.
      */
     public void visualizzaPrenotazione(Prenotazione p) {
         int numeroBiglietti = 1;
@@ -106,6 +146,9 @@ public class Bigliettaio extends Utente {
         System.out.println("=============================================");
     }
 
+    /**
+     * Mostra le opzioni disponibili nel menu testuale dell'area personale del bigliettaio.
+     */
     @Override
     public void mostraMenu() {
         System.out.println("\n=== AREA PERSONALE BIGLIETTAIO: " + getNome().toUpperCase() + " ===");
@@ -114,6 +157,13 @@ public class Bigliettaio extends Utente {
         System.out.println("3. Logout");
     }
 
+    /**
+     * Gestisce l'esecuzione dell'operazione scelta dall'utente a terminale.
+     *
+     * @param scelta               L'opzione numerica selezionata nel menu.
+     * @param databasePrenotazioni L'elenco complessivo delle prenotazioni registrate.
+     * @param databaseUtenti       L'elenco complessivo degli utenti del sistema.
+     */
     public void eseguiAzione(int scelta, List<Prenotazione> databasePrenotazioni, List<Utente> databaseUtenti) {
         Scanner scanner = new Scanner(System.in);
 
@@ -155,6 +205,14 @@ public class Bigliettaio extends Utente {
         }
     }
 
+    /**
+     * Sottomenu guida per l'acquisizione dei criteri di ricerca forniti dall'operatore.
+     *
+     * @param prenotazioni La lista completa delle prenotazioni da interrogare.
+     * @param utenti       La lista degli utenti del sistema.
+     * @param scanner      L'oggetto {@link Scanner} per la lettura dell'input.
+     * @return La lista delle prenotazioni corrispondenti al criterio scelto, oppure {@code null} in caso di errori di input.
+     */
     private List<Prenotazione> cercaPrenotazione(List<Prenotazione> prenotazioni, List<Utente> utenti, Scanner scanner) {
         System.out.println("\n--- 2. CERCA UNA PRENOTAZIONE ---");
         System.out.println("Seleziona il criterio di ricerca:");
@@ -230,11 +288,23 @@ public class Bigliettaio extends Utente {
         return risultati;
     }
 
+    /**
+     * Metodo helper privato per reindirizzare al metodo di gestione selezione.
+     *
+     * @param risultati Lista dei risultati da mostrare.
+     * @param scanner   L'oggetto scanner.
+     */
     private void montreEResettaSelezione(List<Prenotazione> risultati, Scanner scanner) {
-        // Corretto typo nel nome metodo (mostraEResettaSelezione)
         mostraEResettaSelezione(risultati, scanner);
     }
 
+    /**
+     * Mostra l'elenco numerato dei risultati filtrati e permette all'utente di selezionarne
+     * uno per visualizzarne il dettaglio fiscale.
+     *
+     * @param risultati Lista delle prenotazioni trovate.
+     * @param scanner   L'oggetto {@link Scanner} per la gestione dell'input da terminale.
+     */
     private void mostraEResettaSelezione(List<Prenotazione> risultati, Scanner scanner) {
         if (risultati.isEmpty()) {
             System.out.println("Nessuna prenotazione da mostrare.");

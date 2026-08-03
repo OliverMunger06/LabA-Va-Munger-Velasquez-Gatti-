@@ -4,201 +4,152 @@ import cinemax.utils.FileManager;
 import cinemax.gestione.Proiezione;
 import cinemax.gestione.Film;
 import cinemax.gestione.Prenotazione;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Rappresenta l'utente di tipo Cliente all'interno del sistema Cinemax.
+ * <p>
+ * Un cliente puo' ricercare spettacoli in palinsesto, effettuare nuove prenotazioni,
+ * visualizzare le proprie prenotazioni attive, modificarne la proiezione o cancellarle.
+ * Le operazioni di persistenza avvengono direttamente su file CSV riga per riga.
+ * </p>
+ *
+ * @author Cinemax Team
+ */
 public class Cliente extends Utente {
-
-
 
     // ------------------------------------------------------------------------
     // COSTRUTTORI
     // ------------------------------------------------------------------------
 
+    /**
+     * Costruisce un nuovo oggetto {@code Cliente} registrando una password in chiaro.
+     * La password verra' sottoposta ad hashing dalla classe padre {@link Utente}.
+     *
+     * @param nome             Il nome del cliente.
+     * @param cognome          Il cognome del cliente.
+     * @param username         Lo username unico per l'accesso.
+     * @param passwordInChiaro La password non cifrata.
+     * @param dataNascita      La data di nascita nel formato gg/mm/aaaa.
+     * @param luogoDomicilio   Il luogo di domicilio del cliente.
+     */
     public Cliente(String nome, String cognome, String username, String passwordInChiaro,
                    String dataNascita, String luogoDomicilio) {
         super(nome, cognome, username, passwordInChiaro, dataNascita, luogoDomicilio);
     }
 
+    /**
+     * Costruisce un oggetto {@code Cliente} gia' esistente caricando l'hash della password.
+     *
+     * @param nome           Il nome del cliente.
+     * @param cognome        Il cognome del cliente.
+     * @param username       Lo username unico del cliente.
+     * @param passwordHash   L'hash della password gia' calcolato.
+     * @param dataNascita    La data di nascita nel formato gg/mm/aaaa.
+     * @param luogoDomicilio Il luogo di domicilio.
+     * @param isAlreadyHashed {@code true} se la password fornita e' gia' un hash.
+     */
     public Cliente(String nome, String cognome, String username, String passwordHash,
                    String dataNascita, String luogoDomicilio, boolean isAlreadyHashed) {
         super(nome, cognome, username, passwordHash, dataNascita, luogoDomicilio, isAlreadyHashed);
     }
 
+    // ------------------------------------------------------------------------
+    // METODI OPERATIVI
+    // ------------------------------------------------------------------------
+
     /**
-     * Funzionalità di inserimento di una prenotazione singola
+     * Crea una nuova prenotazione per una determinata proiezione, scalando i posti
+     * disponibili ed effettuando il salvataggio diretto sul file CSV.
+     *
+     * @param proiezione La proiezione oggetto della prenotazione.
      */
-    public void creaPrenotazione(Proiezione proiezione, List<Prenotazione> databasePrenotazioni) {
+    public void creaPrenotazione(Proiezione proiezione) {
         if (proiezione.getPostiDisponibili() <= 0) {
-            System.out.println("   Errore: Ci dispiace, la sala è al completo per questa proiezione.");
+            System.out.println("  Errore: Ci dispiace, la sala e' al completo per questa proiezione.");
             return;
         }
 
         if (proiezione.prenotaPosto()) {
             Prenotazione nuovaPrenotazione = new Prenotazione(this, proiezione);
-            databasePrenotazioni.add(nuovaPrenotazione);
+
+            try {
+                FileManager.salvaPrenotazione(nuovaPrenotazione);
+                FileManager.aggiornaPostiProiezioneSuFile(proiezione.getIdProiezione(), proiezione.getPostiDisponibili());
+            } catch (Exception e) {
+                System.out.println("  Avviso: Errore durante il salvataggio dei dati su file: " + e.getMessage());
+            }
 
             System.out.println("  Spettacolo prenotato con successo!");
-            System.out.println("ID Biglietto: " + nuovaPrenotazione.getIdPrenotazione() +
+            System.out.println("  ID Biglietto: " + nuovaPrenotazione.getIdPrenotazione() +
                     " | Codice di Sicurezza QR: " + nuovaPrenotazione.getCodiceBiglietto());
         }
     }
 
     /**
-     * Funzionalità di visualizzazione delle proprie prenotazioni (Filtra già internamente)
+     * Annulla una prenotazione appartenente al cliente corrente rimuovendola
+     * direttamente dal file CSV di persistenza.
+     *
+     * @param idPrenotazione L'identificativo unico della prenotazione da eliminare.
      */
-    public List<Prenotazione> visualizzaPrenotazioni(List<Prenotazione> databasePrenotazioni) {
-        List<Prenotazione> miePrenotazioni = new ArrayList<>();
-        System.out.println("\n--- Riepilogo Prenotazioni di @" + getUsername() + " ---");
-
-        for (Prenotazione p : databasePrenotazioni) {
-            if (p.getUsernameCliente().equalsIgnoreCase(this.getUsername())) {
-                miePrenotazioni.add(p);
-
-                Proiezione proiezione = p.getFilmProiezione();
-                Film film = proiezione.getFilm();
-
-                System.out.println("ID: [" + p.getIdPrenotazione() + "] " +
-                        "Film: " + film.getTitolo() +
-                        " | Data: " + proiezione.getDataProiezione() +
-                        " | Ora: " + proiezione.getOraProiezione() +
-                        " | Posto N.: " + p.getNumeroPosto() +
-                        " | Pagamento: €" + String.format("%.2f", proiezione.getPrezzoBiglietto()));
-            }
-        }
-
-        if (miePrenotazioni.isEmpty()) {
-            System.out.println("Non hai prenotazioni attive al momento.");
-        }
-        return miePrenotazioni;
-    }
-
-    /**
-     * Funzionalità di modifica (cambio data) di una prenotazione
-     */
-    public void modificaPrenotazione(String idPrenotazione, Proiezione nuovaProiezione, List<Prenotazione> databasePrenotazioni) {
-        Prenotazione prenotazioneTrovata = null;
-
-        for (Prenotazione p : databasePrenotazioni) {
-            if (p.getIdPrenotazione().equalsIgnoreCase(idPrenotazione) && p.getUsernameCliente().equalsIgnoreCase(this.getUsername())) {
-                prenotazioneTrovata = p;
-                break;
-            }
-        }
-
-        if (prenotazioneTrovata == null) {
-            System.out.println("   Errore: Prenotazione non trovata o permessi insufficienti.");
-            return;
-        }
-
-        Proiezione vecchiaProiezione = prenotazioneTrovata.getFilmProiezione();
-        LocalDate oggi = LocalDate.now();
-
+    public void eliminaPrenotazione(String idPrenotazione) {
         try {
-            LocalDate dataVecchia = LocalDate.parse(vecchiaProiezione.getDataProiezione(), FMT_ITA);
-            LocalDate dataNuova = LocalDate.parse(nuovaProiezione.getDataProiezione(), FMT_ITA);
-
-            if (!dataVecchia.isAfter(oggi) || !dataNuova.isAfter(oggi)) {
-                System.out.println("   Errore: Puoi modificare solo prenotazioni future con proiezioni future (Data odierna: " + oggi.format(FMT_ITA) + ").");
-                return;
+            boolean rimossa = FileManager.rimuoviPrenotazioneDaFile(idPrenotazione, this.getUsername());
+            if (rimossa) {
+                System.out.println("  Prenotazione annullata con successo dal file CSV.");
+            } else {
+                System.out.println("  Errore: Prenotazione non trovata o ID non valido per questo utente.");
             }
-        } catch (DateTimeParseException e) {
-            System.out.println("   Errore interno nel parsing delle date del database.");
-            return;
-        }
-
-        if (nuovaProiezione.getPostiDisponibili() <= 0) {
-            System.out.println("   Impossibile spostare: la nuova proiezione è esaurita.");
-            return;
-        }
-
-        if (nuovaProiezione.prenotaPosto()) {
-            vecchiaProiezione.liberaPosto();
-            prenotazioneTrovata.setFilmProiezione(nuovaProiezione);
-            System.out.println("  Prenotazione spostata con successo sul film: " + nuovaProiezione.getFilm().getTitolo());
+        } catch (Exception e) {
+            System.out.println("  Errore durante l'eliminazione della prenotazione dal file.");
         }
     }
+
+    // ------------------------------------------------------------------------
+    // INTERFACCIA UTENTE E MENU
+    // ------------------------------------------------------------------------
 
     /**
-     * Funzionalità di cancellazione di una prenotazione
+     * Stampa a schermo le opzioni disponibili nel menu dell'area personale del cliente.
      */
-    public void eliminaPrenotazione(String idPrenotazione, List<Prenotazione> databasePrenotazioni, List<Utente> databaseUtenti) {
-        Iterator<Prenotazione> iterator = databasePrenotazioni.iterator();
-        LocalDate oggi = LocalDate.now();
-        boolean trovataERimossa = false;
-
-        while (iterator.hasNext()) {
-            Prenotazione p = iterator.next();
-
-            if (p.getIdPrenotazione().equalsIgnoreCase(idPrenotazione) && p.getUsernameCliente().equalsIgnoreCase(this.getUsername())) {
-                try {
-                    LocalDate dataProiezione = LocalDate.parse(p.getFilmProiezione().getDataProiezione(), FMT_ITA);
-
-                    if (!dataProiezione.isAfter(oggi)) {
-                        System.out.println("   Errore CineMax: Puoi cancellare solo prenotazioni di spettacoli futuri (Successivi a: " + oggi.format(FMT_ITA) + ").");
-                        return;
-                    }
-                } catch (DateTimeParseException e) {
-                    System.out.println("   Errore nel controllo della data dello spettacolo.");
-                    return;
-                }
-
-                p.getFilmProiezione().liberaPosto();
-                iterator.remove();
-                trovataERimossa = true;
-                System.out.println("  Prenotazione annullata con successo. Il posto è stato liberato.");
-
-                try {
-                    FileManager.salvaPrenotazioni(databasePrenotazioni, databaseUtenti);
-                } catch (Exception e) {
-                    System.out.println("⚠️ Avviso: Errore durante l'aggiornamento del file delle prenotazioni.");
-                }
-                break;
-            }
-        }
-
-        if (!trovataERimossa) {
-            System.out.println("   Errore: Prenotazione non trovata nel tuo archivio o ID errato.");
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // INTERFACCIA UTENTE
-    // ------------------------------------------------------------------------
-
     @Override
     public void mostraMenu() {
         System.out.println("\n=== AREA PERSONALE CLIENTE: " + getNome().toUpperCase() + " ===");
-        System.out.println("1. Cerca proiezioni ");
+        System.out.println("1. Cerca proiezioni");
         System.out.println("2. Inserisci una nuova prenotazione");
         System.out.println("3. Visualizza le tue prenotazioni attive");
-        System.out.println("4. Modifica le tue prenotazioni (Cambio Data)");
+        System.out.println("4. Modifica le tue prenotazioni (Cambio Data/Spettacolo)");
         System.out.println("5. Cancella una prenotazione");
         System.out.println("6. Logout");
     }
 
-    public void eseguiAzione(int scelta, List<Prenotazione> databasePrenotazioni, List<Proiezione> palinsesto, List<Utente> databaseUtenti) {
+    /**
+     * Gestisce la logica e le interazioni da riga di comando relative all'opzione selezionata dal cliente.
+     *
+     * @param scelta    L'opzione numerica selezionata dal menu.
+     * @param palinsesto La lista di proiezioni attualmente disponibili nel palinsesto.
+     */
+    public void eseguiAzione(int scelta, List<Proiezione> palinsesto) {
         Scanner scanner = new Scanner(System.in);
 
         switch (scelta) {
             case 1:
                 System.out.println("\n--- 1. RICERCA E VISUALIZZAZIONE PROIEZIONI ---");
 
-                System.out.print("• Titolo film (INVIO per tutti): ");
+                System.out.print("- Titolo film (INVIO per tutti): ");
                 String titolo = scanner.nextLine().trim();
 
-                System.out.print("• Genere/Tipologia (INVIO per tutti): ");
+                System.out.print("- Genere/Tipologia (INVIO per tutti): ");
                 String genere = scanner.nextLine().trim();
 
-                System.out.print("• Data inizio intervallo (gg/mm/aaaa, INVIO per nessuna): ");
+                System.out.print("- Data inizio intervallo (gg/mm/aaaa, INVIO per nessuna): ");
                 String dataInizioStr = scanner.nextLine().trim();
 
-                System.out.print("• Data fine intervallo (gg/mm/aaaa, INVIO per nessuna): ");
+                System.out.print("- Data fine intervallo (gg/mm/aaaa, INVIO per nessuna): ");
                 String dataFineStr = scanner.nextLine().trim();
 
                 LocalDate filterInizio = null;
@@ -213,17 +164,25 @@ public class Cliente extends Utente {
                 }
 
                 double prezzoMinimo = 3.50;
-                System.out.print("• Prezzo minimo (€, INVIO per 3.50 €): ");
+                System.out.print("- Prezzo minimo (EUR, INVIO per 3.50 EUR): ");
                 String pMinInput = scanner.nextLine().trim();
                 if (!pMinInput.isEmpty()) {
-                    prezzoMinimo = Double.parseDouble(pMinInput);
+                    try {
+                        prezzoMinimo = Double.parseDouble(pMinInput.replace(",", "."));
+                    } catch (NumberFormatException e) {
+                        System.out.println("  Prezzo minimo non valido, impostato a valore predefinito (3.50 EUR).");
+                    }
                 }
 
-                double prezzoMassimo = 9999.0; // Valore di default "infinito" se l'utente preme INVIO
-                System.out.print("• Prezzo massimo (€, INVIO per nessun limite): ");
+                double prezzoMassimo = 9999.0;
+                System.out.print("- Prezzo massimo (EUR, INVIO per nessun limite): ");
                 String pMaxInput = scanner.nextLine().trim();
                 if (!pMaxInput.isEmpty()) {
-                    prezzoMassimo = Double.parseDouble(pMaxInput);
+                    try {
+                        prezzoMassimo = Double.parseDouble(pMaxInput.replace(",", "."));
+                    } catch (NumberFormatException e) {
+                        System.out.println("  Prezzo massimo non valido, impostato a nessun limite.");
+                    }
                 }
 
                 List<Proiezione> risultatiFiltrati = new ArrayList<>();
@@ -255,11 +214,11 @@ public class Cliente extends Utente {
                 }
 
                 if (risultatiFiltrati.isEmpty()) {
-                    System.out.println(" Nessuna proiezione corrisponde ai criteri cercati.");
+                    System.out.println("  Nessuna proiezione corrisponde ai criteri cercati.");
                     break;
                 }
 
-                System.out.println("\n--- RISULTATI TROVATI (Seleziona un numero) ---");
+                System.out.println("\n--- RISULTATI TROVATI ---");
                 for (int i = 0; i < risultatiFiltrati.size(); i++) {
                     Proiezione p = risultatiFiltrati.get(i);
                     System.out.println((i + 1) + ". " + p.getFilm().getTitolo() + " (" + p.getDataProiezione() + " ore " + p.getOraProiezione() + ")");
@@ -298,7 +257,7 @@ public class Cliente extends Utente {
                 }
 
                 if (proiezioniTrovate.isEmpty()) {
-                    System.out.println(" Nessuno spettacolo trovato per il titolo inserito.");
+                    System.out.println("  Nessuno spettacolo trovato per il titolo inserito.");
                     break;
                 }
 
@@ -319,7 +278,7 @@ public class Cliente extends Utente {
                         if (sceltaSpettacolo >= 0 && sceltaSpettacolo <= proiezioniTrovate.size()) {
                             break;
                         }
-                        System.out.println(" Numero di selezione non valido. Riprova.");
+                        System.out.println("  Numero di selezione non valido. Riprova.");
                     } catch (NumberFormatException e) {
                         System.out.println("  Errore: Inserisci un numero intero valido.");
                     }
@@ -353,14 +312,7 @@ public class Cliente extends Utente {
 
                 if (postiRichiesti <= proiezioneScelta.getPostiDisponibili()) {
                     for (int k = 0; k < postiRichiesti; k++) {
-                        // Sfrutta direttamente il metodo nativo interno per la creazione atomica
-                        this.creaPrenotazione(proiezioneScelta, databasePrenotazioni);
-                    }
-                    try {
-                        FileManager.salvaPrenotazioni(databasePrenotazioni, databaseUtenti);
-                        FileManager.salvaPalinsesto(palinsesto);
-                    } catch (Exception e) {
-                        System.out.println("⚠️ Errore durante il salvataggio dei file.");
+                        this.creaPrenotazione(proiezioneScelta);
                     }
                 } else {
                     System.out.println("  Errore: Non ci sono abbastanza posti disponibili. Posti rimasti: " + proiezioneScelta.getPostiDisponibili());
@@ -369,82 +321,38 @@ public class Cliente extends Utente {
 
             case 3:
                 System.out.println("\n--- 3. LE TUE PRENOTAZIONI ---");
-                // Pescaggio ottimizzato: passiamo direttamente il database globale, filtra da sé
-                this.visualizzaPrenotazioni(databasePrenotazioni);
+                try {
+                    FileManager.stampaPrenotazioniUtente(this.getUsername());
+                } catch (Exception e) {
+                    System.out.println("  Errore durante la lettura delle prenotazioni.");
+                }
                 break;
 
             case 4:
                 System.out.println("\n--- 4. MODIFICA PRENOTAZIONE (CAMBIO DATA) ---");
-                // Recuperiamo la lista corretta filtrata delle sole prenotazioni dell'utente per validazione locale
-                List<Prenotazione> miePrenotazioniMod = this.visualizzaPrenotazioni(databasePrenotazioni);
-
-                if (miePrenotazioniMod.isEmpty()) break;
-
-                System.out.print("\nInserisci l'ID della prenotazione da spostare: ");
+                System.out.print("Inserisci l'ID della prenotazione da spostare: ");
                 String idPrenotazioneMod = scanner.nextLine().trim();
 
-                boolean isMiaMod = false;
-                for (Prenotazione pren : miePrenotazioniMod) {
-                    if (pren.getIdPrenotazione().equalsIgnoreCase(idPrenotazioneMod)) {
-                        isMiaMod = true;
-                        break;
-                    }
-                }
-
-                if (!isMiaMod) {
-                    System.out.println("  Errore: Non puoi modificare questa prenotazione (ID errato o non tuo).");
-                    break;
-                }
-
-                System.out.print("Inserisci l'ID della NUOVA proiezione su cui vuoi spostarti (es. P-XXXXXX): ");
+                System.out.print("Inserisci l'ID della NUOVA proiezione su cui vuoi spostarti: ");
                 String idNuovaProiezione = scanner.nextLine().trim();
 
-                boolean trovatoNuova = false;
-                for (Proiezione p : palinsesto) {
-                    if (p.getIdProiezione().equalsIgnoreCase(idNuovaProiezione)) {
-                        this.modificaPrenotazione(idPrenotazioneMod, p, databasePrenotazioni);
-                        trovatoNuova = true;
-
-                        try {
-                            FileManager.salvaPrenotazioni(databasePrenotazioni, databaseUtenti);
-                            FileManager.salvaPalinsesto(palinsesto);
-                        } catch (Exception e) {
-                            System.out.println("⚠️ Errore durante il salvataggio dei file.");
-                        }
-                        break;
+                try {
+                    boolean modificato = FileManager.modificaProiezioneInPrenotazione(idPrenotazioneMod, this.getUsername(), idNuovaProiezione);
+                    if (modificato) {
+                        System.out.println("  Prenotazione aggiornata con successo su file!");
+                    } else {
+                        System.out.println("  Impossibile modificare: ID prenotazione errato o non tuo.");
                     }
-                }
-
-                if (!trovatoNuova) {
-                    System.out.println("  Errore: La nuova proiezione selezionata non esiste.");
+                } catch (Exception e) {
+                    System.out.println("  Errore durante la modifica del file CSV.");
                 }
                 break;
 
             case 5:
                 System.out.println("\n--- 5. CANCELLA PRENOTAZIONE ---");
-                List<Prenotazione> miePrenotazioniDel = this.visualizzaPrenotazioni(databasePrenotazioni);
-
-                if (miePrenotazioniDel.isEmpty()) break;
-
-                System.out.print("\nInserisci l'ID della prenotazione da annullare: ");
+                System.out.print("Inserisci l'ID della prenotazione da annullare: ");
                 String idPrenotazioneCanc = scanner.nextLine().trim();
-
-                boolean isMiaDel = false;
-                for (Prenotazione pren : miePrenotazioniDel) {
-                    if (pren.getIdPrenotazione().equalsIgnoreCase(idPrenotazioneCanc)) {
-                        isMiaDel = true;
-                        break;
-                    }
-                }
-
-                if (isMiaDel) {
-                    this.eliminaPrenotazione(idPrenotazioneCanc, databasePrenotazioni, databaseUtenti);
-                    try {
-                        FileManager.salvaPalinsesto(palinsesto);
-                    } catch (Exception e) { /**/ }
-                } else {
-                    System.out.println("  Errore: Non puoi eliminare questa prenotazione (ID errato o non tuo).");
-                }
+                this.eliminaPrenotazione(idPrenotazioneCanc);
                 break;
 
             case 6:
@@ -452,7 +360,7 @@ public class Cliente extends Utente {
                 break;
 
             default:
-                System.out.println("Scelta non valida.");
+                System.out.println("  Scelta non valida.");
         }
     }
 }
