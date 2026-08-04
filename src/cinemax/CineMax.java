@@ -7,9 +7,7 @@ import cinemax.gestione.Proiezione;
 import cinemax.utils.FileManager;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -20,7 +18,8 @@ import java.util.Scanner;
 
 public class CineMax {
 
-    private static final DateTimeFormatter FMT_ITA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FMT_ITA = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            .withResolverStyle(java.time.format.ResolverStyle.STRICT);
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -45,39 +44,7 @@ public class CineMax {
                     registraCliente(sc);
                     break;
                 case 2:
-                    System.out.println("\n=============================================");
-                    System.out.println("                 LOG IN                      ");
-                    System.out.println("=============================================");
-                    System.out.print("Inserisci Username: ");
-                    String usernameLogin = sc.nextLine().trim();
-
-                    System.out.print("Inserisci Password: ");
-                    String passwordLogin = sc.nextLine().trim();
-
-                    try {
-                        // Cerca l'utente salvato su file tramite l'username
-                        java.util.Optional<Utente> utenteOpt = FileManager.caricaUtentePerUsername(usernameLogin);
-
-                        if (utenteOpt.isPresent()) {
-                            Utente u = utenteOpt.get();
-
-                            // Verifica se la password inserita corrisponde all'hash salvato
-                            if (FileManager.verificaPassword(passwordLogin, u.getPasswordHash())) {
-                                System.out.println("\n  Accesso effettuato con successo!");
-                                System.out.println("  Benvenuto, " + u.getNome() + " " + u.getCognome() + " (" + u.getClass().getSimpleName() + ").");
-
-                                // Avvia la sessione specifica dell'utente (mostrerà il suo menu in base al ruolo)
-                                avviaSessioneUtente(u, sc);
-
-                            } else {
-                                System.out.println("  Errore: Password errata. Riprova.");
-                            }
-                        } else {
-                            System.out.println("  Errore: Nessun utente registrato con l'username '" + usernameLogin + "'.");
-                        }
-                    } catch (IOException e) {
-                        System.err.println("  [ERRORE I/O] Impossibile completare il login: " + e.getMessage());
-                    }
+                    gestisciLogin(sc);
                     break;
                 case 3:
                     gestisciGuest(sc);
@@ -226,89 +193,6 @@ public class CineMax {
         } while (sceltaAzione != opzioneLogout);
 
         System.out.println("\nDisconnessione completata. Ritorno al menu principale...");
-    }
-
-    /**
-     * Filtra la lista del palinsesto in base a molteplici criteri di ricerca.
-     */
-    public static List<Proiezione> cercaProiezione(List<Proiezione> palinsesto,
-                                                   String titolo, String genere,
-                                                   LocalDate dataInizio, LocalDate dataFine,
-                                                   Double prezzoMin, Double prezzoMax) {
-        List<Proiezione> risultati = new ArrayList<>();
-
-        for (Proiezione p : palinsesto) {
-            Film f = p.getFilm();
-
-            if (titolo != null && !titolo.trim().isEmpty() && !f.getTitolo().toLowerCase().contains(titolo.toLowerCase())) {
-                continue;
-            }
-
-            if (genere != null && !genere.trim().isEmpty() && !f.getGenere().equalsIgnoreCase(genere)) {
-                continue;
-            }
-
-            Date dateObj = p.getDataProiezione();
-            if (dateObj != null) {
-                LocalDate dataP = dateObj.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-                if (dataInizio != null && dataP.isBefore(dataInizio)) {
-                    continue;
-                }
-                if (dataFine != null && dataP.isAfter(dataFine)) {
-                    continue;
-                }
-            }
-
-            double prezzo = p.getPrezzoBiglietto();
-            if (prezzoMin != null && prezzo < prezzoMin) {
-                continue;
-            }
-            if (prezzoMax != null && prezzo > prezzoMax) {
-                continue;
-            }
-
-            risultati.add(p);
-        }
-
-        return risultati;
-    }
-
-    /**
-     * Stampa a consolle una scheda formattata con la descrizione completa
-     * di una proiezione e del film associato.
-     */
-    public static void visualizzaProiezione(Proiezione p) {
-        Film f = p.getFilm();
-
-        String dataStr = "N/D";
-        if (p.getDataProiezione() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            dataStr = sdf.format(p.getDataProiezione());
-        }
-
-        LocalTime oraObj = p.getOraProiezione();
-        String oraStr = oraObj != null ? oraObj.toString() : "N/D";
-
-        System.out.println("\n=============================================");
-        System.out.println("          DETTAGLI PROIEZIONE CINEMAX        ");
-        System.out.println("=============================================");
-        System.out.println("CARATTERISTICHE FILM:");
-        System.out.println("  • Titolo:    " + f.getTitolo());
-        System.out.println("  • Genere:    " + f.getGenere());
-        System.out.println("  • Regista:   " + f.getRegista());
-        System.out.println("  • Anno:      " + f.getAnno());
-        System.out.println("  • Durata:    " + f.getDurata() + " minuti");
-        System.out.println("  • Età Min:   " + (f.getEta_minima() == 0 ? "Tutti" : f.getEta_minima() + "+"));
-        System.out.println("---------------------------------------------");
-        System.out.println("PROGRAMMAZIONE:");
-        System.out.println("  • Data:      " + dataStr);
-        System.out.println("  • Ora:       " + oraStr);
-        System.out.println("---------------------------------------------");
-        System.out.println("INFO BIGLIETTI & SALA:");
-        System.out.println("  • Costo:     " + String.format("%.2f€", p.getPrezzoBiglietto()));
-        System.out.println("  • Posti Liberi: " + p.getPostiDisponibili() + " / 200");
-        System.out.println("=============================================\n");
     }
 
     /**
@@ -469,13 +353,7 @@ public class CineMax {
                     // Imposta continua a false per uscire dal loop del Guest
                     continua = false;
 
-                    // Nota: se vuoi che dopo la registrazione entri subito nella sua sessione
-                    // e che al logout esca direttamente al menu principale, ti basta gestire
-                    // il flusso nel main. La registrazione già avvia la sessione.
-                    // Uscendo dal Guest con continua = false, una volta fatto il logout
-                    // dalla sessione cliente, si tornerà al do-while del main.
                     break;
-
                 case 3:
                     System.out.println("Uscita dal menu Ospite...");
                     continua = false;
@@ -486,10 +364,61 @@ public class CineMax {
             }
         }
     }
+    /**
+     * Gestisce il flusso interattivo di Login per gli utenti registrati.
+     * Verifica l'esistenza dell'username e la correttezza della password,
+     * avviando successivamente la sessione dedicata in caso di successo.
+     *
+     * @param sc Scanner condiviso per la lettura dell'input da console.
+     */
+    public static void gestisciLogin(Scanner sc) {
+        boolean loginEffettuato = false;
 
+        while (!loginEffettuato) {
+            System.out.println("\n=============================================");
+            System.out.println("                 LOG IN                      ");
+            System.out.println("=============================================");
+            System.out.print("Inserisci Username (o premi INVIO per tornare indietro): ");
+            String usernameLogin = sc.nextLine().trim();
 
+            // Se l'utente preme invio senza mettere l'username, esce dal login e torna al menu principale
+            if (usernameLogin.isEmpty()) {
+                System.out.println("Ritorno al menu principale...");
+                return;
+            }
 
+            System.out.print("Inserisci Password: ");
+            String passwordLogin = sc.nextLine().trim();
 
+            try {
+                // Cerca l'utente salvato su file tramite l'username
+                java.util.Optional<Utente> utenteOpt = FileManager.caricaUtentePerUsername(usernameLogin);
+
+                if (utenteOpt.isPresent()) {
+                    Utente u = utenteOpt.get();
+
+                    // Verifica se la password inserita corrisponde all'hash salvato
+                    if (FileManager.verificaPassword(passwordLogin, u.getPasswordHash())) {
+                        System.out.println("\n  Accesso effettuato con successo!");
+                        System.out.println("  Benvenuto, " + u.getNome() + " " + u.getCognome() + " (" + u.getClass().getSimpleName() + ").");
+
+                        // Avvia la sessione specifica dell'utente
+                        avviaSessioneUtente(u, sc);
+
+                        loginEffettuato = true; // Imposta a true per uscire dal ciclo una volta fatto il logout
+
+                    } else {
+                        System.out.println("\n  [ERRORE] Password errata. Riprova.");
+                    }
+                } else {
+                    System.out.println("\n  [ERRORE] Nessun utente registrato con l'username '" + usernameLogin + "'. Riprova.");
+                }
+            } catch (IOException e) {
+                System.err.println("\n  [ERRORE I/O] Impossibile completare il login: " + e.getMessage());
+                break; // In caso di errore grave di I/O usciamo dal ciclo
+            }
+        }
+    }
 
 }
 

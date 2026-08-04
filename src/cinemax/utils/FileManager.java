@@ -263,28 +263,30 @@ public class FileManager {
             while ((riga = reader.readLine()) != null) {
                 if (riga.trim().isEmpty()) continue;
 
-                String[] elementi = riga.split(SEPARATORE);
+                // Usa una regex per dividere la riga ignorando le virgole racchiuse tra virgolette (es. nei titoli)
+                String[] elementi = riga.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 if (elementi.length < 11) continue;
 
-                String idProiezione = elementi[0].trim();
-                String dataStringa  = elementi[1].trim();
-                String oraStringa   = elementi[2].trim();
-                String titolo       = elementi[3].trim();
-                String genere       = elementi[4].trim();
-                String regista      = elementi[5].trim();
+                // Pulisce le virgolette doppie e gli spazi dai campi stringa
+                String idProiezione = elementi[0].replace("\"", "").trim();
+                String dataStringa  = elementi[1].replace("\"", "").trim();
+                String oraStringa   = elementi[2].replace("\"", "").trim();
+                String titolo       = elementi[3].replace("\"", "").trim();
+                String genere       = elementi[4].replace("\"", "").trim();
+                String regista      = elementi[5].replace("\"", "").trim();
 
                 try {
-                    int anno         = Integer.parseInt(elementi[6].trim());
-                    int durata       = Integer.parseInt(elementi[7].trim());
-                    int etaMinima    = Integer.parseInt(elementi[8].trim());
-                    double prezzo    = Double.parseDouble(elementi[9].trim());
-                    int postiRimasti = Integer.parseInt(elementi[10].trim());
+                    int anno         = Integer.parseInt(elementi[6].replace("\"", "").trim());
+                    int durata       = Integer.parseInt(elementi[7].replace("\"", "").trim());
+                    int etaMinima    = Integer.parseInt(elementi[8].replace("\"", "").trim());
+                    double prezzo    = Double.parseDouble(elementi[9].replace("\"", "").trim().replace(",", "."));
+                    int postiRimasti = Integer.parseInt(elementi[10].replace("\"", "").trim());
 
                     // Conversione della stringa (es. "dd/MM/yyyy") in java.util.Date tramite LocalDate
                     LocalDate localDate = LocalDate.parse(dataStringa, FMT_ITA);
                     java.util.Date dataProiezione = java.util.Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                    // Conversione della stringa in LocalTime (se il costruttore della proiezione lo richiede)
+                    // Conversione della stringa in LocalTime
                     LocalTime oraProiezione = LocalTime.parse(oraStringa);
 
                     Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
@@ -566,13 +568,16 @@ public class FileManager {
                     continue;
                 }
 
-                String[] elementi = riga.split(SEPARATORE);
-                if (elementi.length >= 6) {
-                    String id = elementi[0].trim();
-                    String user = elementi[3].trim();
+                // Usa la stessa regex per evitare problemi con eventuali virgole e pulisci le virgolette
+                String[] elementi = riga.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                if (elementi.length >= 8) {
+                    // Rimuoviamo le virgolette per un confronto sicuro
+                    String id = elementi[0].replace("\"", "").trim();
+                    String user = elementi[3].replace("\"", "").trim();
 
                     if (id.equalsIgnoreCase(idPrenotazione.trim()) && user.equalsIgnoreCase(usernameUtente.trim())) {
-                        elementi[5] = idNuovaProiezione;
+                        // Sostituisce l'ID proiezione mantenendo le virgolette se lo desideri, oppure pulito
+                        elementi[5] = "\"" + idNuovaProiezione.replace("\"", "").trim() + "\"";
                         riga = String.join(SEPARATORE, elementi);
                         trovato = true;
                     }
