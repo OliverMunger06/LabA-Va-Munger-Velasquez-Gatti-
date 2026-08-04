@@ -1,21 +1,21 @@
-"18/09/2026","10:30:00","Hiroshima mon amour",Drama,"Alain Resnais",1959,90,12,8.50
-"18/09/2026","14:00:00","Raging Bull",Biography,"Martin Scorsese",1980,129,12,6.50
-"21/09/2026","10:30:00","Deadpool 2",Action,"David Leitch",2018,119,16,7.00
-"23/09/2026","13:00:00","The Lion in Winter",Biography,"Anthony Harvey",1968,134,6,7.50
-"23/09/2026","17:00:00","The Lion in Winter",Biography,"Anthony Harvey",1968,134,6,9.50
-"25/10/2026","21:00:00","The Adventures of Robin Hood",Action,"Michael Curtiz",1938,102,6,10.50
-"29/12/2026","16:30:00",Shine,Biography,"Scott Hicks",1996,105,0,7.00
-"31/12/2026","13:00:00","Apocalypse Now",Drama,"Francis Ford Coppola",1979,147,16,8.00
-"01/01/2027","10:00:00","Oliver's life",Action,"Andrew Davis",1993,130,0,6.50
-"03/01/2027","19:00:00","Apocalypse Now",Drama,"Francis Ford Coppola",1979,147,16,8.50
-"05/01/2027","16:00:00",Mononoke-hime,Animation,"Hayao Miyazaki",1997,134,0,8.00
-"05/01/2027","13:00:00","The Killing Fields",Biography,"Roland Joffé",1984,141,12,8.00
-"06/01/2027","10:30:00","El ángel exterminador",Drama,"Luis Buñuel",1962,95,12,8.00
-"06/01/2027","16:30:00",Mononoke-hime,Animation,"Hayao Miyazaki",1997,134,0,6.50
-"09/02/2027","13:30:00",Sleuth,Mystery,"Joseph L. Mankiewicz",1972,138,6,7.50
-"09/03/2028","10:30:00","The Last Picture Show",Drama,"Peter Bogdanovich",1971,118,16,8.00
-"13/03/2028","12:30:00","The Lion in Winter",Biography,"Anthony Harvey",1968,134,6,8.00
-"16/03/2028","10:00:00",Shine,Biography,"Scott Hicks",1996,105,0,8.50
-"21/03/2028","13:30:00","Apocalypse Now",Drama,"Francis Ford Coppola",1979,147,16,7.00
-"25/04/2028","10:30:00","Ayla: The Daughter of War",Biography,"Can Ulkay",2017,125,12,7.50
-"01/01/2019","10:30:00","The Adventures of Robin Hood",Action,"Michael Curtiz",1938,102,6,8.00
+"P-A1B2C3D4","18/09/2026","10:30","Hiroshima mon amour","Drama","Alain Resnais",1959,90,12,8.50,200
+"P-E5F6G7H8","18/09/2026","14:00","Raging Bull","Biography","Martin Scorsese",1980,129,12,6.50,200
+"P-9I0J1K2L","21/09/2026","10:30","Deadpool 2","Action","David Leitch",2018,119,16,7.00,200
+"P-3M4N5O6P","23/09/2026","13:00","The Lion in Winter","Biography","Anthony Harvey",1968,134,6,7.50,200
+"P-7Q8R9S0T","23/09/2026","17:00","The Lion in Winter","Biography","Anthony Harvey",1968,134,6,9.50,200
+"P-U1V2W3X4","25/10/2026","21:00","The Adventures of Robin Hood","Action","Michael Curtiz",1938,102,6,10.50,200
+"P-Y5Z6A7B8","29/12/2026","16:30","Shine","Biography","Scott Hicks",1996,105,0,7.00,200
+"P-C9D0E1F2","31/12/2026","13:00","Apocalypse Now","Drama","Francis Ford Coppola",1979,147,16,8.00,200
+"P-G3H4I5J6","01/01/2027","10:00","Oliver's life","Action","Andrew Davis",1993,130,0,6.50,200
+"P-K7L8M9N0","03/01/2027","19:00","Apocalypse Now","Drama","Francis Ford Coppola",1979,147,16,8.50,200
+"P-O1P2Q3R4","05/01/2027","16:00","Mononoke-hime","Animation","Hayao Miyazaki",1997,134,0,8.00,200
+"P-S5T6U7V8","05/01/2027","13:00","The Killing Fields","Biography","Roland Joffé",1984,141,12,8.00,200
+"P-W9X0Y1Z2","06/01/2027","10:30","El ángel exterminador","Drama","Luis Buñuel",1962,95,12,8.00,200
+"P-3A4B5C6D","06/01/2027","16:30","Mononoke-hime","Animation","Hayao Miyazaki",1997,134,0,6.50,200
+"P-7E8F9G0H","09/02/2027","13:30","Sleuth","Mystery","Joseph L. Mankiewicz",1972,138,6,7.50,200
+"P-I1J2K3L4","09/03/2028","10:30","The Last Picture Show","Drama","Peter Bogdanovich",1971,118,16,8.00,200
+"P-M5N6O7P8","13/03/2028","12:30","The Lion in Winter","Biography","Anthony Harvey",1968,134,6,8.00,200
+"P-Q9R0S1T2","16/03/2028","10:00","Shine","Biography","Scott Hicks",1996,105,0,8.50,200
+"P-U3V4W5X6","21/03/2028","13:30","Apocalypse Now","Drama","Francis Ford Coppola",1979,147,16,7.00,200
+"P-Y7Z8A9B0","25/04/2028","10:30","Ayla: The Daughter of War","Biography","Can Ulkay",2017,125,12,7.50,200
+"P-C1D2E3F4","01/01/2029","10:30","The Adventures of Robin Hood","Action","Michael Curtiz",1938,102,6,8.00,200
