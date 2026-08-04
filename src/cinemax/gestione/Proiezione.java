@@ -1,6 +1,8 @@
 package cinemax.gestione;
 
 import java.util.UUID;
+import java.util.Date;
+import java.time.LocalTime;
 
 /**
  * Rappresenta una proiezione cinematografica (spettacolo) all'interno del sistema Cinemax.
@@ -10,7 +12,6 @@ import java.util.UUID;
  * </p>
  *
  * @author Cinemax Team
- * @version 1.0
  */
 public class Proiezione {
 
@@ -21,11 +22,11 @@ public class Proiezione {
     /** L'identificativo univoco della proiezione (es. "P-A1B2C3D4"). */
     private final String idProiezione;
 
-    /** La data della proiezione in formato stringa (es. "DD/MM/YYYY"). */
-    private String dataProiezione;
+    /** La data della proiezione. */
+    private Date dataProiezione;
 
-    /** L'ora della proiezione in formato stringa (es. "HH:mm"). */
-    private String oraProiezione;
+    /** L'ora della proiezione. */
+    private LocalTime oraProiezione;
 
     /** Il prezzo del singolo biglietto espresso in Euro. */
     private final double prezzoBiglietto;
@@ -46,39 +47,39 @@ public class Proiezione {
      * Genera automaticamente un ID univoco casuale (prefissato con "P-") e imposta
      * il numero iniziale di posti disponibili a 200 (sala vuota).
      * </p>
-
+     *
      * @param data            La data dello spettacolo.
      * @param ora             L'orario di inizio dello spettacolo.
      * @param prezzoBiglietto Il prezzo base del biglietto.
      * @param film            L'oggetto {@link Film} proiettato.
      */
-    public Proiezione(String data, String ora, double prezzoBiglietto, Film film) {
+    public Proiezione(Date data, LocalTime ora, double prezzoBiglietto, Film film) {
         // Genera un ID compatto del tipo "P-A1B2C3D4"
         this.idProiezione = "P-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        this.dataProiezione = data != null ? data.trim() : "";
-        this.oraProiezione = ora != null ? ora.trim() : "";
+        this.dataProiezione = data;
+        this.oraProiezione = ora;
         this.prezzoBiglietto = prezzoBiglietto;
         this.film = film;
         this.postiDisponibili = 200; // Nuovo spettacolo = Sala vuota
     }
 
     /**
-     * COSTRUTTORE 2: Usato dal {@code FileManager} per ripristinare uno spettacolo esistente da File.
+     * COSTRUTTORE 2: Usato per ripristinare uno spettacolo esistente con tipi Date e LocalTime.
      * <p>
-     * Accetta l'ID e lo stato esatto dei posti rimasti letti direttamente dal file di persistenza CSV.
+     * Accetta l'ID, gli oggetti data/ora e lo stato esatto dei posti rimasti.
      * </p>
-
-     * @param idProiezione     L'ID univoco esistente letto da file.
-     * @param data            La data dello spettacolo.
-     * @param ora             L'orario di inizio dello spettacolo.
-     * @param prezzoBiglietto Il prezzo del biglietto.
-     * @param film            L'oggetto {@link Film} associato.
+     *
+     * @param idProiezione     L'ID univoco esistente.
+     * @param data             La data dello spettacolo (oggetto {@link Date}).
+     * @param ora              L'orario di inizio dello spettacolo (oggetto {@link LocalTime}).
+     * @param prezzoBiglietto  Il prezzo del biglietto.
+     * @param film             L'oggetto {@link Film} associato.
      * @param postiDisponibili Il numero di posti rimasti disponibili.
      */
-    public Proiezione(String idProiezione, String data, String ora, double prezzoBiglietto, Film film, int postiDisponibili) {
+    public Proiezione(String idProiezione, Date data, LocalTime ora, double prezzoBiglietto, Film film, int postiDisponibili) {
         this.idProiezione = idProiezione != null ? idProiezione.trim() : "";
-        this.dataProiezione = data != null ? data.trim() : "";
-        this.oraProiezione = ora != null ? ora.trim() : "";
+        this.dataProiezione = data;
+        this.oraProiezione = ora;
         this.prezzoBiglietto = prezzoBiglietto;
         this.film = film;
         this.postiDisponibili = postiDisponibili; // Carica lo stato reale salvato
@@ -102,7 +103,7 @@ public class Proiezione {
      *
      * @return La data dello spettacolo.
      */
-    public String getDataProiezione() {
+    public Date getDataProiezione() {
         return dataProiezione;
     }
 
@@ -111,7 +112,7 @@ public class Proiezione {
      *
      * @param dataProiezione La nuova data dello spettacolo.
      */
-    public void setDataProiezione(String dataProiezione) {
+    public void setDataProiezione(Date dataProiezione) {
         this.dataProiezione = dataProiezione;
     }
 
@@ -120,7 +121,7 @@ public class Proiezione {
      *
      * @return L'ora dello spettacolo.
      */
-    public String getOraProiezione() {
+    public LocalTime getOraProiezione() {
         return oraProiezione;
     }
 
@@ -129,7 +130,7 @@ public class Proiezione {
      *
      * @param oraProiezione Il nuovo orario dello spettacolo.
      */
-    public void setOraProiezione(String oraProiezione) {
+    public void setOraProiezione(LocalTime oraProiezione) {
         this.oraProiezione = oraProiezione;
     }
 
@@ -185,8 +186,8 @@ public class Proiezione {
     /**
      * Tenta di prenotare un posto per lo spettacolo decrementando i posti disponibili.
      *
-     * @return {@code true} se il posto e' stato prenotato con successo (posti > 0),
-     *         {@code false} se la sala e' esaurita.
+     * @return {@code true} se il posto è stato prenotato con successo (posti > 0),
+     *         {@code false} se la sala è esaurita.
      */
     public boolean prenotaPosto() {
         if (this.postiDisponibili > 0) {

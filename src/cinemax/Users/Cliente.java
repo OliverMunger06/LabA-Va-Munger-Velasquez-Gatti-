@@ -7,8 +7,10 @@ import cinemax.gestione.Prenotazione;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -76,7 +78,6 @@ public class Cliente extends Utente {
         }
     }
 
-
     /**
      * Modifica la proiezione associata a una prenotazione esistente del cliente.
      * <p>
@@ -88,13 +89,8 @@ public class Cliente extends Utente {
      */
     public void modificaPrenotazione(Scanner scanner) {
         try {
-            // 1. Chiede l'ID della prenotazione da modificare
             System.out.print("Inserisci l'ID della prenotazione da modificare: ");
             String idPrenotazione = scanner.nextLine().trim();
-
-            // 2. Recupera i dettagli della prenotazione (o verifica che esista e appartenga all'utente)
-            // Nota: Se FileManager restituisce le informazioni o la proiezione associata, puoi effettuare i controlli.
-            // Qui assumiamo di caricare il palinsesto e le prenotazioni per validare le date.
 
             List<Proiezione> palinsesto = FileManager.caricaPalinsesto();
             if (palinsesto.isEmpty()) {
@@ -102,18 +98,17 @@ public class Cliente extends Utente {
                 return;
             }
 
-            // 3. Mostra le proiezioni disponibili per il cambio
             System.out.println("\nSpettacoli disponibili nel palinsesto:");
             for (int i = 0; i < palinsesto.size(); i++) {
                 Proiezione p = palinsesto.get(i);
+                String dataStr = p.getDataProiezione() != null ? FMT_ITA.format(p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) : "N/D";
                 System.out.println((i + 1) + ". [ID: " + p.getIdProiezione() + "] " +
-                        p.getFilm().getTitolo() + " - Data: " + p.getDataProiezione() + " ore " + p.getOraProiezione());
+                        p.getFilm().getTitolo() + " - Data: " + dataStr + " ore " + p.getOraProiezione());
             }
 
             System.out.print("\nInserisci l'ID della NUOVA proiezione su cui vuoi spostarti: ");
             String idNuovaProiezione = scanner.nextLine().trim();
 
-            // 4. Ricerca della nuova proiezione nel palinsesto per controllarne la data
             Proiezione nuovaProiezione = null;
             for (Proiezione p : palinsesto) {
                 if (p.getIdProiezione().equalsIgnoreCase(idNuovaProiezione)) {
@@ -127,34 +122,32 @@ public class Cliente extends Utente {
                 return;
             }
 
-            LocalDate oggi = LocalDate.now();
-
-            // 5. Controllo data nuova proiezione: deve essere SUCCESSIVA ad oggi
-            LocalDate dataNuovaObj = LocalDate.parse(nuovaProiezione.getDataProiezione(), FMT_ITA);
-            if (!dataNuovaObj.isAfter(oggi)) {
-                System.out.println("  Errore: Impossibile effettuare la modifica.");
-                System.out.println("  Motivo: La nuova data (" + nuovaProiezione.getDataProiezione() +
-                        ") non è successiva alla data odierna (" + oggi.format(FMT_ITA) + ").");
+            if (nuovaProiezione.getDataProiezione() == null) {
+                System.out.println("  Errore: La data della nuova proiezione non è valida.");
                 return;
             }
 
-            // 6. Esecuzione della modifica tramite FileManager (che verificherà anche la vecchia data se gestito a livello di persistenza,
-            //    oppure puoi delegare il controllo completo).
+            LocalDate oggi = LocalDate.now();
+            LocalDate dataNuovaObj = nuovaProiezione.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            if (!dataNuovaObj.isAfter(oggi)) {
+                System.out.println("  Errore: Impossibile effettuare la modifica.");
+                System.out.println("  Motivo: La nuova data non è successiva alla data odierna (" + oggi.format(FMT_ITA) + ").");
+                return;
+            }
+
             boolean modificato = FileManager.modificaProiezioneInPrenotazione(idPrenotazione, this.getUsername(), idNuovaProiezione);
 
             if (modificato) {
-                System.out.println("  Prenotazione aggiornata con successo! Nuova data: " + nuovaProiezione.getDataProiezione());
+                System.out.println("  Prenotazione aggiornata con successo! Nuova data: " + dataNuovaObj.format(FMT_ITA));
             } else {
                 System.out.println("  Impossibile modificare: ID prenotazione errato, non tuo, oppure la proiezione passata è già trascorsa.");
             }
 
-        } catch (DateTimeParseException e) {
-            System.out.println("  Errore nel formato della data della proiezione.");
         } catch (Exception e) {
             System.out.println("  Errore durante l'elaborazione della modifica: " + e.getMessage());
         }
     }
-
 
     /**
      * Visualizza a schermo l'elenco di tutte le prenotazioni attive effettuate
@@ -166,7 +159,6 @@ public class Cliente extends Utente {
         System.out.println("==================================================");
 
         try {
-            // Sfrutta il metodo già esistente in FileManager per stampare o recuperare le prenotazioni
             FileManager.stampaPrenotazioniUtente(this.getUsername());
         } catch (Exception e) {
             System.out.println("  Errore durante il recupero delle prenotazioni da file: " + e.getMessage());
@@ -175,13 +167,6 @@ public class Cliente extends Utente {
         System.out.println("==================================================\n");
     }
 
-
-    /**
-     * Annulla una prenotazione appartenente al cliente corrente rimuovendola
-     * direttamente dal file CSV di persistenza.
-     *
-     * @param idPrenotazione L'identificativo unico della prenotazione da eliminare.
-     */
     /**
      * Annulla una prenotazione appartenente al cliente corrente rimuovendola
      * direttamente dal file CSV, a patto che la data di proiezione sia strettamente
@@ -208,11 +193,16 @@ public class Cliente extends Utente {
                 return;
             }
 
+            if (target.getDataProiezione() == null) {
+                System.out.println("  Errore: Impossibile determinare la data della proiezione.");
+                return;
+            }
+
             LocalDate oggi = LocalDate.now();
-            LocalDate dataProiezione = LocalDate.parse(target.getDataStr(), FMT_ITA);
+            LocalDate dataProiezione = target.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
             if (!dataProiezione.isAfter(oggi)) {
-                System.out.println("  Errore: Impossibile cancellare la prenotazione. La data della proiezione (" + target.getDataStr() + ") deve essere successiva a quella odierna.");
+                System.out.println("  Errore: Impossibile cancellare la prenotazione. La data della proiezione deve essere successiva a quella odierna.");
                 return;
             }
 
@@ -232,7 +222,6 @@ public class Cliente extends Utente {
     // INTERFACCIA UTENTE E MENU
     // ------------------------------------------------------------------------
 
-
     /**
      * Restituisce il valore numerico del menu corrispondente all'operazione di logout per il Cliente.
      *
@@ -242,7 +231,6 @@ public class Cliente extends Utente {
     public int getOpzioneLogout() {
         return 6;
     }
-
 
     /**
      * Stampa a schermo le opzioni disponibili nel menu dell'area personale del cliente.
@@ -260,10 +248,6 @@ public class Cliente extends Utente {
 
     /**
      * Gestisce la logica di business e le interazioni da riga di comando per il Cliente.
-     * <p>
-     * Interagisce direttamente con l'utente tramite standard I/O e legge/aggiorna
-     * le proiezioni e le prenotazioni sui file mediante le utility di {@code FileManager}.
-     * </p>
      *
      * @param scelta L'opzione numerica selezionata dal menu.
      */
@@ -275,7 +259,6 @@ public class Cliente extends Utente {
             case 1:
                 System.out.println("\n--- 1. RICERCA E VISUALIZZAZIONE PROIEZIONI ---");
 
-                // Caricamento del palinsesto aggiornato dal file CSV
                 List<Proiezione> palinsestoCaso1;
                 try {
                     palinsestoCaso1 = FileManager.caricaPalinsesto();
@@ -346,12 +329,11 @@ public class Cliente extends Utente {
                         continue;
                     }
 
-                    String dataPStr = p.getDataProiezione();
-                    try {
-                        LocalDate dataProiezioneObj = LocalDate.parse(dataPStr, FMT_ITA);
+                    if (p.getDataProiezione() != null) {
+                        LocalDate dataProiezioneObj = p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                         if (filterInizio != null && dataProiezioneObj.isBefore(filterInizio)) continue;
                         if (filterFine != null && dataProiezioneObj.isAfter(filterFine)) continue;
-                    } catch (DateTimeParseException e) {
+                    } else {
                         continue;
                     }
 
@@ -370,7 +352,8 @@ public class Cliente extends Utente {
                 System.out.println("\n--- RISULTATI TROVATI ---");
                 for (int i = 0; i < risultatiFiltrati.size(); i++) {
                     Proiezione p = risultatiFiltrati.get(i);
-                    System.out.println((i + 1) + ". " + p.getFilm().getTitolo() + " (" + p.getDataProiezione() + " ore " + p.getOraProiezione() + ")");
+                    String dataStr = p.getDataProiezione() != null ? FMT_ITA.format(p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) : "N/D";
+                    System.out.println((i + 1) + ". " + p.getFilm().getTitolo() + " (" + dataStr + " ore " + p.getOraProiezione() + ")");
                 }
                 System.out.println("0. Torna al menu");
 
@@ -396,7 +379,6 @@ public class Cliente extends Utente {
             case 2:
                 System.out.println("\n--- 2. INSERISCI UNA NUOVA PRENOTAZIONE ---");
 
-                // Caricamento del palinsesto aggiornato dal file CSV
                 List<Proiezione> palinsestoCaso2;
                 try {
                     palinsestoCaso2 = FileManager.caricaPalinsesto();
@@ -428,8 +410,9 @@ public class Cliente extends Utente {
                 System.out.println("\nSpettacoli disponibili:");
                 for (int i = 0; i < proiezioniTrovate.size(); i++) {
                     Proiezione p = proiezioniTrovate.get(i);
+                    String dataStr = p.getDataProiezione() != null ? FMT_ITA.format(p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) : "N/D";
                     System.out.println((i + 1) + ". " + p.getFilm().getTitolo() +
-                            " | Data: " + p.getDataProiezione() + " ore " + p.getOraProiezione() +
+                            " | Data: " + dataStr + " ore " + p.getOraProiezione() +
                             " [Posti disponibili: " + p.getPostiDisponibili() + "]");
                 }
                 System.out.println("0. Annulla l'operazione");

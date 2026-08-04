@@ -15,12 +15,16 @@ import java.nio.file.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Optional;
+
+import static cinemax.Users.Utente.FMT_ITA;
 
 /**
  * Gestore dell'I/O su file e della sicurezza per il sistema Cinemax.
@@ -191,10 +195,6 @@ public class FileManager {
         return false; // Scansionato tutto il file senza trovare corrispondenze
     }
 
-
-
-
-
     // ========================================================
     // LETTURA E SCRITTURA PALINSESTO (Preservazione ID e Posti)
     // ========================================================
@@ -267,8 +267,8 @@ public class FileManager {
                 if (elementi.length < 11) continue;
 
                 String idProiezione = elementi[0].trim();
-                String soloData     = elementi[1].trim();
-                String soloOra      = elementi[2].trim();
+                String dataStringa  = elementi[1].trim();
+                String oraStringa   = elementi[2].trim();
                 String titolo       = elementi[3].trim();
                 String genere       = elementi[4].trim();
                 String regista      = elementi[5].trim();
@@ -280,15 +280,20 @@ public class FileManager {
                     double prezzo    = Double.parseDouble(elementi[9].trim());
                     int postiRimasti = Integer.parseInt(elementi[10].trim());
 
-                    Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
-                    Proiezione p = new Proiezione(idProiezione, soloData, soloOra, prezzo, film, postiRimasti);
+                    // Conversione della stringa (es. "dd/MM/yyyy") in java.util.Date tramite LocalDate
+                    LocalDate localDate = LocalDate.parse(dataStringa, FMT_ITA);
+                    java.util.Date dataProiezione = java.util.Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                    // Aggiungiamo la proiezione alla lista anziché fare il return immediato
+                    // Conversione della stringa in LocalTime (se il costruttore della proiezione lo richiede)
+                    LocalTime oraProiezione = LocalTime.parse(oraStringa);
+
+                    Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
+                    Proiezione p = new Proiezione(idProiezione, dataProiezione, oraProiezione, prezzo, film, postiRimasti);
+
                     palinsesto.add(p);
 
-                } catch (NumberFormatException e) {
-                    System.err.println("Errore nel formato numerico della proiezione ID " + idProiezione + ": " + e.getMessage());
-                    // Non interrompiamo il ciclo: continuiamo a leggere le altre proiezioni valide
+                } catch (NumberFormatException | java.time.format.DateTimeParseException e) {
+                    System.err.println("Errore nel formato dei dati della proiezione ID " + idProiezione + ": " + e.getMessage());
                 }
             }
         }
@@ -327,7 +332,6 @@ public class FileManager {
                 if (riga.trim().isEmpty()) continue;
 
                 String[] elementi = riga.split(SEPARATORE);
-                // Struttura attesa: ID, Data, Ora, Titolo, Genere, Regista, Anno, Durata, EtaMin, Prezzo, Posti
                 if (elementi.length >= 11) {
                     String dataCorrente = elementi[1];
                     String oraCorrente = elementi[2];
@@ -340,10 +344,9 @@ public class FileManager {
 
                         if (postiDisponibili < 200) {
                             System.out.println("  Errore: Impossibile modificare. Ci sono già delle prenotazioni!");
-                            return false; // Interrompe subito l'operazione
+                            return false;
                         }
 
-                        // Aggiorna data e ora nella riga
                         elementi[1] = nuovaData;
                         elementi[2] = nuovaOra;
                         riga = String.join(SEPARATORE, elementi);
@@ -407,10 +410,9 @@ public class FileManager {
 
                         if (postiDisponibili < 200) {
                             System.out.println("  Errore: Impossibile eliminare. Ci sono già delle prenotazioni!");
-                            return false; // Interrompe l'operazione
+                            return false;
                         }
 
-                        // Se i posti sono 200, segna come eliminato e NON aggiunge la riga
                         eliminato = true;
                         continue;
                     }
@@ -432,10 +434,9 @@ public class FileManager {
         }
     }
 
-
-// ========================================================
-// LETTURA E SCRITTURA PRENOTAZIONI (Sincronizzato a 7 Campi)
-// ========================================================
+    // ========================================================
+    // LETTURA E SCRITTURA PRENOTAZIONI
+    // ========================================================
 
     /**
      * Salva una singola prenotazione accodandola in fondo al file CSV.
@@ -449,7 +450,6 @@ public class FileManager {
 
         Path path = Paths.get(FILE_PRENOTAZIONI);
 
-        // Se il file non esiste, lo crea; se esiste, aggiunge la riga in coda (APPEND)
         try (BufferedWriter writer = Files.newBufferedWriter(
                 path,
                 StandardOpenOption.CREATE,
@@ -473,7 +473,6 @@ public class FileManager {
         }
     }
 
-
     /**
      * Legge dal file CSV tutte le prenotazioni registrate e le ricostruisce
      * collegando ciascuna alla rispettiva proiezione presente nel palinsesto.
@@ -487,7 +486,7 @@ public class FileManager {
         Path path = Paths.get(FILE_PRENOTAZIONI);
 
         if (!Files.exists(path) || palinsesto == null || palinsesto.isEmpty()) {
-            return listaPrenotazioni; // Restituisce lista vuota se il file o il palinsesto non sono validi
+            return listaPrenotazioni;
         }
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
@@ -509,12 +508,11 @@ public class FileManager {
                 try {
                     numeroPosto = Integer.parseInt(elementi[6].trim());
                 } catch (NumberFormatException e) {
-                    continue; // Salta righe con numero posto corrotto
+                    continue;
                 }
 
                 String codiceBiglietto = elementi[7].trim();
 
-                // Cerca la proiezione corrispondente nel palinsesto
                 Proiezione proiezioneTrovata = null;
                 for (Proiezione proj : palinsesto) {
                     if (proj.getIdProiezione().equalsIgnoreCase(idProiezione)) {
@@ -523,7 +521,6 @@ public class FileManager {
                     }
                 }
 
-                // Se la proiezione esiste nel palinsesto, istanzia la prenotazione e la aggiunge alla lista
                 if (proiezioneTrovata != null) {
                     Prenotazione pren = new Prenotazione(
                             idLetto,
@@ -545,10 +542,6 @@ public class FileManager {
 
     /**
      * Modifica l'ID della proiezione associata a una specifica prenotazione di un utente.
-     * <p>
-     * Il metodo elabora il file CSV riga per riga utilizzando un file temporaneo per la scrittura,
-     * evitando di caricare l'intera struttura dati in memoria.
-     * </p>
      *
      * @param idPrenotazione    L'ID unico della prenotazione da modificare.
      * @param usernameUtente    Lo username dell'utente proprietario della prenotazione.
@@ -561,7 +554,6 @@ public class FileManager {
             return false;
         }
 
-        // Creiamo un file temporaneo nello stesso percorso
         File fileTemporaneo = new File(fileOriginale.getParent(), "prenotazioni_temp.csv");
         boolean trovato = false;
 
@@ -575,19 +567,17 @@ public class FileManager {
                 }
 
                 String[] elementi = riga.split(SEPARATORE);
-                if (elementi.length >= 6) { // Verifichiamo di avere abbastanza elementi
+                if (elementi.length >= 6) {
                     String id = elementi[0].trim();
-                    String user = elementi[3].trim(); // Indice 3 = usernameCliente nel formato standard
+                    String user = elementi[3].trim();
 
-                    // Se trovi la riga corrispondente all'ID e all'Utente
                     if (id.equalsIgnoreCase(idPrenotazione.trim()) && user.equalsIgnoreCase(usernameUtente.trim())) {
-                        elementi[5] = idNuovaProiezione; // Indice 5 = idProiezione nel formato standard
+                        elementi[5] = idNuovaProiezione;
                         riga = String.join(SEPARATORE, elementi);
                         trovato = true;
                     }
                 }
 
-                // Scrivi la riga (modificata o originale) nel file temporaneo
                 writer.write(riga);
                 writer.newLine();
             }
@@ -595,12 +585,11 @@ public class FileManager {
         } catch (IOException e) {
             System.out.println("Errore di I/O durante la modifica della prenotazione: " + e.getMessage());
             if (fileTemporaneo.exists()) {
-                fileTemporaneo.delete(); // Pulisce il file temp in caso di errore
+                fileTemporaneo.delete();
             }
             return false;
         }
 
-        // Se la prenotazione e' stata trovata e modificata, sostituiamo il file originale con quello temporaneo
         if (trovato) {
             if (!fileOriginale.delete()) {
                 System.out.println("Impossibile eliminare il file originale delle prenotazioni.");
@@ -612,7 +601,6 @@ public class FileManager {
             }
             return true;
         } else {
-            // Se non e' stato trovato nulla, rimuoviamo semplicemente il file temporaneo
             fileTemporaneo.delete();
             return false;
         }
@@ -621,9 +609,6 @@ public class FileManager {
     /**
      * Legge il file delle prenotazioni e stampa a schermo tutte le prenotazioni
      * attive appartenenti allo username dell'utente specificato.
-     * <p>
-     * Processa il file riga per riga senza caricare l'intera struttura in memoria.
-     * </p>
      *
      * @param usernameUtente Lo username dell'utente di cui mostrare le prenotazioni.
      */
@@ -661,7 +646,6 @@ public class FileManager {
                     String numeroPosto = elementi[6].trim();
                     String codiceBiglietto = elementi[7].trim();
 
-                    // Verifica se la prenotazione appartiene all'utente specificato
                     if (username.equalsIgnoreCase(usernameUtente)) {
                         contatore++;
                         trovataAlmenoUna = true;
@@ -675,7 +659,6 @@ public class FileManager {
                         System.out.println(" ----------------------------------------------");
                     }
                 } else if (elementi.length >= 4) {
-                    // Formato fallback semplificato
                     String idPrenotazione = elementi[0].trim();
                     String username = elementi[1].trim();
                     String idProiezione = elementi[2].trim();
@@ -707,13 +690,9 @@ public class FileManager {
 
     /**
      * Rimuove una prenotazione dal file CSV in base al suo ID e allo username del cliente.
-     * <p>
-     * Processa il file riga per riga scrivendo su un file temporaneo tutte le righe
-     * tranne quella corrispondente all'ID e allo username specificati.
-     * </p>
      *
      * @param idPrenotazione L'ID unico della prenotazione da rimuovere.
-     * @param usernameUtente Lo username dell'utente richiedente (per sicurezza e verifica proprieta').
+     * @param usernameUtente Lo username dell'utente richiedente.
      * @return {@code true} se la prenotazione e' stata trovata ed eliminata con successo, {@code false} altrimenti.
      */
     public static boolean rimuoviPrenotazioneDaFile(String idPrenotazione, String usernameUtente) {
@@ -738,47 +717,43 @@ public class FileManager {
 
                 String[] elementi = riga.split(SEPARATORE);
 
-                // Verifica formato completo (8 elementi) o ridotto
                 if (elementi.length >= 8) {
                     String id = elementi[0].trim();
-                    String username = elementi[3].trim(); // Indice 3 = usernameCliente
+                    String username = elementi[3].trim();
 
                     if (id.equalsIgnoreCase(idPrenotazione) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;
-                        continue; // Salta la scrittura sul file temp
+                        continue;
                     }
                 } else if (elementi.length >= 4) {
-                    // Formato fallback
                     String id = elementi[0].trim();
                     String username = elementi[1].trim();
 
                     if (id.equalsIgnoreCase(idPrenotazione) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;
-                        continue; // Salta la scrittura sul file temp
+                        continue;
                     }
                 }
 
-                // Scrive la riga non eliminata sul file temporaneo
                 writer.write(riga);
                 writer.newLine();
             }
 
         } catch (IOException e) {
-            System.out.println("  Errore di lettura/scrittura durante la rimozione della prenotazione: " + e.getMessage());
+            System.out.println("  Errore durante la cancellazione della prenotazione: " + e.getMessage());
             if (fileTemporaneo.exists()) {
                 fileTemporaneo.delete();
             }
             return false;
         }
 
-        // Sostituzione del file originale con quello aggiornato
         if (eliminato) {
             if (!fileOriginale.delete()) {
-                System.out.println("  Errore: impossibile eliminare il vecchio file di prenotazioni.");
+                System.out.println("  Impossibile aggiornare l'archivio prenotazioni originale.");
                 return false;
             }
             if (!fileTemporaneo.renameTo(fileOriginale)) {
-                System.out.println("  Errore: impossibile rinominare il file temporaneo.");
+                System.out.println("  Impossibile finalizzare la cancellazione.");
                 return false;
             }
             return true;
@@ -789,125 +764,78 @@ public class FileManager {
     }
 
     /**
-     * Aggiorna il numero di posti disponibili per una determinata proiezione nel file CSV.
-     * <p>
-     * Processa il file delle proiezioni riga per riga scrivendo su un file temporaneo
-     * e aggiorna il valore dei posti quando individua l'ID della proiezione cercata.
-     * </p>
+     * Aggiorna il numero di posti disponibili per una specifica proiezione nel file del palinsesto.
      *
-     * @param idProiezione     L'ID unico della proiezione da aggiornare (es. P-C6014BBC).
-     * @param nuoviPostiDisp Il nuovo numero di posti disponibili da salvare.
-     * @return {@code true} se l'aggiornamento e' andato a buon fine, {@code false} altrimenti.
+     * @param idProiezione     L'ID della proiezione da aggiornare.
+     * @param nuoviDisponibili Il nuovo numero di posti disponibili.
      */
-    public static boolean aggiornaPostiProiezioneSuFile(String idProiezione, int nuoviPostiDisp) {
-        File fileOriginale = new File(FILE_PALINSESTO);
+    public static void aggiornaPostiProiezioneSuFile(String idProiezione, int nuoviDisponibili) {
+        File filePalinsesto = new File(FILE_PALINSESTO);
+        if (!filePalinsesto.exists()) return;
 
-        if (!fileOriginale.exists()) {
-            System.out.println("  Archivio proiezioni non trovato.");
-            return false;
-        }
+        File fileTemp = new File(filePalinsesto.getParent(), "palinsesto_temp.csv");
 
-        File fileTemporaneo = new File(fileOriginale.getParent(), "proiezioni_temp.csv");
-        boolean aggiornato = false;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileOriginale));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(fileTemporaneo))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePalinsesto));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(fileTemp))) {
 
             String riga;
             while ((riga = reader.readLine()) != null) {
-                if (riga.trim().isEmpty()) {
-                    continue;
-                }
+                if (riga.trim().isEmpty()) continue;
 
                 String[] elementi = riga.split(SEPARATORE);
-
-                if (elementi.length >= 11) { // Nota: il formato Proiezione ha 11 campi (0..10)
-                    String idLetto = elementi[0].trim();
-
-                    if (idLetto.equalsIgnoreCase(idProiezione.trim())) {
-                        // Modifica il campo dei posti disponibili (indice 10)
-                        elementi[10] = String.valueOf(nuoviPostiDisp);
+                if (elementi.length >= 11) {
+                    String id = elementi[0].trim();
+                    if (id.equalsIgnoreCase(idProiezione.trim())) {
+                        elementi[10] = String.valueOf(nuoviDisponibili);
                         riga = String.join(SEPARATORE, elementi);
-                        aggiornato = true;
                     }
                 }
-
-                // Scrive la riga (aggiornata o invariata) sul file temporaneo
                 writer.write(riga);
                 writer.newLine();
             }
 
         } catch (IOException e) {
-            System.out.println("  Errore di I/O durante l'aggiornamento dei posti: " + e.getMessage());
-            if (fileTemporaneo.exists()) {
-                fileTemporaneo.delete();
-            }
-            return false;
+            System.err.println("Errore durante l'aggiornamento dei posti su file: " + e.getMessage());
+            if (fileTemp.exists()) fileTemp.delete();
+            return;
         }
 
-        // Sostituisce il file originale con quello aggiornato
-        if (aggiornato) {
-            if (!fileOriginale.delete()) {
-                System.out.println("  Errore: impossibile eliminare il vecchio file delle proiezioni.");
-                return false;
-            }
-            if (!fileTemporaneo.renameTo(fileOriginale)) {
-                System.out.println("  Errore: impossibile rinominare il file temporaneo delle proiezioni.");
-                return false;
-            }
-            return true;
-        } else {
-            fileTemporaneo.delete();
-            return false;
+        if (filePalinsesto.delete()) {
+            fileTemp.renameTo(filePalinsesto);
         }
     }
 
     // ========================================================
-    // SICUREZZA & PASSWORD
+    // SICUREZZA E HASHING (PBKDF2)
     // ========================================================
 
     /**
-     * Genera l'hash crittografico di una password in chiaro utilizzando l'algoritmo
-     * PBKDF2WithHmacSHA256 e una chiave segreta come salt.
+     * Esegue l'hashing di una password in chiaro utilizzando l'algoritmo PBKDF2WithHmacSHA256.
      *
-     * @param password La password in chiaro da cifrare.
-     * @return La stringa codificata in Base64 dell'hash generato.
-     * @throws RuntimeException Se si verificano errori nell'algoritmo di cifratura.
+     * @param passwordInChiaro La password non cifrata inserita dall'utente.
+     * @return Una stringa formattata contenente il salt e l'hash risultanti, codificati in Base64.
      */
-    public static String generaPasswordHash(String password) {
+    public static String generaPasswordHash(String passwordInChiaro) {
         try {
-            byte[] chiaveInByte = CHIAVE_SEGRETA.getBytes();
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), chiaveInByte, 65536, 128);
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256"); // Password-Based Key Derivation Function 2
+            byte[] salt = CHIAVE_SEGRETA.getBytes(StandardCharsets.UTF_8);
+            KeySpec spec = new PBEKeySpec(passwordInChiaro.toCharArray(), salt, 65536, 128);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             byte[] hash = factory.generateSecret(spec).getEncoded();
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new RuntimeException("Errore nella cifratura", e);
+            throw new RuntimeException("Errore critico durante l'hashing della password", e);
         }
     }
 
     /**
-     * Verifica la correttezza di una password inserita rispetto all'hash memorizzato nell'oggetto {@link Utente}.
-     * <p>
-     * Il confronto viene eseguito in tempo costante mediante {@link MessageDigest#isEqual(byte[], byte[])}
-     * per prevenire vulnerabilita' a attacchi di tipo <i>Timing Attack</i>.
-     * </p>
+     * Verifica la corrispondenza tra una password in chiaro e un hash memorizzato.
      *
-     * @param utente L'utente proprietario dell'account.
-     * @param passwordDaVerificare La password fornita in chiaro per il tentativo di login.
-     * @return {@code true} se la password fornita corrisponde all'hash salvato, {@code false} altrimenti.
+     * @param passwordInChiaro La password inserita dall'utente in fase di login.
+     * @param passwordHash     L'hash salvato nel file di persistenza.
+     * @return {@code true} se la password corrisponde, {@code false} altrimenti.
      */
-    public static boolean verificaPassword(Utente utente, String passwordDaVerificare) {
-        if (utente == null || utente.getPasswordHash() == null || passwordDaVerificare == null) {
-            return false;
-        }
-
-        String hashCalcolato = generaPasswordHash(passwordDaVerificare);
-
-        // Convertiamo in byte per il confronto a tempo costante
-        byte[] hashInDB = utente.getPasswordHash().getBytes(StandardCharsets.UTF_8);
-        byte[] hashGenerato = hashCalcolato.getBytes(StandardCharsets.UTF_8);
-
-        return MessageDigest.isEqual(hashInDB, hashGenerato);
+    public static boolean verificaPassword(String passwordInChiaro, String passwordHash) {
+        String hashTentativo = generaPasswordHash(passwordInChiaro);
+        return hashTentativo.equals(passwordHash);
     }
 }

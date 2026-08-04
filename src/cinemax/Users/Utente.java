@@ -3,7 +3,11 @@ package cinemax.Users;
 import cinemax.gestione.Proiezione;
 import cinemax.gestione.Film;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,7 +19,7 @@ import java.util.List;
  * </p>
  *
  * @author Cinemax System
- * @version 1.1
+ * @version 1.2
  */
 public abstract class Utente {
     private String username;
@@ -28,7 +32,7 @@ public abstract class Utente {
     /**
      * Formattatore standard per le date nel formato italiano (dd/MM/yyyy).
      */
-    protected static final java.time.format.DateTimeFormatter FMT_ITA =
+    public static final java.time.format.DateTimeFormatter FMT_ITA =
             java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     /**
@@ -123,18 +127,14 @@ public abstract class Utente {
                 continue;
             }
 
-            String dataStringa = p.getDataProiezione();
-            if (dataStringa != null && !dataStringa.isEmpty()) {
-                try {
-                    LocalDate dataP = LocalDate.parse(dataStringa, FMT_ITA);
+            Date dateObj = p.getDataProiezione();
+            if (dateObj != null) {
+                LocalDate dataP = dateObj.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-                    if (dataInizio != null && dataP.isBefore(dataInizio)) {
-                        continue;
-                    }
-                    if (dataFine != null && dataP.isAfter(dataFine)) {
-                        continue;
-                    }
-                } catch (java.time.format.DateTimeParseException e) {
+                if (dataInizio != null && dataP.isBefore(dataInizio)) {
+                    continue;
+                }
+                if (dataFine != null && dataP.isAfter(dataFine)) {
                     continue;
                 }
             }
@@ -159,8 +159,15 @@ public abstract class Utente {
      */
     public static void visualizzaProiezione(Proiezione p) {
         Film f = p.getFilm();
-        String data = p.getDataProiezione();
-        String ora = p.getOraProiezione();
+
+        String dataStr = "N/D";
+        if (p.getDataProiezione() != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            dataStr = sdf.format(p.getDataProiezione());
+        }
+
+        LocalTime oraObj = p.getOraProiezione();
+        String oraStr = oraObj != null ? oraObj.toString() : "N/D";
 
         System.out.println("\n=============================================");
         System.out.println("          DETTAGLI PROIEZIONE CINEMAX        ");
@@ -174,8 +181,8 @@ public abstract class Utente {
         System.out.println("  • Età Min:   " + (f.getEta_minima() == 0 ? "Tutti" : f.getEta_minima() + "+"));
         System.out.println("---------------------------------------------");
         System.out.println("PROGRAMMAZIONE:");
-        System.out.println("  • Data:      " + data);
-        System.out.println("  • Ora:       " + ora);
+        System.out.println("  • Data:      " + dataStr);
+        System.out.println("  • Ora:       " + oraStr);
         System.out.println("---------------------------------------------");
         System.out.println("INFO BIGLIETTI & SALA:");
         System.out.println("  • Costo:     " + String.format("%.2f€", p.getPrezzoBiglietto()));

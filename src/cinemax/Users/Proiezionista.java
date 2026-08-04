@@ -4,6 +4,11 @@ import cinemax.utils.FileManager;
 import cinemax.gestione.Proiezione;
 import cinemax.gestione.Film;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -48,10 +53,29 @@ public class Proiezionista extends Utente {
     public void aggiungiProiezione(Scanner scanner) {
         System.out.println("\n--- INSERIMENTO NUOVA PROIEZIONE ---");
 
-        System.out.print("Data (gg/mm/aaaa): ");
-        String dataStr = scanner.nextLine().trim();
-        System.out.print("Ora (hh:mm): ");
-        String oraStr = scanner.nextLine().trim();
+        Date dataProiezione = null;
+        while (dataProiezione == null) {
+            System.out.print("Data (gg/mm/aaaa): ");
+            String dataStr = scanner.nextLine().trim();
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                sdf.setLenient(false);
+                dataProiezione = sdf.parse(dataStr);
+            } catch (ParseException e) {
+                System.out.println("  Errore: Formato data non valido. Usa il formato gg/mm/aaaa.");
+            }
+        }
+
+        LocalTime oraProiezione = null;
+        while (oraProiezione == null) {
+            System.out.print("Ora (hh:mm): ");
+            String oraStr = scanner.nextLine().trim();
+            try {
+                oraProiezione = LocalTime.parse(oraStr);
+            } catch (DateTimeParseException e) {
+                System.out.println("  Errore: Formato ora non valido. Usa il formato hh:mm.");
+            }
+        }
 
         double prezzo = 0.0;
         while (true) {
@@ -85,7 +109,7 @@ public class Proiezionista extends Utente {
         }
 
         Film nuovoFilm = new Film(titolo, genere, regista, anno, durata, etaMin);
-        Proiezione nuovaProiezione = new Proiezione(dataStr, oraStr, prezzo, nuovoFilm);
+        Proiezione nuovaProiezione = new Proiezione(dataProiezione, oraProiezione, prezzo, nuovoFilm);
 
         boolean salvato = FileManager.salvaProiezione(nuovaProiezione);
         if (salvato) {

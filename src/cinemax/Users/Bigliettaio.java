@@ -6,8 +6,11 @@ import cinemax.utils.FileManager;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -108,19 +111,17 @@ public class Bigliettaio extends Utente {
         List<Prenotazione> risultati = new ArrayList<>();
 
         for (Prenotazione p : prenotazioni) {
-            if (p.getDataStr().equals("N/D") || p.getDataStr().isEmpty()) continue;
+            Date dataObj = p.getDataProiezione();
+            if (dataObj == null) continue;
 
-            try {
-                LocalDate dataSpec = LocalDate.parse(p.getDataStr(), FMT_ITA);
+            // Converte l'oggetto java.util.Date in java.time.LocalDate per il confronto
+            LocalDate dataSpec = dataObj.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-                boolean dopoInizio = (inizio == null) || !dataSpec.isBefore(inizio);
-                boolean primaFine = (fine == null) || !dataSpec.isAfter(fine);
+            boolean dopoInizio = (inizio == null) || !dataSpec.isBefore(inizio);
+            boolean primaFine = (fine == null) || !dataSpec.isAfter(fine);
 
-                if (dopoInizio && primaFine) {
-                    risultati.add(p);
-                }
-            } catch (DateTimeParseException e) {
-                continue; // Salta record corrotti nel file CSV
+            if (dopoInizio && primaFine) {
+                risultati.add(p);
             }
         }
         return risultati;
@@ -136,12 +137,15 @@ public class Bigliettaio extends Utente {
         double costoUnitario = p.getFilmProiezione() != null ? p.getFilmProiezione().getPrezzoBiglietto() : 0.0;
         double costoTotale = costoUnitario * numeroBiglietti;
 
+        String dataFormattata = p.getDataProiezione() != null ? FMT_ITA.format(p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) : "N/D";
+        String oraFormattata = p.getOraProiezione() != null ? p.getOraProiezione().toString() : "N/D";
+
         System.out.println("\n=============================================");
         System.out.println("       DETTAGLIO FISCALE PRENOTAZIONE        ");
         System.out.println("=============================================");
         System.out.println("• Codice Prenotazione: " + p.getIdPrenotazione());
         System.out.println("• Intestatario:        " + p.getNomeCliente() + " " + p.getCognomeCliente() + " (@" + p.getUsernameCliente() + ")");
-        System.out.println("• Spettacolo del:      " + p.getDataStr() + " alle ore " + p.getOraStr());
+        System.out.println("• Spettacolo del:      " + dataFormattata + " alle ore " + oraFormattata);
         System.out.println("---------------------------------------------");
         System.out.println("• Quantità Biglietti:  " + numeroBiglietti);
         System.out.printf("• Costo Unitario:      %.2f €\n", costoUnitario);
@@ -159,8 +163,6 @@ public class Bigliettaio extends Utente {
         return 3;
     }
 
-
-
     /**
      * Mostra le opzioni disponibili nel menu testuale dell'area personale del bigliettaio.
      */
@@ -174,11 +176,7 @@ public class Bigliettaio extends Utente {
 
     /**
      * Gestisce le operazioni del Bigliettaio tramite riga di comando.
-     * <p>
-     * Interroga direttamente il file delle prenotazioni per recuperare la lista
-     * dei biglietti associati alla giornata corrente o filtri di ricerca mirati.
-     * </p>
-
+     *
      * @param scelta L'opzione numerica selezionata dal menu.
      */
     @Override
@@ -194,14 +192,16 @@ public class Bigliettaio extends Utente {
                 System.out.println("Data odierna di sistema: " + oggiFormattato);
 
                 try {
-                    // Carichiamo tutte le prenotazioni leggendo autonomamente il palinsesto e le prenotazioni da file
                     List<Proiezione> palinsesto = FileManager.caricaPalinsesto();
                     List<Prenotazione> tutteLePrenotazioni = FileManager.caricaPrenotazioni(palinsesto);
                     List<Prenotazione> prenotazioniOggi = new ArrayList<>();
 
                     for (Prenotazione p : tutteLePrenotazioni) {
-                        if (p.getDataStr().equals(oggiFormattato)) {
-                            prenotazioniOggi.add(p);
+                        if (p.getDataProiezione() != null) {
+                            LocalDate dataP = p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                            if (dataP.equals(oggi)) {
+                                prenotazioniOggi.add(p);
+                            }
                         }
                     }
 
@@ -233,10 +233,9 @@ public class Bigliettaio extends Utente {
 
     /**
      * Sottomenu guida per l'acquisizione dei criteri di ricerca forniti dall'operatore.
-     * Legge la lista delle prenotazioni aggiornata direttamente da file.
      *
      * @param scanner L'oggetto {@link Scanner} per la lettura dell'input.
-     * @return La lista delle prenotazioni corrispondenti al criterio scelto, oppure {@code null} in caso di errori di input o di I/O.
+     * @return La lista delle prenotazioni corrispondenti al criterio scelto.
      */
     private List<Prenotazione> cercaPrenotazione(Scanner scanner) {
         System.out.println("\n--- 2. CERCA UNA PRENOTAZIONE ---");
@@ -251,7 +250,6 @@ public class Bigliettaio extends Utente {
         List<Prenotazione> prenotazioni = new ArrayList<>();
         List<Prenotazione> risultati = new ArrayList<>();
 
-        // Gestione try-catch per la lettura da file CSV
         try {
             List<Proiezione> palinsesto = FileManager.caricaPalinsesto();
             prenotazioni = FileManager.caricaPrenotazioni(palinsesto);
@@ -334,10 +332,13 @@ public class Bigliettaio extends Utente {
         System.out.println("\n--- RISULTATI PRENOTAZIONI TROVATE ---");
         for (int i = 0; i < lista.size(); i++) {
             Prenotazione p = lista.get(i);
+            String dataStr = p.getDataProiezione() != null ? FMT_ITA.format(p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) : "N/D";
+            String oraStr = p.getOraProiezione() != null ? p.getOraProiezione().toString() : "N/D";
+
             System.out.println((i + 1) + ". ID: " + p.getIdPrenotazione() +
                     " | Cliente: " + p.getNomeCliente() + " " + p.getCognomeCliente() +
                     " | Film: " + p.getTitoloFilm() +
-                    " | Data: " + p.getDataStr() + " ore " + p.getOraStr());
+                    " | Data: " + dataStr + " ore " + oraStr);
         }
         System.out.println("0. Torna al menu principale");
 
@@ -349,7 +350,6 @@ public class Bigliettaio extends Utente {
                 System.out.println("Operazione completata.");
             } else if (sceltaIndice > 0 && sceltaIndice <= lista.size()) {
                 Prenotazione prenotazioneSelezionata = lista.get(sceltaIndice - 1);
-                // Richiama il metodo richiesto per la visualizzazione dettagliata/fiscale
                 this.visualizzaPrenotazione(prenotazioneSelezionata);
 
                 System.out.print("\nPremi INVIO per continuare...");
@@ -361,5 +361,4 @@ public class Bigliettaio extends Utente {
             System.out.println("  Errore: Inserisci un numero intero valido.");
         }
     }
-
 }

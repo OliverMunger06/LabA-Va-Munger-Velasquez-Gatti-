@@ -1,6 +1,9 @@
 package cinemax.gestione;
 
 import cinemax.Users.Utente;
+
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -30,7 +33,7 @@ public class Prenotazione {
 
     /**
      * Costruttore completo utilizzato principalmente da {@code FileManager}
-     * durante il caricamento e la ricostruzione dei dati da file CSV.
+     * durante il caricamento e la ricostruzione dei dati da file.
      *
      * @param idPrenotazione   L'identificativo univoco della prenotazione.
      * @param nomeCliente      Il nome del cliente intestatario.
@@ -198,27 +201,27 @@ public class Prenotazione {
     }
 
     /**
-     * Recupera la data di proiezione in formato stringa.
+     * Recupera la data di proiezione.
      *
-     * @return La data della proiezione, oppure {@code "N/D"} se non disponibile.
+     * @return L'oggetto {@link Date} della proiezione, oppure {@code null} se non disponibile.
      */
-    public String getDataStr() {
-        if (filmProiezione != null && filmProiezione.getDataProiezione() != null) {
+    public Date getDataProiezione() {
+        if (filmProiezione != null) {
             return filmProiezione.getDataProiezione();
         }
-        return "N/D";
+        return null;
     }
 
     /**
-     * Recupera l'orario di proiezione in formato stringa.
+     * Recupera l'orario di proiezione.
      *
-     * @return L'ora della proiezione, oppure {@code "N/D"} se non disponibile.
+     * @return L'oggetto {@link LocalTime} della proiezione, oppure {@code null} se non disponibile.
      */
-    public String getOraStr() {
-        if (filmProiezione != null && filmProiezione.getOraProiezione() != null) {
+    public LocalTime getOraProiezione() {
+        if (filmProiezione != null) {
             return filmProiezione.getOraProiezione();
         }
-        return "N/D";
+        return null;
     }
 
     /**
@@ -229,13 +232,15 @@ public class Prenotazione {
     @Override
     public String toString() {
         double prezzo = (filmProiezione != null) ? filmProiezione.getPrezzoBiglietto() : 0.0;
+        Object data = getDataProiezione() != null ? getDataProiezione() : "N/D";
+        Object ora = getOraProiezione() != null ? getOraProiezione() : "N/D";
 
         return " BIGLIETTO CINEMAX \n" +
                 "▪️ ID Prenotazione: " + idPrenotazione + "\n" +
                 "▪️ Codice QR:        " + codiceBiglietto + "\n" +
                 "▪️ Cliente:          " + nomeCliente + " " + cognomeCliente + " (@" + usernameCliente + ")\n" +
                 "▪️ Film:             " + getTitoloFilm() + "\n" +
-                "▪️ Data e Ora:       " + getDataStr() + " ore " + getOraStr() + "\n" +
+                "▪️ Data e Ora:       " + data + " ore " + ora + "\n" +
                 "▪️ Biglietto N.:     " + numeroPosto + "\n" +
                 "▪️ Prezzo:           " + String.format("%.2f", prezzo) + " €\n" +
                 "---------------------------------------------";

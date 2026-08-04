@@ -33,7 +33,7 @@ public class CineMax {
             }
             switch (scelta) {
                 case 1:
-                    gestisciRegistrazione(sc);
+                    registraCliente(sc);
                     break;
                 case 2:
                     // Logica di Login
@@ -59,11 +59,11 @@ public class CineMax {
      *
      * @param sc Scanner condiviso per la lettura dell'input da console.
      */
-    public static void gestisciRegistrazione(Scanner sc) {
+    public static void registraCliente(Scanner sc) {
         System.out.println("\n--- REGISTRAZIONE NUOVO UTENTE ---");
 
         // 1. SELEZIONE RUOLO (con controllo d'errore sull'input intero)
-        int sceltaRuolo = 0;
+        /*int sceltaRuolo = 0;
         boolean ruoloValido = false;
 
         while (!ruoloValido) {
@@ -83,7 +83,7 @@ public class CineMax {
             } catch (NumberFormatException e) {
                 System.out.println("Errore: Inserisci un numero intero valido.\n");
             }
-        }
+        }*/
 
         // 2. ACQUISIZIONE DATI ANAGRAFICI CON VALIDAZIONE
         String nome = "";
@@ -157,21 +157,11 @@ public class CineMax {
         }
 
         // 3. CREAZIONE DELL'ISTANZA POLIMORFICA
-        Utente nuovoUtente = null;
-        switch (sceltaRuolo) {
-            case 1:
-                nuovoUtente = new Cliente(nome, cognome, username, passwordHash, dataNascita, domicilio);
-                break;
-            case 2:
-                nuovoUtente = new Proiezionista(nome, cognome, username, passwordHash, dataNascita, domicilio);
-                break;
-            case 3:
-                nuovoUtente = new Bigliettaio(nome, cognome, username, passwordHash, dataNascita, domicilio);
-                break;
-        }
+        Utente nuovoUtente = new Cliente(nome, cognome, username, passwordHash, dataNascita, domicilio);
+
 
         // 4. PERSISTENZA E AVVIO SESSIONE
-        if (nuovoUtente != null) {
+
             try {
                 FileManager.salvaUtente(nuovoUtente);
                 System.out.println("\nRegistrazione completata con successo per @" + nuovoUtente.getUsername() + "!");
@@ -183,7 +173,7 @@ public class CineMax {
                 System.err.println("\nErrore durante il salvataggio dell'utente su file: " + e.getMessage());
                 System.out.println("La registrazione non è stata completata. Riprova più tardi.");
             }
-        }
+
     }
 
     /**
