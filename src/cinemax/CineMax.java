@@ -12,13 +12,12 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class CineMax {
 
-    private static final DateTimeFormatter FMT_ITA = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    private static final DateTimeFormatter FMT_ITA = DateTimeFormatter.ofPattern("dd/MM/uuuu")
             .withResolverStyle(java.time.format.ResolverStyle.STRICT);
 
     public static void main(String[] args) {
@@ -136,7 +135,7 @@ public class CineMax {
                 dataValida = true;
             } else {
                 try {
-                    // Tenta di parsare la stringa usando il formato italiano e controlla che la data esista realmente
+                    // Tenta di parsare la stringa usando il formato corretto con 'uuuu' e controlla che la data esista realmente
                     LocalDate.parse(dataNascita, FMT_ITA);
                     dataValida = true; // Se non lancia eccezioni, la data è formattata bene ed esiste
                 } catch (DateTimeParseException e) {
