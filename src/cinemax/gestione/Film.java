@@ -7,32 +7,19 @@ package cinemax.gestione;
  * anno di uscita, durata in minuti ed eventuale limite di eta' minima.
  * </p>
  *
- * @author Cinemax Team
- * @version 1.0
+ * @author Oliver Munger , matricola num. 764208 , VA
+ * @author Davide Gatti , matricola num. 765949 , VA
+ * @author Davide Noe Velasquez Carpio , matricola num. 765163 , VA
  */
 public class Film {
 
-    /** Il titolo del film. */
+
     private String titolo;
-
-    /** Il genere cinematografico (es. Azione, Drammatico, Commedia). */
     private String genere;
-
-    /** Il nome e cognome del regista. */
     private String regista;
-
-    /** L'anno di pubblicazione o uscita del film. */
     private int anno;
-
-    /** La durata del film espressa in minuti. */
     private int durata;
-
-    /** L'eta' minima richiesta per la visione del film (es. 0, 14, 18). */
     private int eta_minima;
-
-    // ------------------------------------------------------------------------
-    // COSTRUTTORI
-    // ------------------------------------------------------------------------
 
     /**
      * Costruisce un nuovo oggetto {@code Film} con le informazioni specificate.
@@ -53,9 +40,6 @@ public class Film {
         this.eta_minima = eta_minima;
     }
 
-    // ------------------------------------------------------------------------
-    // GETTER
-    // ------------------------------------------------------------------------
 
     /**
      * Restituisce il titolo del film.

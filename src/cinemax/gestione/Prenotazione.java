@@ -13,10 +13,12 @@ import java.util.UUID;
  * il numero del posto assegnato e un codice univoco di verifica biglietto (QR Code).
  * </p>
  *
- * @author Cinemax Team
- * @version 1.0
+ * @author Oliver Munger , matricola num. 764208 , VA
+ * @author Davide Gatti , matricola num. 765949 , VA
+ * @author Davide Noe Velasquez Carpio , matricola num. 765163 , VA
  */
 public class Prenotazione {
+
 
     private String idPrenotazione;
     private String nomeCliente;
@@ -26,10 +28,6 @@ public class Prenotazione {
     private Proiezione filmProiezione;
     private int numeroPosto;
     private String codiceBiglietto;
-
-    // ------------------------------------------------------------------------
-    // COSTRUTTORI
-    // ------------------------------------------------------------------------
 
     /**
      * Costruttore completo utilizzato principalmente da {@code FileManager}
@@ -75,10 +73,6 @@ public class Prenotazione {
         this.codiceBiglietto = "QR-" + UUID.randomUUID().toString().substring(0, 5).toUpperCase();
     }
 
-    // ------------------------------------------------------------------------
-    // GETTER E SETTER
-    // ------------------------------------------------------------------------
-
     /**
      * Restituisce il nome del cliente intestatario.
      *
@@ -115,14 +109,6 @@ public class Prenotazione {
         return this.usernameCliente;
     }
 
-    /**
-     * Imposta lo username del cliente associato alla prenotazione.
-     *
-     * @param usernameCliente Il nuovo username.
-     */
-    public void setUsernameCliente(String usernameCliente) {
-        this.usernameCliente = usernameCliente;
-    }
 
     /**
      * Restituisce l'ID univoco della prenotazione.
@@ -151,14 +137,6 @@ public class Prenotazione {
         return this.filmProiezione;
     }
 
-    /**
-     * Associa una nuova proiezione a questa prenotazione.
-     *
-     * @param filmProiezione La nuova {@link Proiezione} da assegnare.
-     */
-    public void setFilmProiezione(Proiezione filmProiezione) {
-        this.filmProiezione = filmProiezione;
-    }
 
     /**
      * Restituisce il numero del posto assegnato.
@@ -183,10 +161,6 @@ public class Prenotazione {
             this.numeroPosto = 0;
         }
     }
-
-    // ------------------------------------------------------------------------
-    // METODI DELEGATI E DI UTILITÀ
-    // ------------------------------------------------------------------------
 
     /**
      * Recupera il titolo del film associato alla proiezione corrente.

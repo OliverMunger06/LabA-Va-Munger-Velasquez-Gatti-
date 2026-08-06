@@ -33,37 +33,23 @@ import static cinemax.Users.Utente.FMT_ITA;
  * oltre a funzioni di hashing e verifica delle password tramite PBKDF2 e SHA-256.
  * </p>
  *
- * @author Cinemax Team
- * @version 1.0
+ * @author Oliver Munger , matricola num. 764208 , VA
+ * @author Davide Gatti , matricola num. 765949 , VA
+ * @author Davide Noe Velasquez Carpio , matricola num. 765163 , VA
  */
 public class FileManager {
 
-    /** Separatore di percorso specifico del sistema operativo in uso. */
     private static final String SEP = File.separator;
-
-    /** Percorso relativo del file CSV degli utenti. */
     private static final String FILE_UTENTI = "." + SEP + "data" + SEP + "utenti.csv";
-
-    /** Percorso relativo del file CSV del palinsesto proiezioni. */
     private static final String FILE_PALINSESTO = "." + SEP + "data" + SEP + "palinsesto.csv";
-
-    /** Percorso relativo del file CSV delle prenotazioni. */
     private static final String FILE_PRENOTAZIONI = "." + SEP + "data" + SEP + "prenotazioni.csv";
-
-    /** Chiave segreta utilizzata per l'algoritmo di hashing delle password. */
     private static final String CHIAVE_SEGRETA = "c8f391b4a2e5d790f61284a37b9015e14d3f28e6c710a9f5d301b894e2a6c712";
-
-    /** Separatore standard utilizzato per i file CSV. */
     private static final String SEPARATORE = ",";
 
     /**
      * Costruttore privato per impedire l'istanziamento di una classe di utilita'.
      */
     private FileManager() {}
-
-    // ========================================================
-    // LETTURA E SCRITTURA UTENTI (Gestione del Polimorfismo)
-    // ========================================================
 
     /**
      * Salva un oggetto {@link Utente} in coda al file CSV degli utenti.
@@ -121,7 +107,7 @@ public class FileManager {
 
                 String username = elementi[2].trim();
 
-                // Se l'username corrisponde, creiamo l'oggetto e lo restituiamo subito
+
                 if (username.equalsIgnoreCase(usernameTarget.trim())) {
                     String nome        = elementi[0].trim();
                     String cognome     = elementi[1].trim();
@@ -165,7 +151,6 @@ public class FileManager {
 
         Path path = Paths.get(FILE_UTENTI);
 
-        // Se il file non esiste ancora (es. primo avvio dell'app), l'username è libero
         if (!Files.exists(path)) {
             return false;
         }
@@ -181,7 +166,7 @@ public class FileManager {
                 if (campi.length > 2) {
                     String usernameNelFile = campi[2].trim();
 
-                    // Interrompe la lettura e restituisce true al primo match trovato
+
                     if (usernameNelFile.equalsIgnoreCase(usernameDaCercare.trim())) {
                         return true;
                     }
@@ -192,12 +177,9 @@ public class FileManager {
             return false;
         }
 
-        return false; // Scansionato tutto il file senza trovare corrispondenze
+        return false;
     }
 
-    // ========================================================
-    // LETTURA E SCRITTURA PALINSESTO (Preservazione ID e Posti)
-    // ========================================================
 
     /**
      * Salva una nuova {@link Proiezione} accodandola nel file CSV del palinsesto.
@@ -216,12 +198,18 @@ public class FileManager {
 
             Film f = p.getFilm();
 
-            String riga = p.getIdProiezione() + SEPARATORE +
-                    p.getDataProiezione() + SEPARATORE +
-                    p.getOraProiezione() + SEPARATORE +
-                    f.getTitolo() + SEPARATORE +
-                    f.getGenere() + SEPARATORE +
-                    f.getRegista() + SEPARATORE +
+            String dataFormattata = "";
+            if (p.getDataProiezione() != null) {
+                LocalDate localDate = p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                dataFormattata = localDate.format(FMT_ITA);
+            }
+
+            String riga = "\"" + p.getIdProiezione() + "\"" + SEPARATORE +
+                    "\"" + dataFormattata + "\"" + SEPARATORE +
+                    "\"" + p.getOraProiezione() + "\"" + SEPARATORE +
+                    "\"" + f.getTitolo() + "\"" + SEPARATORE +
+                    "\"" + f.getGenere() + "\"" + SEPARATORE +
+                    "\"" + f.getRegista() + "\"" + SEPARATORE +
                     f.getAnno() + SEPARATORE +
                     f.getDurata() + SEPARATORE +
                     f.getEta_minima() + SEPARATORE +
@@ -253,7 +241,6 @@ public class FileManager {
         List<Proiezione> palinsesto = new ArrayList<>();
         Path path = Paths.get(FILE_PALINSESTO);
 
-        // Se il file non esiste ancora, restituisce una lista vuota
         if (!Files.exists(path)) {
             return palinsesto;
         }
@@ -263,11 +250,10 @@ public class FileManager {
             while ((riga = reader.readLine()) != null) {
                 if (riga.trim().isEmpty()) continue;
 
-                // Usa una regex per dividere la riga ignorando le virgole racchiuse tra virgolette (es. nei titoli)
                 String[] elementi = riga.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 if (elementi.length < 11) continue;
 
-                // Pulisce le virgolette doppie e gli spazi dai campi stringa
+
                 String idProiezione = elementi[0].replace("\"", "").trim();
                 String dataStringa  = elementi[1].replace("\"", "").trim();
                 String oraStringa   = elementi[2].replace("\"", "").trim();
@@ -282,11 +268,9 @@ public class FileManager {
                     double prezzo    = Double.parseDouble(elementi[9].replace("\"", "").trim().replace(",", "."));
                     int postiRimasti = Integer.parseInt(elementi[10].replace("\"", "").trim());
 
-                    // Conversione della stringa (es. "dd/MM/yyyy") in java.util.Date tramite LocalDate
                     LocalDate localDate = LocalDate.parse(dataStringa, FMT_ITA);
                     java.util.Date dataProiezione = java.util.Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                    // Conversione della stringa in LocalTime
                     LocalTime oraProiezione = LocalTime.parse(oraStringa);
 
                     Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
@@ -301,6 +285,84 @@ public class FileManager {
         }
 
         return palinsesto;
+    }
+
+    /**
+     * Aggiunge una nuova proiezione al palinsesto verificando che non vi siano sovrapposizioni orarie.
+     * <p>
+     * Una sovrapposizione si verifica se nella stessa data un altro film è in corso
+     * durante l'intervallo temporale della nuova proiezione (calcolato in base alla durata del film).
+     * </p>
+     *
+     * @ La {@link Proiezione} da aggiungere.
+     * @return {@code true} se la proiezione è stata aggiunta con successo, {@code false} in caso di sovrapposizione o errore.
+     */
+    public static boolean aggiungiProiezione(Proiezione p) {
+        if (p == null || p.getFilm() == null) {
+            return false;
+        }
+
+        Path path = Paths.get(FILE_PALINSESTO);
+
+        try {
+            List<Proiezione> palinsestoEsistente = caricaPalinsesto();
+
+            LocalDate nuovaData = p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalTime nuovoInizio = p.getOraProiezione();
+            int durataNuovoFilm = p.getFilm().getDurata();
+            LocalTime nuovoFine = nuovoInizio.plusMinutes(durataNuovoFilm);
+
+            for (Proiezione esistente : palinsestoEsistente) {
+                LocalDate dataEsistente = esistente.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                if (dataEsistente.equals(nuovaData)) {
+                    LocalTime inizioEsistente = esistente.getOraProiezione();
+                    int durataEsistente = esistente.getFilm().getDurata();
+                    LocalTime fineEsistente = inizioEsistente.plusMinutes(durataEsistente);
+
+
+                    if (nuovoInizio.isBefore(fineEsistente) && nuovoFine.isAfter(inizioEsistente)) {
+                        System.out.println("  Errore: Sovrapposizione rilevata con lo spettacolo \"" +
+                                esistente.getFilm().getTitolo() + "\" (" + inizioEsistente + " - " + fineEsistente + ").");
+                        return false;
+                    }
+                }
+            }
+
+
+            try (BufferedWriter writer = Files.newBufferedWriter(path,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND)) {
+
+                Film f = p.getFilm();
+
+
+                String dataFormattata = "";
+                if (p.getDataProiezione() != null) {
+                    dataFormattata = FMT_ITA.format(nuovaData);
+                }
+
+                String riga = "\"" + p.getIdProiezione() + "\"" + SEPARATORE +
+                        "\"" + dataFormattata + "\"" + SEPARATORE +
+                        "\"" + p.getOraProiezione() + "\"" + SEPARATORE +
+                        "\"" + f.getTitolo() + "\"" + SEPARATORE +
+                        "\"" + f.getGenere() + "\"" + SEPARATORE +
+                        "\"" + f.getRegista() + "\"" + SEPARATORE +
+                        f.getAnno() + SEPARATORE +
+                        f.getDurata() + SEPARATORE +
+                        f.getEta_minima() + SEPARATORE +
+                        p.getPrezzoBiglietto() + SEPARATORE +
+                        p.getPostiDisponibili();
+
+                writer.write(riga);
+                writer.newLine();
+                return true;
+            }
+
+        } catch (IOException e) {
+            System.err.println("Errore durante l'aggiunta della proiezione su file: " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -335,22 +397,21 @@ public class FileManager {
 
                 String[] elementi = riga.split(SEPARATORE);
                 if (elementi.length >= 11) {
-                    String dataCorrente = elementi[1];
-                    String oraCorrente = elementi[2];
-                    String titoloCorrente = elementi[3];
-                    int postiDisponibili = Integer.parseInt(elementi[10]);
+                    String dataCorrente = elementi[1].replace("\"", "").trim();
+                    String oraCorrente = elementi[2].replace("\"", "").trim();
+                    String titoloCorrente = elementi[3].replace("\"", "").trim();
+                    int postiDisponibili = Integer.parseInt(elementi[10].replace("\"", "").trim());
 
                     if (titoloCorrente.equalsIgnoreCase(titoloFilm) &&
                             dataCorrente.equals(vecchiaData) &&
                             oraCorrente.equals(vecchiaOra)) {
 
                         if (postiDisponibili < 200) {
-                            System.out.println("  Errore: Impossibile modificare. Ci sono già delle prenotazioni!");
                             return false;
                         }
 
-                        elementi[1] = nuovaData;
-                        elementi[2] = nuovaOra;
+                        elementi[1] = "\"" + nuovaData + "\"";
+                        elementi[2] = "\"" + nuovaOra + "\"";
                         riga = String.join(SEPARATORE, elementi);
                         modificato = true;
                     }
@@ -401,17 +462,16 @@ public class FileManager {
 
                 String[] elementi = riga.split(SEPARATORE);
                 if (elementi.length >= 11) {
-                    String dataCorrente = elementi[1];
-                    String oraCorrente = elementi[2];
-                    String titoloCorrente = elementi[3];
-                    int postiDisponibili = Integer.parseInt(elementi[10]);
+                    String dataCorrente = elementi[1].replace("\"", "").trim();
+                    String oraCorrente = elementi[2].replace("\"", "").trim();
+                    String titoloCorrente = elementi[3].replace("\"", "").trim();
+                    int postiDisponibili = Integer.parseInt(elementi[10].replace("\"", "").trim());
 
                     if (titoloCorrente.equalsIgnoreCase(titoloFilm) &&
                             dataCorrente.equals(dataStr) &&
                             oraCorrente.equals(oraStr)) {
 
                         if (postiDisponibili < 200) {
-                            System.out.println("  Errore: Impossibile eliminare. Ci sono già delle prenotazioni!");
                             return false;
                         }
 
@@ -436,9 +496,6 @@ public class FileManager {
         }
     }
 
-    // ========================================================
-    // LETTURA E SCRITTURA PRENOTAZIONI
-    // ========================================================
 
     /**
      * Salva una singola prenotazione accodandola in fondo al file CSV.
@@ -568,15 +625,14 @@ public class FileManager {
                     continue;
                 }
 
-                // Usa la stessa regex per evitare problemi con eventuali virgole e pulisci le virgolette
+
                 String[] elementi = riga.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 if (elementi.length >= 8) {
-                    // Rimuoviamo le virgolette per un confronto sicuro
+
                     String id = elementi[0].replace("\"", "").trim();
                     String user = elementi[3].replace("\"", "").trim();
 
                     if (id.equalsIgnoreCase(idPrenotazione.trim()) && user.equalsIgnoreCase(usernameUtente.trim())) {
-                        // Sostituisce l'ID proiezione mantenendo le virgolette se lo desideri, oppure pulito
                         elementi[5] = "\"" + idNuovaProiezione.replace("\"", "").trim() + "\"";
                         riga = String.join(SEPARATORE, elementi);
                         trovato = true;
@@ -810,9 +866,60 @@ public class FileManager {
         }
     }
 
-    // ========================================================
-    // SICUREZZA E HASHING (PBKDF2)
-    // ========================================================
+    /**
+     * Aggiorna i posti disponibili di una proiezione decrementandoli di 1 dopo una prenotazione.
+     *
+     * @ L'identificativo della proiezione interessata
+     * @return {@code true} se l'aggiornamento è avvenuto con successo, {@code false} altrimenti.
+     */
+    public static boolean scalaPostoDisponibile(String idProiezione) {
+        Path path = Paths.get(FILE_PALINSESTO);
+        if (!Files.exists(path)) {
+            return false;
+        }
+
+        boolean aggiornato = false;
+
+        try {
+            List<String> righe = Files.readAllLines(path);
+            List<String> nuoveRighe = new ArrayList<>();
+
+            for (String riga : righe) {
+                if (riga.trim().isEmpty()) continue;
+
+                String[] elementi = riga.split(SEPARATORE);
+                if (elementi.length >= 11) {
+                    String idCorrente = elementi[0].replace("\"", "").trim();
+
+                    if (idCorrente.equals(idProiezione)) {
+                        int postiDisponibili = Integer.parseInt(elementi[10].replace("\"", "").trim());
+
+                        if (postiDisponibili > 0) {
+                            postiDisponibili--; // Scala di 1 posto
+                            elementi[10] = String.valueOf(postiDisponibili); // Aggiorna l'array
+                            riga = String.join(SEPARATORE, elementi); // Ricompone la riga CSV
+                            aggiornato = true;
+                        } else {
+                            System.out.println("Errore: Post esauriti per questa proiezione.");
+                            return false;
+                        }
+                    }
+                }
+                nuoveRighe.add(riga);
+            }
+
+            if (aggiornato) {
+                Files.write(path, nuoveRighe);
+                return true;
+            }
+
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Errore durante l'aggiornamento dei posti disponibili: " + e.getMessage());
+        }
+
+        return false;
+    }
+
 
     /**
      * Esegue l'hashing di una password in chiaro utilizzando l'algoritmo PBKDF2WithHmacSHA256.

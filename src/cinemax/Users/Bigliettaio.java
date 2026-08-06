@@ -22,8 +22,9 @@ import java.util.Scanner;
  * e la visualizzazione del relativo dettaglio fiscale.
  * </p>
  *
- * @author Cinemax Team
- * @version 1.0
+ * @author Oliver Munger , matricola num. 764208 , VA
+ * @author Davide Gatti , matricola num. 765949 , VA
+ * @author Davide Noe Velasquez Carpio , matricola num. 765163 , VA
  */
 public class Bigliettaio extends Utente {
 
@@ -114,7 +115,6 @@ public class Bigliettaio extends Utente {
             Date dataObj = p.getDataProiezione();
             if (dataObj == null) continue;
 
-            // Converte l'oggetto java.util.Date in java.time.LocalDate per il confronto
             LocalDate dataSpec = dataObj.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
             boolean dopoInizio = (inizio == null) || !dataSpec.isBefore(inizio);

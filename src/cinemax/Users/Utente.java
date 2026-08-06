@@ -18,8 +18,9 @@ import java.util.List;
  * e i metodi statici condivisi per la ricerca e la visualizzazione delle proiezioni.
  * </p>
  *
- * @author Cinemax System
- * @version 1.2
+ * @author Oliver Munger , matricola num. 764208 , VA
+ * @author Davide Gatti , matricola num. 765949 , VA
+ * @author Davide Noe Velasquez Carpio , matricola num. 765163 , VA
  */
 public abstract class Utente {
     private String username;
@@ -75,57 +76,100 @@ public abstract class Utente {
      */
     public abstract int getOpzioneLogout();
 
-    // ========================================================================
-    // GETTER
-    // ========================================================================
-
+    /**
+     * Restituisce l'username dell'utente.
+     *
+     * @return una stringa contenente l'username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Restituisce il nome dell'utente.
+     *
+     * @return una stringa contenente il nome
+     */
     public String getNome() {
         return nome;
     }
 
+    /**
+     * Restituisce il cognome dell'utente.
+     *
+     * @return una stringa contenente il cognome
+     */
     public String getCognome() {
         return cognome;
     }
 
+    /**
+     * Restituisce il luogo di domicilio dell'utente.
+     *
+     * @return una stringa contenente il domicilio
+     */
     public String getLuogoDomicilio() {
         return luogoDomicilio;
     }
 
+    /**
+     * Restituisce la data di nascita dell'utente.
+     *
+     * @return una stringa contenente la data di nascita (nel formato gg/mm/aaaa o "N/D")
+     */
     public String getDataNascita() {
         return dataNascita;
     }
 
+    /**
+     * Restituisce l'hash crittografico della password dell'utente.
+     *
+     * @return una stringa contenente l'hash della password
+     */
     public String getPasswordHash() {
         return passwordHash;
     }
 
-    // ========================================================================
-    // METODI STATICI CONDIVISI
-    // ========================================================================
 
     /**
      * Filtra la lista del palinsesto in base a molteplici criteri di ricerca.
+     *
+     * @     * @param palinsesto la lista completa delle proiezioni disponibili
+     * @param titolo     il titolo (anche parziale) del film da cercare (può essere vuoto o null)
+     * @param genere     il genere del film da cercare (può essere vuoto o null)
+     * @param dataInizio la data di inizio dell'intervallo di ricerca (può essere null)
+     * @param dataFine   la data di fine dell'intervallo di ricerca (può essere null)
+     * @param prezzoMin  il prezzo minimo del biglietto (può essere null)
+     * @param prezzoMax  il prezzo massimo del biglietto (può essere null)
+     * @return una lista di {@link Proiezione} che soddisfano tutti i criteri di ricerca
      */
-    public static List<Proiezione> cercaProiezione(List<Proiezione> palinsesto,
+    public static  List<Proiezione> cercaProiezione(List<Proiezione> palinsesto,
                                                    String titolo, String genere,
                                                    LocalDate dataInizio, LocalDate dataFine,
                                                    Double prezzoMin, Double prezzoMax) {
         List<Proiezione> risultati = new ArrayList<>();
 
+        if (palinsesto == null) {
+            return risultati;
+        }
+
         for (Proiezione p : palinsesto) {
             Film f = p.getFilm();
 
-            if (titolo != null && !titolo.trim().isEmpty() && !f.getTitolo().toLowerCase().contains(titolo.toLowerCase())) {
-                continue;
+
+            if (titolo != null && !titolo.trim().isEmpty()) {
+                if (f == null || f.getTitolo() == null || !f.getTitolo().toLowerCase().contains(titolo.toLowerCase())) {
+                    continue;
+                }
             }
 
-            if (genere != null && !genere.trim().isEmpty() && !f.getGenere().equalsIgnoreCase(genere)) {
-                continue;
+
+            if (genere != null && !genere.trim().isEmpty()) {
+                if (f == null || f.getGenere() == null || !f.getGenere().equalsIgnoreCase(genere)) {
+                    continue;
+                }
             }
+
 
             Date dateObj = p.getDataProiezione();
             if (dateObj != null) {
@@ -135,6 +179,10 @@ public abstract class Utente {
                     continue;
                 }
                 if (dataFine != null && dataP.isAfter(dataFine)) {
+                    continue;
+                }
+            } else {
+                if (dataInizio != null || dataFine != null) {
                     continue;
                 }
             }

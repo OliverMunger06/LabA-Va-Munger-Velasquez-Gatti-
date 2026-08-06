@@ -22,13 +22,12 @@ import java.util.Scanner;
  * Le operazioni di persistenza avvengono direttamente su file CSV riga per riga.
  * </p>
  *
- * @author Cinemax Team
+ * @author Oliver Munger , matricola num. 764208 , VA
+ * @author Davide Gatti , matricola num. 765949 , VA
+ * @author Davide Noe Velasquez Carpio , matricola num. 765163 , VA
  */
 public class Cliente extends Utente {
 
-    // ------------------------------------------------------------------------
-    // COSTRUTTORI
-    // ------------------------------------------------------------------------
 
     /**
      * Costruisce un nuovo oggetto {@code Cliente} registrando una password in chiaro.
@@ -46,9 +45,6 @@ public class Cliente extends Utente {
         super(nome, cognome, username, passwordInChiaro, dataNascita, luogoDomicilio);
     }
 
-    // ------------------------------------------------------------------------
-    // METODI OPERATIVI
-    // ------------------------------------------------------------------------
 
     /**
      * Crea una nuova prenotazione per una determinata proiezione, scalando i posti
@@ -218,9 +214,6 @@ public class Cliente extends Utente {
         }
     }
 
-    // ------------------------------------------------------------------------
-    // INTERFACCIA UTENTE E MENU
-    // ------------------------------------------------------------------------
 
     /**
      * Restituisce il valore numerico del menu corrispondente all'operazione di logout per il Cliente.
@@ -295,7 +288,7 @@ public class Cliente extends Utente {
                     break;
                 }
 
-                double prezzoMinimo = 3.50;
+                Double prezzoMinimo = 3.50;
                 System.out.print("- Prezzo minimo (EUR, INVIO per 3.50 EUR): ");
                 String pMinInput = scanner.nextLine().trim();
                 if (!pMinInput.isEmpty()) {
@@ -306,7 +299,7 @@ public class Cliente extends Utente {
                     }
                 }
 
-                double prezzoMassimo = 9999.0;
+                Double prezzoMassimo = 9999.0;
                 System.out.print("- Prezzo massimo (EUR, INVIO per nessun limite): ");
                 String pMaxInput = scanner.nextLine().trim();
                 if (!pMaxInput.isEmpty()) {
@@ -317,32 +310,10 @@ public class Cliente extends Utente {
                     }
                 }
 
-                List<Proiezione> risultatiFiltrati = new ArrayList<>();
-                for (Proiezione p : palinsestoCaso1) {
-                    Film f = p.getFilm();
 
-                    if (!titolo.isEmpty() && !f.getTitolo().toLowerCase().contains(titolo.toLowerCase())) {
-                        continue;
-                    }
-
-                    if (!genere.isEmpty() && !f.getGenere().equalsIgnoreCase(genere)) {
-                        continue;
-                    }
-
-                    if (p.getDataProiezione() != null) {
-                        LocalDate dataProiezioneObj = p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        if (filterInizio != null && dataProiezioneObj.isBefore(filterInizio)) continue;
-                        if (filterFine != null && dataProiezioneObj.isAfter(filterFine)) continue;
-                    } else {
-                        continue;
-                    }
-
-                    if (p.getPrezzoBiglietto() < prezzoMinimo || p.getPrezzoBiglietto() > prezzoMassimo) {
-                        continue;
-                    }
-
-                    risultatiFiltrati.add(p);
-                }
+                List<Proiezione> risultatiFiltrati = Utente.cercaProiezione(
+                        palinsestoCaso1, titolo, genere, filterInizio, filterFine, prezzoMinimo, prezzoMassimo
+                );
 
                 if (risultatiFiltrati.isEmpty()) {
                     System.out.println("  Nessuna proiezione corrisponde ai criteri cercati.");
@@ -460,6 +431,8 @@ public class Cliente extends Utente {
                 if (postiRichiesti <= proiezioneScelta.getPostiDisponibili()) {
                     for (int k = 0; k < postiRichiesti; k++) {
                         this.creaPrenotazione(proiezioneScelta);
+                        // Scala il posto disponibile su file per ogni biglietto creato correttamente
+                        FileManager.scalaPostoDisponibile(proiezioneScelta.getIdProiezione());
                     }
                 } else {
                     System.out.println("  Errore: Non ci sono abbastanza posti disponibili. Posti rimasti: " + proiezioneScelta.getPostiDisponibili());
