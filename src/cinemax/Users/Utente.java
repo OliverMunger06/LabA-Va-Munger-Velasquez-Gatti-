@@ -1,5 +1,6 @@
 package cinemax.Users;
 
+import cinemax.gestione.Genere;
 import cinemax.gestione.Proiezione;
 import cinemax.gestione.Film;
 import java.time.LocalDate;
@@ -144,7 +145,7 @@ public abstract class Utente {
      * @return una lista di {@link Proiezione} che soddisfano tutti i criteri di ricerca
      */
     public static  List<Proiezione> cercaProiezione(List<Proiezione> palinsesto,
-                                                   String titolo, String genere,
+                                                   String titolo, Genere genere,
                                                    LocalDate dataInizio, LocalDate dataFine,
                                                    Double prezzoMin, Double prezzoMax) {
         List<Proiezione> risultati = new ArrayList<>();
@@ -165,8 +166,8 @@ public abstract class Utente {
             }
 
 
-            if (genere != null && !genere.trim().isEmpty()) {
-                if (f == null || f.getGenere() == null || !f.getGenere().equalsIgnoreCase(genere)) {
+            if (genere != null) {
+                if (f == null || f.getGenere() == null || !f.getGenere().equals(genere)) {
                     continue;
                 }
             }

@@ -2,6 +2,7 @@ package cinemax.controls;
 
 import cinemax.Users.Cliente;
 import cinemax.Users.Utente;
+import cinemax.gestione.Genere;
 import cinemax.gestione.Proiezione;
 import cinemax.utils.FileManager;
 
@@ -231,8 +232,38 @@ public GestoreMenu(Scanner sc){
                     System.out.print("- Titolo film (INVIO per tutti): ");
                     String titolo = sc.nextLine().trim();
 
-                    System.out.print("- Genere/Tipologia (INVIO per tutti): ");
-                    String genere = sc.nextLine().trim();
+                    Genere genereSelezionato = null;
+                    boolean inputGenereValido = false;
+
+                    while (!inputGenereValido) {
+                        System.out.println("  Seleziona il genere (inserisci il numero, oppure INVIO per tutti):");
+
+                        for (Genere g : Genere.values()) {
+                            System.out.println("  " + g.getCodice() + ". " + g.getDescrizione());
+                        }
+
+                        System.out.print("  Scelta: ");
+                        String inputGenereStr = sc.nextLine().trim();
+
+                        if (inputGenereStr.isEmpty()) {
+                            inputGenereValido = true;
+                        } else {
+                            try {
+                                int sceltaGenereNum = Integer.parseInt(inputGenereStr);
+                                genereSelezionato = Genere.daCodice(sceltaGenereNum);
+
+                                if (genereSelezionato != null) {
+                                    inputGenereValido = true;
+                                } else {
+                                    System.out.println("  Errore: Selezione non valida. Riprova.");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("  Errore: Inserisci un numero valido o premi INVIO.");
+                            }
+                        }
+                    }
+
+                    Genere genere = genereSelezionato;
 
                     System.out.print("- Data inizio intervallo (gg/mm/aaaa, INVIO per nessuna): ");
                     String dataInizioStr = sc.nextLine().trim();

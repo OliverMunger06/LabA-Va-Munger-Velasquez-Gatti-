@@ -159,7 +159,7 @@ public class Proiezione {
     @Override
     public String toString() {
         String titoloFilm = (film != null) ? film.getTitolo() : "Film non specificato";
-        String genereFilm = (film != null) ? film.getGenere() : "N/D";
+        Genere genereFilm = (film != null) ? film.getGenere() : null;
 
         return "ID Proiezione: " + idProiezione +
                 "\nFilm: " + titoloFilm + " | Genere: " + genereFilm +

@@ -15,7 +15,7 @@ public class Film {
 
 
     private String titolo;
-    private String genere;
+    private Genere genere;
     private String regista;
     private int anno;
     private int durata;
@@ -31,7 +31,7 @@ public class Film {
      * @param durata     La durata in minuti.
      * @param eta_minima L'eta' minima consona/richiesta per la visione.
      */
-    public Film(String titolo, String genere, String regista, int anno, int durata, int eta_minima) {
+    public Film(String titolo, Genere genere, String regista, int anno, int durata, int eta_minima) {
         this.titolo = titolo;
         this.genere = genere;
         this.regista = regista;
@@ -55,7 +55,7 @@ public class Film {
      *
      * @return Il genere cinematografico.
      */
-    public String getGenere() {
+    public Genere getGenere() {
         return genere;
     }
 

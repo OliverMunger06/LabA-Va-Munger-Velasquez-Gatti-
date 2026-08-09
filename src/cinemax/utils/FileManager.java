@@ -1,6 +1,7 @@
 package cinemax.utils;
 
 import cinemax.gestione.Film;
+import cinemax.gestione.Genere;
 import cinemax.gestione.Prenotazione;
 import cinemax.gestione.Proiezione;
 import cinemax.Users.Bigliettaio;
@@ -208,12 +209,11 @@ public class FileManager {
                 String[] elementi = riga.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 if (elementi.length < 11) continue;
 
-
                 String idProiezione = elementi[0].replace("\"", "").trim();
                 String dataStringa  = elementi[1].replace("\"", "").trim();
                 String oraStringa   = elementi[2].replace("\"", "").trim();
                 String titolo       = elementi[3].replace("\"", "").trim();
-                String genere       = elementi[4].replace("\"", "").trim();
+                String genereStr    = elementi[4].replace("\"", "").trim();
                 String regista      = elementi[5].replace("\"", "").trim();
 
                 try {
@@ -227,6 +227,8 @@ public class FileManager {
                     java.util.Date dataProiezione = java.util.Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
                     LocalTime oraProiezione = LocalTime.parse(oraStringa);
+
+                    Genere genere = Genere.daDescrizione(genereStr);
 
                     Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
                     Proiezione p = new Proiezione(idProiezione, dataProiezione, oraProiezione, prezzo, film, postiRimasti);
@@ -278,7 +280,6 @@ public class FileManager {
                     int durataEsistente = esistente.getFilm().getDurata();
                     LocalTime fineEsistente = inizioEsistente.plusMinutes(durataEsistente);
 
-
                     if (nuovoInizio.isBefore(fineEsistente) && nuovoFine.isAfter(inizioEsistente)) {
                         System.out.println("  Errore: Sovrapposizione rilevata con lo spettacolo \"" +
                                 esistente.getFilm().getTitolo() + "\" (" + inizioEsistente + " - " + fineEsistente + ").");
@@ -287,13 +288,11 @@ public class FileManager {
                 }
             }
 
-
             try (BufferedWriter writer = Files.newBufferedWriter(path,
                     StandardOpenOption.CREATE,
                     StandardOpenOption.APPEND)) {
 
                 Film f = p.getFilm();
-
 
                 String dataFormattata = "";
                 if (p.getDataProiezione() != null) {
@@ -304,7 +303,7 @@ public class FileManager {
                         "\"" + dataFormattata + "\"" + SEPARATORE +
                         "\"" + p.getOraProiezione() + "\"" + SEPARATORE +
                         "\"" + f.getTitolo() + "\"" + SEPARATORE +
-                        "\"" + f.getGenere() + "\"" + SEPARATORE +
+                        "\"" + f.getGenere().getDescrizione() + "\"" + SEPARATORE +
                         "\"" + f.getRegista() + "\"" + SEPARATORE +
                         f.getAnno() + SEPARATORE +
                         f.getDurata() + SEPARATORE +
@@ -487,7 +486,7 @@ public class FileManager {
                     StandardOpenOption.APPEND)) {
 
                 String riga = "\"" + film.getTitolo().trim() + "\"" + SEPARATORE +
-                        "\"" + film.getGenere().trim() + "\"" + SEPARATORE +
+                        "\"" + film.getGenere().getDescrizione() + "\"" + SEPARATORE +
                         "\"" + film.getRegista().trim() + "\"" + SEPARATORE +
                         film.getAnno() + SEPARATORE +
                         film.getDurata() + SEPARATORE +
@@ -525,14 +524,16 @@ public class FileManager {
                 String[] elementi = riga.split(SEPARATORE + "(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 if (elementi.length < 6) continue;
 
-                String titolo  = elementi[0].replace("\"", "").trim();
-                String genere  = elementi[1].replace("\"", "").trim();
-                String regista = elementi[2].replace("\"", "").trim();
+                String titolo   = elementi[0].replace("\"", "").trim();
+                String genereStr = elementi[1].replace("\"", "").trim();
+                String regista  = elementi[2].replace("\"", "").trim();
 
                 try {
                     int anno      = Integer.parseInt(elementi[3].replace("\"", "").trim());
                     int durata    = Integer.parseInt(elementi[4].replace("\"", "").trim());
                     int etaMinima = Integer.parseInt(elementi[5].replace("\"", "").trim());
+
+                    Genere genere = Genere.daDescrizione(genereStr);
 
                     Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
                     listaFilm.add(film);

@@ -1,5 +1,6 @@
 package cinemax.Users;
 
+import cinemax.gestione.Genere;
 import cinemax.utils.FileManager;
 import cinemax.gestione.Proiezione;
 import cinemax.gestione.Film;
@@ -268,8 +269,39 @@ public class Cliente extends Utente {
                 System.out.print("- Titolo film (INVIO per tutti): ");
                 String titolo = scanner.nextLine().trim();
 
-                System.out.print("- Genere/Tipologia (INVIO per tutti): ");
-                String genere = scanner.nextLine().trim();
+                Genere genereSelezionato = null;
+                String inputGenere = "";
+
+                boolean inputValido = false;
+                while (!inputValido) {
+                    System.out.println("  Seleziona il genere (inserisci il numero, oppure INVIO per tutti):");
+
+                    for (Genere g : Genere.values()) {
+                        System.out.println("  " + g.getCodice() + ". " + g.getDescrizione());
+                    }
+
+                    System.out.print("  Scelta: ");
+                    inputGenere = scanner.nextLine().trim();
+
+                    if (inputGenere.isEmpty()) {
+                        inputValido = true;
+                    } else {
+                        try {
+                            int sceltaGenere = Integer.parseInt(inputGenere);
+                            genereSelezionato = Genere.daCodice(sceltaGenere);
+
+                            if (genereSelezionato != null) {
+                                inputValido = true;
+                            } else {
+                                System.out.println("  Errore: Selezione non valida. Riprova.");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("  Errore: Inserisci un numero valido o premi INVIO.");
+                        }
+                    }
+                }
+
+                Genere genere = genereSelezionato;
 
                 System.out.print("- Data inizio intervallo (gg/mm/aaaa, INVIO per nessuna): ");
                 String dataInizioStr = scanner.nextLine().trim();
