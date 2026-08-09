@@ -431,8 +431,7 @@ public class Cliente extends Utente {
                 if (postiRichiesti <= proiezioneScelta.getPostiDisponibili()) {
                     for (int k = 0; k < postiRichiesti; k++) {
                         this.creaPrenotazione(proiezioneScelta);
-                        // Scala il posto disponibile su file per ogni biglietto creato correttamente
-                        FileManager.scalaPostoDisponibile(proiezioneScelta.getIdProiezione());
+                        FileManager.scalaPostoDisponibile(proiezioneScelta.getIdProiezione(), postiRichiesti);
                     }
                 } else {
                     System.out.println("  Errore: Non ci sono abbastanza posti disponibili. Posti rimasti: " + proiezioneScelta.getPostiDisponibili());

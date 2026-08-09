@@ -43,6 +43,7 @@ public class FileManager {
     private static final String FILE_UTENTI = "." + SEP + "data" + SEP + "utenti.csv";
     private static final String FILE_PALINSESTO = "." + SEP + "data" + SEP + "palinsesto.csv";
     private static final String FILE_PRENOTAZIONI = "." + SEP + "data" + SEP + "prenotazioni.csv";
+    private static final String FILE_FILM = "." + SEP + "data" + SEP + "film.csv";
     private static final String CHIAVE_SEGRETA = "c8f391b4a2e5d790f61284a37b9015e14d3f28e6c710a9f5d301b894e2a6c712";
     private static final String SEPARATORE = ",";
 
@@ -180,52 +181,6 @@ public class FileManager {
         return false;
     }
 
-
-    /**
-     * Salva una nuova {@link Proiezione} accodandola nel file CSV del palinsesto.
-     *
-     * @param p La proiezione da salvare.
-     * @return {@code true} se la proiezione è stata salvata con successo, {@code false} in caso di errore I/O.
-     */
-    public static boolean salvaProiezione(Proiezione p) {
-        if (p == null || p.getFilm() == null) {
-            return false;
-        }
-
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_PALINSESTO),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND)) {
-
-            Film f = p.getFilm();
-
-            String dataFormattata = "";
-            if (p.getDataProiezione() != null) {
-                LocalDate localDate = p.getDataProiezione().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                dataFormattata = localDate.format(FMT_ITA);
-            }
-
-            String riga = "\"" + p.getIdProiezione() + "\"" + SEPARATORE +
-                    "\"" + dataFormattata + "\"" + SEPARATORE +
-                    "\"" + p.getOraProiezione() + "\"" + SEPARATORE +
-                    "\"" + f.getTitolo() + "\"" + SEPARATORE +
-                    "\"" + f.getGenere() + "\"" + SEPARATORE +
-                    "\"" + f.getRegista() + "\"" + SEPARATORE +
-                    f.getAnno() + SEPARATORE +
-                    f.getDurata() + SEPARATORE +
-                    f.getEta_minima() + SEPARATORE +
-                    p.getPrezzoBiglietto() + SEPARATORE +
-                    p.getPostiDisponibili();
-
-            writer.write(riga);
-            writer.newLine();
-            return true;
-
-        } catch (IOException e) {
-            System.err.println("Errore durante il salvataggio della proiezione su file: " + e.getMessage());
-            return false;
-        }
-    }
-
     /**
      * Carica l'intero palinsesto delle proiezioni dal file CSV.
      * <p>
@@ -294,7 +249,10 @@ public class FileManager {
      * durante l'intervallo temporale della nuova proiezione (calcolato in base alla durata del film).
      * </p>
      *
-     * @ La {@link Proiezione} da aggiungere.
+     * Il formato della riga è : {@code idProiezione,dataProiezione,oraProiezione,titolo,genere,regista,anno,durata,etaMin,prezzo,postiDisponibili}.
+     * </p>
+     *
+     * @param p La {@link Proiezione} da aggiungere.
      * @return {@code true} se la proiezione è stata aggiunta con successo, {@code false} in caso di sovrapposizione o errore.
      */
     public static boolean aggiungiProiezione(Proiezione p) {
@@ -496,10 +454,144 @@ public class FileManager {
         }
     }
 
+    /**
+     * Salva un oggetto {@link Film} in coda al file CSV dei film,
+     * verificando preventivamente che il titolo non sia già presente (case-insensitive).
+     * <p>
+     * Il formato della riga è: {@code titolo,genere,regista,anno,durata,etaMin}.
+     * </p>
+     *
+     * @param film Il film da salvare.
+     * @return {@code true} se il film è stato salvato con successo,
+     *         {@code false} se il film è già esistente o si verifica un errore I/O.
+     */
+    public static boolean salvaFilm(Film film) {
+        if (film == null || film.getTitolo() == null || film.getTitolo().trim().isEmpty()) {
+            return false;
+        }
+
+        if (isTitoloFilmEsistente(film.getTitolo())) {
+            System.out.println("  Errore: Il film \"" + film.getTitolo() + "\" è già presente nel database.");
+            return false;
+        }
+
+        Path path = Paths.get(FILE_FILM);
+
+        try {
+            if (path.getParent() != null && !Files.exists(path.getParent())) {
+                Files.createDirectories(path.getParent());
+            }
+
+            try (BufferedWriter writer = Files.newBufferedWriter(path,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND)) {
+
+                String riga = "\"" + film.getTitolo().trim() + "\"" + SEPARATORE +
+                        "\"" + film.getGenere().trim() + "\"" + SEPARATORE +
+                        "\"" + film.getRegista().trim() + "\"" + SEPARATORE +
+                        film.getAnno() + SEPARATORE +
+                        film.getDurata() + SEPARATORE +
+                        film.getEta_minima();
+
+                writer.write(riga);
+                writer.newLine();
+                return true;
+            }
+        } catch (IOException e) {
+            System.err.println("Errore durante il salvataggio del film su file: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Carica l'intero elenco dei film dal file CSV.
+     *
+     * @return Una {@link List} contenente tutti i {@link Film} caricati da file.
+     *         Restituisce una lista vuota se il file non esiste o non contiene dati validi.
+     */
+    public static List<Film> caricaFilm() {
+        List<Film> listaFilm = new ArrayList<>();
+        Path path = Paths.get(FILE_FILM);
+
+        if (!Files.exists(path)) {
+            return listaFilm;
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String riga;
+            while ((riga = reader.readLine()) != null) {
+                if (riga.trim().isEmpty()) continue;
+
+                String[] elementi = riga.split(SEPARATORE + "(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                if (elementi.length < 6) continue;
+
+                String titolo  = elementi[0].replace("\"", "").trim();
+                String genere  = elementi[1].replace("\"", "").trim();
+                String regista = elementi[2].replace("\"", "").trim();
+
+                try {
+                    int anno      = Integer.parseInt(elementi[3].replace("\"", "").trim());
+                    int durata    = Integer.parseInt(elementi[4].replace("\"", "").trim());
+                    int etaMinima = Integer.parseInt(elementi[5].replace("\"", "").trim());
+
+                    Film film = new Film(titolo, genere, regista, anno, durata, etaMinima);
+                    listaFilm.add(film);
+
+                } catch (NumberFormatException e) {
+                    System.err.println("Errore nel formato numerico dei dati del film \"" + titolo + "\": " + e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Errore durante la lettura del file dei film: " + e.getMessage());
+        }
+
+        return listaFilm;
+    }
+
+    /**
+     * Verifica se un determinato titolo di film è già presente all'interno del file CSV dei film.
+     * Il controllo viene eseguito ignorando maiuscole e minuscole.
+     *
+     * @param titoloDaCercare Il titolo del film da ricercare.
+     * @return {@code true} se il titolo esiste già, {@code false} altrimenti.
+     */
+    public static boolean isTitoloFilmEsistente(String titoloDaCercare) {
+        if (titoloDaCercare == null || titoloDaCercare.trim().isEmpty()) {
+            return false;
+        }
+
+        Path path = Paths.get(FILE_FILM);
+        if (!Files.exists(path)) {
+            return false;
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String riga;
+            while ((riga = reader.readLine()) != null) {
+                if (riga.trim().isEmpty()) continue;
+
+                String[] elementi = riga.split(SEPARATORE + "(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                if (elementi.length > 0) {
+                    String titoloNelFile = elementi[0].replace("\"", "").trim();
+                    if (titoloNelFile.equalsIgnoreCase(titoloDaCercare.trim())) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Errore durante il controllo dei duplicati nel file film: " + e.getMessage());
+            return false;
+        }
+
+        return false;
+    }
 
     /**
      * Salva una singola prenotazione accodandola in fondo al file CSV.
      * Se il file non esiste, viene creato automaticamente.
+     * <p>
+     * Il formato della riga è : {@code idPrenotazione,nomeCliente,cognomeCliente,usernameCliente,passwordHash,idProiezione,numeroPosto,codiceBiglietto}.
+     * </p>
      *
      * @param p La prenotazione da persistere su file.
      * @throws IOException Se si verifica un errore durante l'accesso al file.
@@ -867,14 +959,15 @@ public class FileManager {
     }
 
     /**
-     * Aggiorna i posti disponibili di una proiezione decrementandoli di 1 dopo una prenotazione.
+     * Aggiorna i posti disponibili di una proiezione decrementandoli in base al numero di biglietti acquistati.
      *
-     * @ L'identificativo della proiezione interessata
+     * @param idProiezione L'identificativo della proiezione interessata.
+     * @param quantita     Il numero di biglietti acquistati dall'utente da sottrarre ai posti disponibili.
      * @return {@code true} se l'aggiornamento è avvenuto con successo, {@code false} altrimenti.
      */
-    public static boolean scalaPostoDisponibile(String idProiezione) {
+    public static boolean scalaPostoDisponibile(String idProiezione, int quantita) {
         Path path = Paths.get(FILE_PALINSESTO);
-        if (!Files.exists(path)) {
+        if (!Files.exists(path) || quantita <= 0) {
             return false;
         }
 
@@ -894,13 +987,13 @@ public class FileManager {
                     if (idCorrente.equals(idProiezione)) {
                         int postiDisponibili = Integer.parseInt(elementi[10].replace("\"", "").trim());
 
-                        if (postiDisponibili > 0) {
-                            postiDisponibili--; // Scala di 1 posto
+                        if (postiDisponibili >= quantita) {
+                            postiDisponibili -= quantita; // Scala del numero effettivo di biglietti
                             elementi[10] = String.valueOf(postiDisponibili); // Aggiorna l'array
                             riga = String.join(SEPARATORE, elementi); // Ricompone la riga CSV
                             aggiornato = true;
                         } else {
-                            System.out.println("Errore: Post esauriti per questa proiezione.");
+                            System.out.println("Errore: Posti insufficienti per completare l'acquisto.");
                             return false;
                         }
                     }

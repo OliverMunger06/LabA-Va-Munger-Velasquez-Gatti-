@@ -158,7 +158,8 @@ public abstract class Utente {
 
 
             if (titolo != null && !titolo.trim().isEmpty()) {
-                if (f == null || f.getTitolo() == null || !f.getTitolo().toLowerCase().contains(titolo.toLowerCase())) {
+                String ricercaPulita = titolo.trim().toLowerCase();
+                if (f == null || f.getTitolo() == null || !f.getTitolo().toLowerCase().contains(ricercaPulita)) {
                     continue;
                 }
             }

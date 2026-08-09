@@ -11,6 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Scanner;
 
 /**
@@ -101,53 +102,115 @@ public class Proiezionista extends Utente {
 
         System.out.print("Titolo Film: ");
         String titolo = scanner.nextLine().trim();
-        System.out.print("Genere: ");
-        String genere = scanner.nextLine().trim();
-        System.out.print("Regista: ");
-        String regista = scanner.nextLine().trim();
 
-        int anno = 0;
-        while (true) {
-            System.out.print("Anno di uscita (es. 2026): ");
-            String annoStr = scanner.nextLine().trim();
-            if (annoStr.matches("\\d{4}")) {
-                anno = Integer.parseInt(annoStr);
-                if (anno >= 1895 && anno <= 2100) {
-                    break;
-                } else {
-                    System.out.println("  Errore: Inserisci un anno di uscita verosimile (tra 1895 e 2100).");
+        Optional<Film> filmEsistente = FileManager.caricaFilm().stream()
+                .filter(f -> f.getTitolo().equalsIgnoreCase(titolo))
+                .findFirst();
+
+        Film filmPerProiezione;
+
+        if (filmEsistente.isPresent()) {
+            filmPerProiezione = filmEsistente.get();
+
+            System.out.println("  Film trovato nel database! Campi compilati automaticamente:");
+            System.out.println("  - Genere: " + filmPerProiezione.getGenere());
+            System.out.println("  - Regista: " + filmPerProiezione.getRegista());
+            System.out.println("  - Anno: " + filmPerProiezione.getAnno());
+            System.out.println("  - Durata: " + filmPerProiezione.getDurata() + " min");
+            System.out.println("  - Età minima: " + filmPerProiezione.getEta_minima());
+
+        } else {
+            System.out.println("  Film non presente nel database. Inserisci i dettagli:");
+
+            System.out.print("Genere: ");
+            String genere = "";
+            while (genere.isEmpty()) {
+                System.out.println("  Seleziona il genere (inserisci il numero):");
+                System.out.println("  1. Azione");
+                System.out.println("  2. Animazione");
+                System.out.println("  3. Avventura");
+                System.out.println("  4. Biografico");
+                System.out.println("  5. Commedia");
+                System.out.println("  6. Drammatico");
+                System.out.println("  7. Fantascienza");
+                System.out.println("  8. Fantasy");
+                System.out.println("  9. Horror");
+                System.out.println(" 10. Mistero");
+                System.out.println(" 11. Romantico");
+                System.out.println(" 12. Storico");
+                System.out.println(" 13. Thriller");
+                System.out.print("  Scelta: ");
+
+                String sceltaGenere = scanner.nextLine().trim();
+                switch (sceltaGenere) {
+                    case "1": genere = "Azione"; break;
+                    case "2": genere = "Animazione"; break;
+                    case "3": genere = "Avventura"; break;
+                    case "4": genere = "Biografico"; break;
+                    case "5": genere = "Commedia"; break;
+                    case "6": genere = "Drammatico"; break;
+                    case "7": genere = "Fantascienza"; break;
+                    case "8": genere = "Fantasy"; break;
+                    case "9": genere = "Horror"; break;
+                    case "10": genere = "Mistero"; break;
+                    case "11": genere = "Romantico"; break;
+                    case "12": genere = "Storico"; break;
+                    case "13": genere = "Thriller"; break;
+                    default: System.out.println("  Errore: Selezione non valida. Riprova.");
                 }
-            } else {
-                System.out.println("  Errore: L'anno di uscita deve essere composto esattamente da 4 cifre numeriche.");
+            }
+
+            System.out.print("Regista: ");
+            String regista = scanner.nextLine().trim();
+
+            int anno = 0;
+            while (true) {
+                System.out.print("Anno di uscita (es. 2026): ");
+                String annoStr = scanner.nextLine().trim();
+                if (annoStr.matches("\\d{4}")) {
+                    anno = Integer.parseInt(annoStr);
+                    if (anno >= 1895 && anno <= 2100) {
+                        break;
+                    } else {
+                        System.out.println("  Errore: Inserisci un anno di uscita verosimile (tra 1895 e 2100).");
+                    }
+                } else {
+                    System.out.println("  Errore: L'anno di uscita deve essere composto esattamente da 4 cifre numeriche.");
+                }
+            }
+
+            int durata = 0;
+            while (true) {
+                System.out.print("Durata (in minuti): ");
+                try {
+                    durata = Integer.parseInt(scanner.nextLine().trim());
+                    if (durata > 0) break;
+                    System.out.println("  La durata deve essere maggiore di 0 minuti.");
+                } catch (NumberFormatException e) {
+                    System.out.println("  Errore: Inserisci un numero intero valido per la durata.");
+                }
+            }
+
+            int etaMin = 0;
+            while (true) {
+                System.out.print("Età minima consigliata: ");
+                try {
+                    etaMin = Integer.parseInt(scanner.nextLine().trim());
+                    if (etaMin >= 0) break;
+                    System.out.println("  L'età minima non può essere negativa.");
+                } catch (NumberFormatException e) {
+                    System.out.println("  Errore: Inserisci un valore numerico valido.");
+                }
+            }
+
+            filmPerProiezione = new Film(titolo, genere, regista, anno, durata, etaMin);
+            boolean filmSalvato = FileManager.salvaFilm(filmPerProiezione);
+            if (filmSalvato) {
+                System.out.println("  Nuovo film registrato con successo nel file film.csv!");
             }
         }
 
-        int durata = 0;
-        while (true) {
-            System.out.print("Durata (in minuti): ");
-            try {
-                durata = Integer.parseInt(scanner.nextLine().trim());
-                if (durata > 0) break;
-                System.out.println("  La durata deve essere maggiore di 0 minuti.");
-            } catch (NumberFormatException e) {
-                System.out.println("  Errore: Inserisci un numero intero valido per la durata.");
-            }
-        }
-
-        int etaMin = 0;
-        while (true) {
-            System.out.print("Età minima consigliata: ");
-            try {
-                etaMin = Integer.parseInt(scanner.nextLine().trim());
-                if (etaMin >= 0) break;
-                System.out.println("  L'età minima non può essere negativa.");
-            } catch (NumberFormatException e) {
-                System.out.println("  Errore: Inserisci un valore numerico valido.");
-            }
-        }
-
-        Film nuovoFilm = new Film(titolo, genere, regista, anno, durata, etaMin);
-        Proiezione nuovaProiezione = new Proiezione(dataProiezione, oraProiezione, prezzo, nuovoFilm);
+        Proiezione nuovaProiezione = new Proiezione(dataProiezione, oraProiezione, prezzo, filmPerProiezione);
 
         boolean salvato = FileManager.aggiungiProiezione(nuovaProiezione);
         if (salvato) {
