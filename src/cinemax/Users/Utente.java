@@ -24,11 +24,52 @@ import java.util.List;
  * @author Davide Noe Velasquez Carpio , matricola num. 765163 , VA
  */
 public abstract class Utente {
+    /**
+     * Rappresenta lo username univoco dell'utente per l'accesso al sistema.
+     *
+     * <p>L'attributo <code>username</code> viene utilizzato per identificare
+     * in modo univoco ogni utente durante le operazioni di autenticazione.
+     */
     private String username;
+
+    /**
+     * Conserva la password dell'utente protetta tramite funzione di hash.
+     *
+     * <p>L'attributo <code>passwordHash</code> garantisce la sicurezza dei dati
+     * memorizzando la rappresentazione crittografata della chiave d'accesso.
+     */
     private String passwordHash;
+
+    /**
+     * Contiene il nome di battesimo dell'utente.
+     *
+     * <p>L'attributo <code>nome</code> è memorizzato come stringa di testo
+     * per completare le informazioni anagrafiche personali.
+     */
     private String nome;
+
+    /**
+     * Conserva il cognome dell'utente.
+     *
+     * <p>L'attributo <code>cognome</code> viene associato al nome per identificare
+     * formalmente l'anagrafica della persona.
+     */
     private String cognome;
+
+    /**
+     * Specifica la data di nascita dell'utente.
+     *
+     * <p>L'attributo <code>dataNascita</code> viene utilizzato per registrare
+     * l'età e verificare eventuali restrizioni o requisiti del sistema.
+     */
     private String dataNascita;
+
+    /**
+     * Indica il luogo di domicilio o residenza attuale dell'utente.
+     *
+     * <p>L'attributo <code>luogoDomicilio</code> fornisce informazioni geografiche
+     * di contatto o riferimento associate al profilo.
+     */
     private String luogoDomicilio;
 
     /**

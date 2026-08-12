@@ -14,11 +14,52 @@ package cinemax.gestione;
 public class Film {
 
 
+    /**
+     * Rappresenta il titolo ufficiale del film.
+     *
+     * <p>L'attributo <code>titolo</code> viene utilizzato per identificare
+     * l'opera all'interno della programmazione e nelle ricerche dei clienti.
+     */
     private String titolo;
+
+    /**
+     * Indica la categoria o il genere cinematografico di appartenenza.
+     *
+     * <p>L'attributo <code>genere</code> fa riferimento all'enumerazione
+     * o alla classe <code>Genere</code> associata alla proiezione.
+     */
     private Genere genere;
+
+    /**
+     * Conserva il nome del regista che ha diretto il film.
+     *
+     * <p>L'attributo <code>regista</code> è memorizzato come stringa di testo
+     * per fini informativi e di catalogazione.
+     */
     private String regista;
+
+    /**
+     * Specifica l'anno di uscita o di produzione della pellicola.
+     *
+     * <p>L'attributo <code>anno</code> viene rappresentato come valore numerico intero
+     * per eventuali ordinamenti o filtri temporali.
+     */
     private int anno;
+
+    /**
+     * Indica la durata complessiva del film espressa in minuti.
+     *
+     * <p>L'attributo <code>durata</code> è utile per calcolare gli orari
+     * di inizio e fine delle singole proiezioni in sala.
+     */
     private int durata;
+
+    /**
+     * Definisce il limite di età minimo consigliato o imposto per la visione.
+     *
+     * <p>L'attributo <code>eta_minima</code> viene utilizzato dai sistemi di controllo
+     * per verificare i requisiti d'accesso durante la prenotazione o l'emissione del biglietto.
+     */
     private int eta_minima;
 
     /**

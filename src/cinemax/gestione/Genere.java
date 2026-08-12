@@ -24,7 +24,22 @@ public enum Genere {
     STORICO(12, "Storico"),
     THRILLER(13, "Thriller");
 
+    /**
+     * Rappresenta il codice identificativo univoco.
+     *
+     * <p>L'attributo <code>codice</code> è dichiarato come costante (<code>final</code>)
+     * per garantire che non possa essere modificato dopo la creazione dell'oggetto,
+     * fungendo da chiave primaria o identificatore di riferimento.
+     */
     private final int codice;
+
+    /**
+     * Contiene una descrizione testuale dettagliata.
+     *
+     * <p>L'attributo <code>descrizione</code> fornisce informazioni aggiuntive
+     * o esplicative ed è anch'esso costante (<code>final</code>) per preservare
+     * l'immutabilità dei dati associati.
+     */
     private final String descrizione;
 
     /**

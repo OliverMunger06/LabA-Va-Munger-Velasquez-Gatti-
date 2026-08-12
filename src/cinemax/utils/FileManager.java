@@ -40,12 +40,60 @@ import static cinemax.Users.Utente.FMT_ITA;
  */
 public class FileManager {
 
+    /**
+     * Separatore di percorso indipendente dal sistema operativo.
+     *
+     * <p>L'attributo <code>SEP</code> viene ricavato direttamente da <code>File.separator</code>
+     * per garantire la corretta compatibilità dei percorsi dei file su diverse piattaforme.
+     */
     private static final String SEP = File.separator;
+
+    /**
+     * Percorso del file CSV contenente i dati degli utenti.
+     *
+     * <p>L'attributo <code>FILE_UTENTI</code> definisce la posizione in cui vengono
+     * letti e memorizzati permanentemente i profili degli utenti del sistema.
+     */
     private static final String FILE_UTENTI = "." + SEP + "data" + SEP + "utenti.csv";
+
+    /**
+     * Percorso del file CSV per la gestione del palinsesto.
+     *
+     * <p>L'attributo <code>FILE_PALINSESTO</code> indica il percorso in cui sono salvate
+     * le informazioni relative alle proiezioni e alla programmazione del cinema.
+     */
     private static final String FILE_PALINSESTO = "." + SEP + "data" + SEP + "palinsesto.csv";
+
+    /**
+     * Percorso del file CSV adibito alla conservazione delle prenotazioni.
+     *
+     * <p>L'attributo <code>FILE_PRENOTAZIONI</code> viene utilizzato per accedere
+     * allo storico e ai dati aggiornati di tutte le prenotazioni effettuate.
+     */
     private static final String FILE_PRENOTAZIONI = "." + SEP + "data" + SEP + "prenotazioni.csv";
+
+    /**
+     * Percorso del file CSV dedicato all'elenco dei film.
+     *
+     * <p>L'attributo <code>FILE_FILM</code> individua la risorsa in cui sono archiviati
+     * i dettagli e i cataloghi di tutte le pellicole cinematografiche.
+     */
     private static final String FILE_FILM = "." + SEP + "data" + SEP + "film.csv";
+
+    /**
+     * Chiave segreta utilizzata per operazioni di cifratura o sicurezza.
+     *
+     * <p>L'attributo <code>CHIAVE_SEGRETA</code> è una stringa costante ad alta complessità
+     * impiegata internamente per validare o proteggere i dati sensibili.
+     */
     private static final String CHIAVE_SEGRETA = "c8f391b4a2e5d790f61284a37b9015e14d3f28e6c710a9f5d301b894e2a6c712";
+
+    /**
+     * Carattere delimitatore utilizzato per la suddivisione dei campi nei file CSV.
+     *
+     * <p>L'attributo <code>SEPARATORE</code> è impostato sulla virgola (<code>,</code>)
+     * per regolare il parsing e la formattazione dei dati testuali tabulati.
+     */
     private static final String SEPARATORE = ",";
 
     /**

@@ -18,11 +18,53 @@ import java.time.LocalTime;
 public class Proiezione {
 
 
+    /**
+     * Rappresenta l'identificativo univoco della proiezione.
+     *
+     * <p>L'attributo <code>idProiezione</code> è dichiarato come costante (<code>final</code>)
+     * per garantire che il codice identificativo non possa essere modificato
+     * dopo la creazione della proiezione.
+     */
     private final String idProiezione;
+
+    /**
+     * Indica la data in cui si terrà la proiezione cinematografica.
+     *
+     * <p>L'attributo <code>dataProiezione</code> viene utilizzato per la pianificazione
+     * del calendario e per filtrare gli spettacoli disponibili.
+     */
     private Date dataProiezione;
+
+    /**
+     * Specifica l'orario di inizio della proiezione in sala.
+     *
+     * <p>L'attributo <code>oraProiezione</code> è memorizzato come oggetto <code>LocalTime</code>
+     * per gestire la programmazione oraria giornaliera.
+     */
     private LocalTime oraProiezione;
+
+    /**
+     * Definisce il prezzo standard per l'acquisto di un biglietto per questa proiezione.
+     *
+     * <p>L'attributo <code>prezzoBiglietto</code> è costante (<code>final</code>)
+     * per mantenere fisso il costo stabilito per lo spettacolo.
+     */
     private final double prezzoBiglietto;
+
+    /**
+     * Riferimento al film proiettato durante lo spettacolo.
+     *
+     * <p>L'attributo <code>film</code> punta all'oggetto <code>Film</code> associato
+     * per recuperare tutte le informazioni relative all'opera cinematografica.
+     */
     private Film film;
+
+    /**
+     * Conserva il conteggio dei posti ancora liberi e prenotabili in sala.
+     *
+     * <p>L'attributo <code>postiDisponibili</code> viene aggiornato dinamicamente
+     * a ogni nuova prenotazione o cancellazione per monitorare la capienza residua.
+     */
     private int postiDisponibili;
 
 

@@ -28,8 +28,22 @@ import java.util.Scanner;
 public class GestoreMenu {
 
 
-private Scanner sc;
-private final DateTimeFormatter FMT_ITA = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(java.time.format.ResolverStyle.STRICT);
+        /**
+         * Scanner utilizzato per la lettura degli input da tastiera.
+         *
+         * <p>Questo attributo <code>sc</code> viene impiegato per gestire
+         * l'interazione testuale con l'utente all'interno della classe.
+         */
+        private Scanner sc;
+
+        /**
+         * Formattatore di date basato sullo standard italiano (giorno/mese/anno).
+         *
+         * <p>L'attributo <code>FMT_ITA</code> è costante (<code>final</code>)
+         * e utilizza uno stile di risoluzione rigido (<code>ResolverStyle.STRICT</code>)
+         * per garantire la validazione corretta dei giorni e dei mesi inseriti.
+         */
+        private final DateTimeFormatter FMT_ITA = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(java.time.format.ResolverStyle.STRICT);
 
     /**
      * Costruisce una nuova istanza di {@code GestoreMenu} associata a uno scanner per la lettura

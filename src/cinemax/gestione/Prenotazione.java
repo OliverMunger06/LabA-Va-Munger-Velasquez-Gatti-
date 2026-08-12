@@ -20,13 +20,68 @@ import java.util.UUID;
 public class Prenotazione {
 
 
+    /**
+     * Rappresenta l'identificativo univoco della prenotazione.
+     *
+     * <p>L'attributo <code>idPrenotazione</code> viene utilizzato dal sistema
+     * per tracciare e gestire ogni singola prenotazione effettuata.
+     */
     private String idPrenotazione;
+
+    /**
+     * Contiene il nome di battesimo del cliente che ha effettuato la prenotazione.
+     *
+     * <p>L'attributo <code>nomeCliente</code> è memorizzato come stringa di testo
+     * per finalità di identificazione e contatto.
+     */
     private String nomeCliente;
+
+    /**
+     * Conserva il cognome del cliente associato alla prenotazione.
+     *
+     * <p>L'attributo <code>cognomeCliente</code> viene utilizzato insieme al nome
+     * per completare l'anagrafica del cliente.
+     */
     private String cognomeCliente;
+
+    /**
+     * Rappresenta lo username univoco scelto dal cliente per l'accesso.
+     *
+     * <p>L'attributo <code>usernameCliente</code> serve per identificare
+     * l'utente all'interno del sistema durante le fasi di autenticazione.
+     */
     private String usernameCliente;
+
+    /**
+     * Conserva la password dell'utente protetta tramite funzione di hash.
+     *
+     * <p>L'attributo <code>passwordHash</code> garantisce la sicurezza dei dati
+     * memorizzando la rappresentazione crittografata anziché la password in chiaro.
+     */
     private String passwordHash;
+
+    /**
+     * Riferimento alla proiezione cinematografica associata alla prenotazione.
+     *
+     * <p>L'attributo <code>filmProiezione</code> punta all'oggetto <code>Proiezione</code>
+     * per recuperare tutti i dettagli relativi a film, orario e sala.
+     */
     private Proiezione filmProiezione;
+
+    /**
+     * Specifica il numero del posto a sedere assegnato in sala.
+     *
+     * <p>L'attributo <code>numeroPosto</code> è un valore numerico intero
+     * impiegato per evitare sovrapposizioni e gestire la mappa dei posti.
+     */
     private int numeroPosto;
+
+    /**
+     * Rappresenta il codice alfanumerico univoco del biglietto emesso.
+     *
+     * <p>L'attributo <code>codiceBiglietto</code> viene generato per identificare
+     * il titolo d'accesso valido per la proiezione.
+     */
     private String codiceBiglietto;
 
     /**
