@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -73,10 +74,14 @@ public abstract class Utente {
     private String luogoDomicilio;
 
     /**
-     * Formattatore standard per le date nel formato italiano (dd/MM/yyyy).
+     * Formattatore di date basato sullo standard italiano (giorno/mese/anno).
+     *
+     * <p>L'attributo <code>FMT_ITA</code> è costante (<code>final</code>)
+     * e utilizza uno stile di risoluzione rigido (<code>ResolverStyle.STRICT</code>)
+     * per garantire la validazione corretta dei giorni e dei mesi inseriti.
      */
     public static final java.time.format.DateTimeFormatter FMT_ITA =
-            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(java.time.format.ResolverStyle.STRICT);
 
     /**
      * Costruisce un nuovo oggetto {@code Utente} con le informazioni anagrafiche e le credenziali.
