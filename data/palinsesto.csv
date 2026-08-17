@@ -1,22 +1,300 @@
-"P-A1B2C3D4","18/09/2026","10:30","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,8.50,200
-"P-E5F6G7H8","18/09/2026","14:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,6.50,200
-"P-9I0J1K2L","21/09/2026","10:30","Deadpool 2","Azione","David Leitch",2018,119,16,7.00,200
-"P-3M4N5O6P","23/09/2026","13:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
-"P-7Q8R9S0T","23/09/2026","17:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,9.50,200
-"P-U1V2W3X4","25/10/2026","21:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,10.50,200
-"P-Y5Z6A7B8","29/12/2026","16:30","Shine","Biografico","Scott Hicks",1996,105,0,7.00,200
-"P-C9D0E1F2","31/12/2026","13:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,8.00,200
-"P-G3H4I5J6","01/01/2027","10:00","The Fugitive","Azione","Andrew Davis",1993,130,0,6.50,200
-"P-K7L8M9N0","03/01/2027","19:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,8.50,200
-"P-O1P2Q3R4","05/01/2027","16:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
-"P-S5T6U7V8","05/01/2027","13:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
-"P-W9X0Y1Z2","06/01/2027","10:30","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,8.00,200
-"P-3A4B5C6D","06/01/2027","16:30","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,6.50,200
-"P-7E8F9G0H","09/02/2027","13:30","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,7.50,200
-"P-I1J2K3L4","09/03/2028","10:30","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,8.00,200
-"P-M5N6O7P8","13/03/2028","12:30","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,8.00,200
-"P-Q9R0S1T2","16/03/2028","10:00","Shine","Biografico","Scott Hicks",1996,105,0,8.50,200
-"P-U3V4W5X6","21/03/2028","13:30","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,7.00,200
-"P-Y7Z8A9B0","25/04/2028","10:30","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,7.50,200
-"P-C1D2E3F4","01/01/2029","10:30","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.00,200
-"P-04F99015","09/08/2026","15:00","i pirati dei caraibi","Avventura","nel",2003,130,12,5.0,200
+"P-A7F31D92","14/09/2026","09:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-3C8E5B17","14/09/2026","12:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-D91A47F3","14/09/2026","15:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-62B8E4C1","14/09/2026","18:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-F5C29A83","14/09/2026","21:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-8D41F6B2","15/09/2026","09:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-B3E97C15","15/09/2026","12:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-4A6D82F9","15/09/2026","15:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-E1C53B76","15/09/2026","18:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-79F24D8A","15/09/2026","21:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-C6A91E43","16/09/2026","09:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-2F7B5C19","16/09/2026","12:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-AD38E6F2","16/09/2026","15:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-51C9B7D4","16/09/2026","18:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-E84A2F61","16/09/2026","21:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-37D5C8A9","17/09/2026","09:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-BF163E72","17/09/2026","12:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-9A4C7D35","17/09/2026","15:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-E25B81F6","17/09/2026","18:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-6C39A4E8","17/09/2026","21:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-D7F52B1C","18/09/2026","09:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-1E8C63A5","18/09/2026","12:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-A4B97D26","18/09/2026","15:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-F31E58C9","18/09/2026","18:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-72D6A1B4","18/09/2026","21:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-C85F3E17","19/09/2026","09:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-49A2D7E6","19/09/2026","12:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-B6C14F93","19/09/2026","15:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-E73D8A25","19/09/2026","18:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-5F9B2C68","19/09/2026","21:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-A13E76D4","20/09/2026","09:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-D58C29F1","20/09/2026","12:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-8B47E3A6","20/09/2026","15:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-F264C9D7","20/09/2026","18:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-3A81B5E2","20/09/2026","21:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-C7D93F48","21/09/2026","09:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-15E6A2B9","21/09/2026","12:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-B4F87C31","21/09/2026","15:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-6D29E5A7","21/09/2026","18:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-E8B13F52","21/09/2026","21:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-92C47AD6","22/09/2026","09:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-F5A83D19","22/09/2026","12:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-3E61B7C4","22/09/2026","15:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-A9D25F73","22/09/2026","18:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-48C7E1B5","22/09/2026","21:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-D63A9F28","23/09/2026","09:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-7B14E5C9","23/09/2026","12:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-F2C86A31","23/09/2026","15:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-5E39D7B4","23/09/2026","18:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-C1A64F82","23/09/2026","21:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-8F25B3D7","24/09/2026","09:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-E4C971A6","24/09/2026","12:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-2A58D3F9","24/09/2026","15:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-B7E16C45","24/09/2026","18:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-94F32A81","24/09/2026","21:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-D5B79E23","25/09/2026","09:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-61C4F8A7","25/09/2026","12:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-AE237D59","25/09/2026","15:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-3B95C1F6","25/09/2026","18:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-F8D42A17","25/09/2026","21:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-57E9B3C2","26/09/2026","09:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-C4A16F85","26/09/2026","12:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-82D7E931","26/09/2026","15:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-B6F35A4C","26/09/2026","18:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-1D9C72E8","26/09/2026","21:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-E53A8F14","27/09/2026","09:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-6B2D97C5","27/09/2026","12:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-F1A46E83","27/09/2026","15:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-39C8B2D7","27/09/2026","18:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-A5E17F64","27/09/2026","21:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-D82B4C91","28/09/2026","09:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-47F6A3E5","28/09/2026","12:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-C9D15B72","28/09/2026","15:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-2E83F4A6","28/09/2026","18:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-B1C679D3","28/09/2026","21:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-F73A2E58","29/09/2026","09:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-5C18D9B4","29/09/2026","12:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-E6B347A1","29/09/2026","15:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-93F25C7D","29/09/2026","18:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-4A81E6B3","29/09/2026","21:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-D7C39F15","30/09/2026","09:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-26B5A8E4","30/09/2026","12:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-F1E73C69","30/09/2026","15:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-8D42B6A5","30/09/2026","18:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-C5A19E37","30/09/2026","21:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-71F3D8B2","01/10/2026","09:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-A6C45E19","01/10/2026","12:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-3B82F7D4","01/10/2026","15:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-E9A16C53","01/10/2026","18:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-58D4B2F7","01/10/2026","21:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-C17E93A6","02/10/2026","09:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-4F28D6B1","02/10/2026","12:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-B5A7E39C","02/10/2026","15:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-82D14F65","02/10/2026","18:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-E3C96A27","02/10/2026","21:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-69B5F1D8","03/10/2026","09:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-A4E27C93","03/10/2026","12:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-F8361B52","03/10/2026","15:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-1C79D4E6","03/10/2026","18:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-B2F58A37","03/10/2026","21:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-7D13E9C4","04/10/2026","09:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-E5A42F81","04/10/2026","12:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-38C6B7D2","04/10/2026","15:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-A91E5F63","04/10/2026","18:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-F4B28C17","04/10/2026","21:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-63D9A5E2","05/10/2026","09:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-C7F14B86","05/10/2026","12:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-2A95E3D1","05/10/2026","15:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-B48C6F79","05/10/2026","18:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-E13D7A52","05/10/2026","21:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-5F82B9C4","06/10/2026","09:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-D6A31E87","06/10/2026","12:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-94C57B12","06/10/2026","15:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-F2E68A35","06/10/2026","18:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-3B17D9C6","06/10/2026","21:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-A8F42E71","07/10/2026","09:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-61C93B5D","07/10/2026","12:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-E47A1F82","07/10/2026","15:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-2D85C6B3","07/10/2026","18:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-B9E34A17","07/10/2026","21:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-F63C8D25","08/10/2026","09:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-48A17E93","08/10/2026","12:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-D5B2F761","08/10/2026","15:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-9C43E8A6","08/10/2026","18:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-E71D5B39","08/10/2026","21:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-3F86C2A4","09/10/2026","09:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-B1A57D69","09/10/2026","12:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-64E9F318","09/10/2026","15:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-C7D25A81","09/10/2026","18:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-5B43E6F2","09/10/2026","21:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-A9C17D53","10/10/2026","09:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-F4E82B67","10/10/2026","12:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-28D65A91","10/10/2026","15:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-C3B71F48","10/10/2026","18:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-7E94D2A6","10/10/2026","21:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-E15A83C9","11/10/2026","09:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-52F7C1D4","11/10/2026","12:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-B86E4A23","11/10/2026","15:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-39D2F75A","11/10/2026","18:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-A4C681E9","11/10/2026","21:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-F73B2D58","12/10/2026","09:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-1E95C6A3","12/10/2026","12:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-D8A41F72","12/10/2026","15:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-63E7B9C5","12/10/2026","18:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-B2F54A18","12/10/2026","21:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-8C31E6D7","13/10/2026","09:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-E5A92B43","13/10/2026","12:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-47D1F8C6","13/10/2026","15:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-C93A5E17","13/10/2026","18:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-2F74B6D9","13/10/2026","21:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-A81E3C52","14/10/2026","09:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-D67B4F93","14/10/2026","12:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-5C29E8A1","14/10/2026","15:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-F43D71C8","14/10/2026","18:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-96A5B2E4","14/10/2026","21:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-C17F83D6","15/10/2026","09:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-4E62A9B5","15/10/2026","12:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-D83C1F47","15/10/2026","15:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-B6A57E92","15/10/2026","18:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-31E9C4F8","15/10/2026","21:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-F5B28A63","16/10/2026","09:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-7D43E1C9","16/10/2026","12:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-A26F58B4","16/10/2026","15:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-E91C37D5","16/10/2026","18:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-54B8A2F6","16/10/2026","21:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-C73E1D95","17/10/2026","09:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-18A6F4B2","17/10/2026","12:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-D95C37E1","17/10/2026","15:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-62F8B5A4","17/10/2026","18:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-B31E7C69","17/10/2026","21:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-E48A2F15","18/10/2026","09:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-9C57D3B8","18/10/2026","12:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-F16B84E2","18/10/2026","15:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-3D95A7C1","18/10/2026","18:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-A62E4F79","18/10/2026","21:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-C85B1D36","19/10/2026","09:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-47E9A2F5","19/10/2026","12:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-D13C68B4","19/10/2026","15:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-F72A5E91","19/10/2026","18:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-2B84D7C3","19/10/2026","21:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-E51F3A68","20/10/2026","09:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-9D27C4B1","20/10/2026","12:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-63A8E5F2","20/10/2026","15:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-B4C19D76","20/10/2026","18:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-F82E57A3","20/10/2026","21:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-1C63B9E4","21/10/2026","09:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-D57A2F81","21/10/2026","12:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-8E41C6B5","21/10/2026","15:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-A93D75F2","21/10/2026","18:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-4B16E8C7","21/10/2026","21:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-E72C5A39","22/10/2026","09:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-35F81D64","22/10/2026","12:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-C9A47E12","22/10/2026","15:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-61D3B8F5","22/10/2026","18:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-B7E25C91","22/10/2026","21:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-F43A6D28","23/10/2026","09:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-8C17B5E3","23/10/2026","12:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-D6A92F41","23/10/2026","15:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-2E58C7B4","23/10/2026","18:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-A13F69D5","23/10/2026","21:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-74C2E8B6","24/10/2026","09:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-E95A31F7","24/10/2026","12:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-3D68B4C2","24/10/2026","15:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-B51F7A93","24/10/2026","18:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-C8462E15","24/10/2026","21:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-17A5D9F3","25/10/2026","09:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-E38C61B7","25/10/2026","12:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-5F94A2D8","25/10/2026","15:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-A6D37E21","25/10/2026","18:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-C1B85F64","25/10/2026","21:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-92E4A7D3","26/10/2026","09:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-F53C18B6","26/10/2026","12:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-4A72E9D1","26/10/2026","15:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-B6C35F82","26/10/2026","18:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-E17D49A5","26/10/2026","21:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-83F2C6B9","27/10/2026","09:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-D45A91E7","27/10/2026","12:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-2C68B3F1","27/10/2026","15:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-A97E51D4","27/10/2026","18:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-F3B824C6","27/10/2026","21:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-5D16A9E2","28/10/2026","09:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-C74F2B85","28/10/2026","12:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-E9A531D7","28/10/2026","15:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-38C6F1B4","28/10/2026","18:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-B2D87E53","28/10/2026","21:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-F61A49C8","29/10/2026","09:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-7E35D2A1","29/10/2026","12:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-C9B184F6","29/10/2026","15:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-42D7A5E3","29/10/2026","18:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-A8F31C69","29/10/2026","21:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-E52B96D4","30/10/2026","09:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-1F73C8A5","30/10/2026","12:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-B4E16D92","30/10/2026","15:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-6A39F7C1","30/10/2026","18:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-D85C2E43","30/10/2026","21:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-93A7F1B6","31/10/2026","09:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-C51E68D2","31/10/2026","12:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-F27B4A95","31/10/2026","15:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-4D83C6E1","31/10/2026","18:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-A65F2198","31/10/2026","21:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-E3C74B5A","01/11/2026","09:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-8F16D9C2","01/11/2026","12:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-B57A3E81","01/11/2026","15:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-2D94F6C7","01/11/2026","18:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-C18E5A43","01/11/2026","21:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-7B36D2F9","02/11/2026","09:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-EA514C68","02/11/2026","12:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-49D87F21","02/11/2026","15:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-F3C15B96","02/11/2026","18:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-62A9E4D7","02/11/2026","21:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-B85F31C4","03/11/2026","09:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-D27E6A91","03/11/2026","12:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-4C93B7F5","03/11/2026","15:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-E16D52A8","03/11/2026","18:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-739AF4C2","03/11/2026","21:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-C5E18B63","04/11/2026","09:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-91D4F7A2","04/11/2026","12:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-B63C2E85","04/11/2026","15:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-F8A519D4","04/11/2026","18:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-2E74C6B1","04/11/2026","21:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-A37D91F8","05/11/2026","09:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-E5C24B67","05/11/2026","12:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-6F81D3A9","05/11/2026","15:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-C48E72F1","05/11/2026","18:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-B16A5D83","05/11/2026","21:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-9D37F2C5","06/11/2026","09:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-E84B16A7","06/11/2026","12:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-52C9D3F1","06/11/2026","15:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-A67E41B8","06/11/2026","18:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-F35D8C24","06/11/2026","21:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-1A72E6B9","07/11/2026","09:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-C58F31D7","07/11/2026","12:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-B94A2E63","07/11/2026","15:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-E17C65F2","07/11/2026","18:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-43D8A1C5","07/11/2026","21:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-F69B24E7","08/11/2026","09:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-3C57D8A1","08/11/2026","12:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-A84E1F63","08/11/2026","15:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-D25B79C4","08/11/2026","18:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200
+"P-E71A46F8","08/11/2026","21:00","Apocalypse Now","Drammatico","Francis Ford Coppola",1979,147,16,9.00,200
+"P-5D93C2B7","09/11/2026","09:00","The Fugitive","Azione","Andrew Davis",1993,130,0,9.00,200
+"P-B41E76A9","09/11/2026","12:00","Mononoke-hime","Animazione","Hayao Miyazaki",1997,134,0,8.00,200
+"P-F82C15D3","09/11/2026","15:00","The Killing Fields","Biografico","Roland Joffé",1984,141,12,8.00,200
+"P-6A47E9C1","09/11/2026","18:00","El ángel exterminador","Drammatico","Luis Buñuel",1962,95,12,7.50,200
+"P-C35D81F6","09/11/2026","21:00","Sleuth","Mistero","Joseph L. Mankiewicz",1972,138,6,8.50,200
+"P-E9B62A54","10/11/2026","09:00","The Last Picture Show","Drammatico","Peter Bogdanovich",1971,118,16,7.50,200
+"P-17F4C8D2","10/11/2026","12:00","Ayla: The Daughter of War","Biografico","Can Ulkay",2017,125,12,8.00,200
+"P-A53E71B9","10/11/2026","15:00","Taxi Driver","Drammatico","Martin Scorsese",1976,114,16,9.00,200
+"P-D84C26F5","10/11/2026","18:00","Blade Runner","Fantascienza","Ridley Scott",1982,117,12,9.50,200
+"P-3F91B7E6","10/11/2026","21:00","In the Mood for Love","Romantico","Wong Kar-wai",2000,98,6,8.50,200
+"P-C62A85D1","11/11/2026","09:00","Raiders of the Lost Ark","Avventura","Steven Spielberg",1981,115,6,10.00,200
+"P-F47D39B8","11/11/2026","12:00","The Shining","Horror","Stanley Kubrick",1980,144,16,9.50,200
+"P-8B16E5C3","11/11/2026","15:00","Modern Times","Commedia","Charlie Chaplin",1936,87,0,7.00,200
+"P-A92F73D4","11/11/2026","18:00","Se7en","Thriller","David Fincher",1995,127,16,9.50,200
+"P-E5C81A67","11/11/2026","21:00","Hiroshima mon amour","Drammatico","Alain Resnais",1959,90,12,7.50,200
+"P-31D94F82","12/11/2026","09:00","Raging Bull","Biografico","Martin Scorsese",1980,129,12,8.00,200
+"P-B76E2A15","12/11/2026","12:00","Deadpool 2","Azione","David Leitch",2018,119,16,10.00,200
+"P-F13C58D9","12/11/2026","15:00","The Lion in Winter","Biografico","Anthony Harvey",1968,134,6,7.50,200
+"P-4A87E6B3","12/11/2026","18:00","The Adventures of Robin Hood","Azione","Michael Curtiz",1938,102,6,8.50,200
+"P-C25D91F7","12/11/2026","21:00","Shine","Biografico","Scott Hicks",1996,105,0,7.50,200

@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"cinemax"},{"l":"cinemax.controls"},{"l":"cinemax.gestione"},{"l":"cinemax.Users"},{"l":"cinemax.utils"}];updateSearchResults();

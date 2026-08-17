@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="LabA-Va-Munger-Velasquez-Gatti-.jar">
+    <output-path>$PROJECT_DIR$/bin</output-path>
+    <root id="archive" name="LabA-Va-Munger-Velasquez-Gatti-.jar">
+      <element id="module-output" name="LabA-Va-Munger-Velasquez-Gatti-" />
+    </root>
+  </artifact>
+</component>

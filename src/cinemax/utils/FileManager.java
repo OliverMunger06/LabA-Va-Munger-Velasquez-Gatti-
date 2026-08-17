@@ -41,44 +41,24 @@ import static cinemax.Users.Utente.FMT_ITA;
 public class FileManager {
 
     /**
-     * Separatore di percorso indipendente dal sistema operativo.
-     *
-     * <p>L'attributo <code>SEP</code> viene ricavato direttamente da <code>File.separator</code>
-     * per garantire la corretta compatibilità dei percorsi dei file su diverse piattaforme.
+     * Percorso del file CSV per la gestione degli utenti.
      */
-    private static final String SEP = File.separator;
-
-    /**
-     * Percorso del file CSV contenente i dati degli utenti.
-     *
-     * <p>L'attributo <code>FILE_UTENTI</code> definisce la posizione in cui vengono
-     * letti e memorizzati permanentemente i profili degli utenti del sistema.
-     */
-    private static final String FILE_UTENTI = "." + SEP + "data" + SEP + "utenti.csv";
+    private static final String FILE_UTENTI = getdataPath("utenti.csv");
 
     /**
      * Percorso del file CSV per la gestione del palinsesto.
-     *
-     * <p>L'attributo <code>FILE_PALINSESTO</code> indica il percorso in cui sono salvate
-     * le informazioni relative alle proiezioni e alla programmazione del cinema.
      */
-    private static final String FILE_PALINSESTO = "." + SEP + "data" + SEP + "palinsesto.csv";
+    private static final String FILE_PALINSESTO = getdataPath("palinsesto.csv");
 
     /**
      * Percorso del file CSV adibito alla conservazione delle prenotazioni.
-     *
-     * <p>L'attributo <code>FILE_PRENOTAZIONI</code> viene utilizzato per accedere
-     * allo storico e ai dati aggiornati di tutte le prenotazioni effettuate.
      */
-    private static final String FILE_PRENOTAZIONI = "." + SEP + "data" + SEP + "prenotazioni.csv";
+    private static final String FILE_PRENOTAZIONI = getdataPath("prenotazioni.csv");
 
     /**
      * Percorso del file CSV dedicato all'elenco dei film.
-     *
-     * <p>L'attributo <code>FILE_FILM</code> individua la risorsa in cui sono archiviati
-     * i dettagli e i cataloghi di tutte le pellicole cinematografiche.
      */
-    private static final String FILE_FILM = "." + SEP + "data" + SEP + "film.csv";
+    private static final String FILE_FILM = getdataPath("film.csv");
 
     /**
      * Chiave segreta utilizzata per operazioni di cifratura o sicurezza.
@@ -100,6 +80,24 @@ public class FileManager {
      * Costruttore privato per impedire l'istanziamento di una classe di utilita'.
      */
     private FileManager() {}
+
+
+    /**
+     * Restituisce il percorso dinamico e compatibile cross-platform per accedere ai file
+     * all'interno della cartella dei dati, a seconda della directory di esecuzione del programma.
+     *
+     * @param fileName il nome del file (o il percorso relativo) di cui si vuole ottenere il path
+     * @return la stringa contenente il percorso corretto del file in base all'ambiente di esecuzione
+     */
+    public static String getdataPath(String fileName) {
+        File currentDir = new File(System.getProperty("user.dir"));
+
+        if (currentDir.getName().equals("bin")) {
+            return ".." + File.separator + "data" + File.separator + fileName;
+        }
+
+        return "data" + File.separator + fileName;
+    }
 
     /**
      * Salva un oggetto {@link Utente} in coda al file CSV degli utenti.
