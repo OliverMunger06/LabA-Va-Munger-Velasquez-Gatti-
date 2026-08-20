@@ -905,6 +905,7 @@ public class FileManager {
 
         File fileTemporaneo = new File(fileOriginale.getParent(), "prenotazioni_temp.csv");
         boolean eliminato = false;
+        String idProiezioneTrovata = null;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileOriginale));
              BufferedWriter writer = new BufferedWriter(new FileWriter(fileTemporaneo))) {
@@ -918,19 +919,21 @@ public class FileManager {
                 String[] elementi = riga.split(SEPARATORE);
 
                 if (elementi.length >= 8) {
-                    String id = elementi[0].trim();
-                    String username = elementi[3].trim();
+                    String id = elementi[0].replace("\"", "").trim(); // ID della prenotazione
+                    String username = elementi[3].replace("\"", "").trim(); // Username cliente
 
-                    if (id.equalsIgnoreCase(idPrenotazione) && username.equalsIgnoreCase(usernameUtente)) {
+                    if (id.equalsIgnoreCase(idPrenotazione.replace("\"", "").trim()) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;
+                        idProiezioneTrovata = elementi[5].replace("\"", "").trim();
                         continue;
                     }
-                } else if (elementi.length >= 4) {
-                    String id = elementi[0].trim();
-                    String username = elementi[1].trim();
+                } else if (elementi.length >= 6) {
+                    String id = elementi[0].replace("\"", "").trim();
+                    String username = elementi[3].replace("\"", "").trim();
 
-                    if (id.equalsIgnoreCase(idPrenotazione) && username.equalsIgnoreCase(usernameUtente)) {
+                    if (id.equalsIgnoreCase(idPrenotazione.replace("\"", "").trim()) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;
+                        idProiezioneTrovata = elementi[5].replace("\"", "").trim();
                         continue;
                     }
                 }
@@ -956,6 +959,11 @@ public class FileManager {
                 System.out.println("  Impossibile finalizzare la cancellazione.");
                 return false;
             }
+
+            if (idProiezioneTrovata != null) {
+                aggiornaPostoRimosso(idProiezioneTrovata, 1);
+            }
+
             return true;
         } else {
             fileTemporaneo.delete();
@@ -984,8 +992,11 @@ public class FileManager {
 
                 String[] elementi = riga.split(SEPARATORE);
                 if (elementi.length >= 11) {
-                    String id = elementi[0].trim();
-                    if (id.equalsIgnoreCase(idProiezione.trim())) {
+
+                    String id = elementi[0].replace("\"", "").trim();
+                    String idCercato = idProiezione.replace("\"", "").trim();
+
+                    if (id.equalsIgnoreCase(idCercato)) {
                         elementi[10] = String.valueOf(nuoviDisponibili);
                         riga = String.join(SEPARATORE, elementi);
                     }
@@ -1032,13 +1043,15 @@ public class FileManager {
                     String idCorrente = elementi[0].replace("\"", "").trim();
 
                     if (idCorrente.equals(idProiezione)) {
+
                         int postiDisponibili = Integer.parseInt(elementi[10].replace("\"", "").trim());
 
                         if (postiDisponibili >= quantita) {
-                            postiDisponibili -= quantita; // Scala del numero effettivo di biglietti
-                            elementi[10] = String.valueOf(postiDisponibili); // Aggiorna l'array
-                            riga = String.join(SEPARATORE, elementi); // Ricompone la riga CSV
+                            postiDisponibili -= quantita;
+                            elementi[10] = String.valueOf(postiDisponibili);
+                            riga = String.join(SEPARATORE, elementi);
                             aggiornato = true;
+
                         } else {
                             System.out.println("Errore: Posti insufficienti per completare l'acquisto.");
                             return false;
@@ -1060,6 +1073,41 @@ public class FileManager {
         return false;
     }
 
+    /**
+     * Aggiorna i posti disponibili di una proiezione incrementandoli in seguito alla cancellazione di una prenotazione.
+     *
+     * @param idProiezione         L'identificativo della proiezione interessata.
+     * @param quantitaDaRipristinare Il numero di posti da restituire e sommare ai posti disponibili.
+     */
+    private static void aggiornaPostoRimosso(String idProiezione, int quantitaDaRipristinare) {
+        Path path = Paths.get(FILE_PALINSESTO);
+        if (!Files.exists(path)) {
+            return;
+        }
+
+        try {
+            List<String> righe = Files.readAllLines(path);
+            for (String riga : righe) {
+                if (riga.trim().isEmpty()) continue;
+
+                String[] elementi = riga.split(SEPARATORE);
+                if (elementi.length >= 11) {
+                    String idCorrente = elementi[0].replace("\"", "").trim();
+
+                    if (idCorrente.equalsIgnoreCase(idProiezione.trim())) {
+                        int postiDisponibili = Integer.parseInt(elementi[10].replace("\"", "").trim());
+
+                        int nuoviDisponibili = postiDisponibili + quantitaDaRipristinare;
+
+                        aggiornaPostiProiezioneSuFile(idProiezione, nuoviDisponibili);
+                        break;
+                    }
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Errore durante il ripristino del posto: " + e.getMessage());
+        }
+    }
 
     /**
      * Esegue l'hashing di una password in chiaro utilizzando l'algoritmo PBKDF2WithHmacSHA256.

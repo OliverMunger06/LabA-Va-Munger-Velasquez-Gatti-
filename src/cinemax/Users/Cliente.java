@@ -64,7 +64,6 @@ public class Cliente extends Utente {
 
             try {
                 FileManager.salvaPrenotazione(nuovaPrenotazione);
-                FileManager.aggiornaPostiProiezioneSuFile(proiezione.getIdProiezione(), proiezione.getPostiDisponibili());
             } catch (Exception e) {
                 System.out.println("  Avviso: Errore durante il salvataggio dei dati su file: " + e.getMessage());
             }
@@ -461,12 +460,13 @@ public class Cliente extends Utente {
                 }
 
                 if (postiRichiesti <= proiezioneScelta.getPostiDisponibili()) {
+
                     for (int k = 0; k < postiRichiesti; k++) {
                         this.creaPrenotazione(proiezioneScelta);
-                        FileManager.scalaPostoDisponibile(proiezioneScelta.getIdProiezione(), postiRichiesti);
+                        FileManager.scalaPostoDisponibile(proiezioneScelta.getIdProiezione(), 1);
                     }
                 } else {
-                    System.out.println("  Errore: Non ci sono abbastanza posti disponibili. Posti rimasti: " + proiezioneScelta.getPostiDisponibili());
+                    System.out.println("  Errore: Non ci sono abbastanza posti disponibili.");
                 }
                 break;
 
