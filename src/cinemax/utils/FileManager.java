@@ -1079,7 +1079,7 @@ public class FileManager {
      * @param idProiezione         L'identificativo della proiezione interessata.
      * @param quantitaDaRipristinare Il numero di posti da restituire e sommare ai posti disponibili.
      */
-    private static void aggiornaPostoRimosso(String idProiezione, int quantitaDaRipristinare) {
+    public static void aggiornaPostoRimosso(String idProiezione, int quantitaDaRipristinare) {
         Path path = Paths.get(FILE_PALINSESTO);
         if (!Files.exists(path)) {
             return;
