@@ -423,24 +423,52 @@ public GestoreMenu(Scanner sc){
             }
         }
 
+        /**
+         * Gestisce l'intero flusso interattivo per la prenotazione dei posti di una proiezione.
+         * Richiede all'utente il numero di posti desiderati tramite console, effettua i controlli
+         * di validazione (input numerico valido e posti positivi), verifica la disponibilità
+         * effettiva nella sala e, in caso positivo, crea la prenotazione associandola al cliente
+         * e aggiorna i posti disponibili tramite il FileManager.
+         *
+         * @param scanner                  Lo {@link Scanner} utilizzato per leggere l'input da console.
+         * @param proiezioneSelezionata    La {@link Proiezione} per la quale si desidera effettuare la prenotazione.
+         * @param clienteCorrente          Il {@link Cliente} che sta eseguendo l'operazione di prenotazione.
+         * @return                         {@code true} se la prenotazione è andata a buon fine;
+         *                                 {@code false} se l'utente ha annullato l'operazione (inserendo 0)
+         *                                 o se non ci sono abbastanza posti disponibili.
+         */
+        public boolean gestisciPrenotazione(Scanner scanner, Proiezione proiezioneSelezionata, Cliente clienteCorrente) {
+            int postiDaPrenotare = 0;
 
+            while (true) {
+                System.out.print("\nQuanti posti vuoi prenotare? (0 per annullare): ");
+                try {
+                    postiDaPrenotare = Integer.parseInt(scanner.nextLine().trim());
+                    if (postiDaPrenotare >= 0) {
+                        break;
+                    }
+                    System.out.println("  Errore: Il numero di posti deve essere positivo.");
+                } catch (NumberFormatException e) {
+                    System.out.println("  Errore: Inserisci un numero intero valido.");
+                }
+            }
 
+            if (postiDaPrenotare == 0) {
+                System.out.println("Operazione annullata.");
+                return false;
+            }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if (postiDaPrenotare <= proiezioneSelezionata.getPostiDisponibili()) {
+                for (int k = 0; k < postiDaPrenotare; k++) {
+                    clienteCorrente.creaPrenotazione(proiezioneSelezionata);
+                    FileManager.scalaPostoDisponibile(proiezioneSelezionata.getIdProiezione(), 1);
+                }
+                System.out.println("  Prenotazione/i effettuata/e con successo!");
+                return true;
+            } else {
+                System.out.println("  Errore: Non ci sono abbastanza posti disponibili.");
+                return false;
+            }
+        }
 
 }

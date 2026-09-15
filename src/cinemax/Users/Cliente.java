@@ -4,6 +4,7 @@ import cinemax.gestione.Genere;
 import cinemax.utils.FileManager;
 import cinemax.gestione.Proiezione;
 import cinemax.gestione.Prenotazione;
+import cinemax.controls.GestoreMenu;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -245,6 +246,8 @@ public class Cliente extends Utente {
     @Override
     public void eseguiAzione(int scelta) {
         Scanner scanner = new Scanner(System.in);
+        GestoreMenu gm = new GestoreMenu(scanner);
+
 
         switch (scelta) {
             case 1:
@@ -380,33 +383,7 @@ public class Cliente extends Utente {
                         }
 
                         if(risposta.equalsIgnoreCase("si")){
-                            int postiDaPrenotare = 0;
-                            while (true) {
-                                System.out.print("\nQuanti posti vuoi prenotare? (0 per annullare): ");
-                                try {
-                                    postiDaPrenotare = Integer.parseInt(scanner.nextLine().trim());
-                                    if (postiDaPrenotare >= 0) {
-                                        break;
-                                    }
-                                    System.out.println("  Errore: Il numero di posti deve essere positivo.");
-                                } catch (NumberFormatException e) {
-                                    System.out.println("  Errore: Inserisci un numero intero valido.");
-                                }
-                            }
-                            if (postiDaPrenotare == 0) {
-                                System.out.println("Operazione annullata.");
-                                break;
-                            }
-
-                            if (postiDaPrenotare <= proiezioneSelezionata.getPostiDisponibili()) {
-
-                                for (int k = 0; k < postiDaPrenotare; k++) {
-                                    this.creaPrenotazione(proiezioneSelezionata);
-                                    FileManager.scalaPostoDisponibile(proiezioneSelezionata.getIdProiezione(), 1);
-                                }
-                            } else {
-                                System.out.println("  Errore: Non ci sono abbastanza posti disponibili.");
-                            }
+                            gm.gestisciPrenotazione(scanner, proiezioneSelezionata, this);
                             break;
 
                         } else if(risposta.equalsIgnoreCase("no")){
@@ -480,37 +457,8 @@ public class Cliente extends Utente {
                     System.out.println("Operazione annullata.");
                     break;
                 }
-
                 Proiezione proiezioneScelta = proiezioniTrovate.get(sceltaSpettacolo - 1);
-
-                int postiRichiesti = 0;
-                while (true) {
-                    System.out.print("Quanti posti desideri richiedere? (0 per annullare): ");
-                    try {
-                        postiRichiesti = Integer.parseInt(scanner.nextLine().trim());
-                        if (postiRichiesti >= 0) {
-                            break;
-                        }
-                        System.out.println("  Errore: Il numero di posti deve essere positivo.");
-                    } catch (NumberFormatException e) {
-                        System.out.println("  Errore: Inserisci un numero intero valido.");
-                    }
-                }
-
-                if (postiRichiesti == 0) {
-                    System.out.println("Operazione annullata.");
-                    break;
-                }
-
-                if (postiRichiesti <= proiezioneScelta.getPostiDisponibili()) {
-
-                    for (int k = 0; k < postiRichiesti; k++) {
-                        this.creaPrenotazione(proiezioneScelta);
-                        FileManager.scalaPostoDisponibile(proiezioneScelta.getIdProiezione(), 1);
-                    }
-                } else {
-                    System.out.println("  Errore: Non ci sono abbastanza posti disponibili.");
-                }
+                gm.gestisciPrenotazione(scanner , proiezioneScelta, this);
                 break;
 
             case 3:

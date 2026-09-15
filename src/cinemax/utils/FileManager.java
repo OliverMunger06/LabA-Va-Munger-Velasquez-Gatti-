@@ -903,8 +903,8 @@ public class FileManager {
                 String[] elementi = riga.split(SEPARATORE);
 
                 if (elementi.length >= 8) {
-                    String id = elementi[0].replace("\"", "").trim(); // ID della prenotazione
-                    String username = elementi[3].replace("\"", "").trim(); // Username cliente
+                    String id = elementi[0].replace("\"", "").trim();
+                    String username = elementi[3].replace("\"", "").trim();
 
                     if (id.equalsIgnoreCase(idPrenotazione.replace("\"", "").trim()) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;
