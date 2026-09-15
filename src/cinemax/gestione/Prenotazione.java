@@ -118,7 +118,7 @@ public class Prenotazione {
      * @param proiezione La {@link Proiezione} da prenotare.
      */
     public Prenotazione(Utente cliente, Proiezione proiezione) {
-        this.idPrenotazione = UUID.randomUUID().toString().substring(0, 8);
+        this.idPrenotazione = UUID.randomUUID().toString().replace("-", "");
         this.nomeCliente = cliente.getNome();
         this.cognomeCliente = cliente.getCognome();
         this.usernameCliente = cliente.getUsername();

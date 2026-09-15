@@ -368,8 +368,44 @@ public class Cliente extends Utente {
                     } else if (indiceScelto > 0 && indiceScelto <= risultatiFiltrati.size()) {
                         Proiezione proiezioneSelezionata = risultatiFiltrati.get(indiceScelto - 1);
                         Utente.visualizzaProiezione(proiezioneSelezionata);
-                        System.out.println("Premi INVIO per tornare al menu principale...");
-                        scanner.nextLine();
+
+                        System.out.print("\nVuoi fare una prenotazione? (si o no): ");
+                        String risposta = scanner.nextLine().trim();
+
+                        if(risposta.equalsIgnoreCase("si")){
+                            int postiDaPrenotare = 0;
+                            while (true) {
+                                System.out.print("\nQuanti posti vuoi prenotare? (0 per annullare): ");
+                                try {
+                                    postiDaPrenotare = Integer.parseInt(scanner.nextLine().trim());
+                                    if (postiDaPrenotare >= 0) {
+                                        break;
+                                    }
+                                    System.out.println("  Errore: Il numero di posti deve essere positivo.");
+                                } catch (NumberFormatException e) {
+                                    System.out.println("  Errore: Inserisci un numero intero valido.");
+                                }
+                            }
+                            if (postiDaPrenotare == 0) {
+                                System.out.println("Operazione annullata.");
+                                break;
+                            }
+
+                            if (postiDaPrenotare <= proiezioneSelezionata.getPostiDisponibili()) {
+
+                                for (int k = 0; k < postiDaPrenotare; k++) {
+                                    this.creaPrenotazione(proiezioneSelezionata);
+                                    FileManager.scalaPostoDisponibile(proiezioneSelezionata.getIdProiezione(), 1);
+                                }
+                            } else {
+                                System.out.println("  Errore: Non ci sono abbastanza posti disponibili.");
+                            }
+                            break;
+
+                        } else if(risposta.equalsIgnoreCase("no")){
+                            break;
+                        }
+
                     } else {
                         System.out.println("  Numero non valido.");
                     }
