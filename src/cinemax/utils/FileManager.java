@@ -858,22 +858,6 @@ public class FileManager {
                         System.out.println("  ▪️ Posto N.        : " + numeroPosto);
                         System.out.println(" ----------------------------------------------");
                     }
-                } else if (elementi.length >= 4) {
-                    String idPrenotazione = elementi[0].trim();
-                    String username = elementi[1].trim();
-                    String idProiezione = elementi[2].trim();
-                    String codiceBiglietto = elementi[3].trim();
-
-                    if (username.equalsIgnoreCase(usernameUtente)) {
-                        contatore++;
-                        trovataAlmenoUna = true;
-
-                        System.out.println("\n [" + contatore + "] BIGLIETTO CINEMAX");
-                        System.out.println("  ▪️ ID Prenotazione : " + idPrenotazione);
-                        System.out.println("  ▪️ Codice QR       : " + codiceBiglietto);
-                        System.out.println("  ▪️ ID Proiezione   : " + idProiezione);
-                        System.out.println(" ----------------------------------------------");
-                    }
                 }
             }
 
@@ -921,15 +905,6 @@ public class FileManager {
                 if (elementi.length >= 8) {
                     String id = elementi[0].replace("\"", "").trim(); // ID della prenotazione
                     String username = elementi[3].replace("\"", "").trim(); // Username cliente
-
-                    if (id.equalsIgnoreCase(idPrenotazione.replace("\"", "").trim()) && username.equalsIgnoreCase(usernameUtente)) {
-                        eliminato = true;
-                        idProiezioneTrovata = elementi[5].replace("\"", "").trim();
-                        continue;
-                    }
-                } else if (elementi.length >= 6) {
-                    String id = elementi[0].replace("\"", "").trim();
-                    String username = elementi[3].replace("\"", "").trim();
 
                     if (id.equalsIgnoreCase(idPrenotazione.replace("\"", "").trim()) && username.equalsIgnoreCase(usernameUtente)) {
                         eliminato = true;

@@ -3,7 +3,6 @@ package cinemax.Users;
 import cinemax.gestione.Genere;
 import cinemax.utils.FileManager;
 import cinemax.gestione.Proiezione;
-import cinemax.gestione.Film;
 import cinemax.gestione.Prenotazione;
 
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
