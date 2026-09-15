@@ -369,8 +369,17 @@ public class Cliente extends Utente {
                         Proiezione proiezioneSelezionata = risultatiFiltrati.get(indiceScelto - 1);
                         Utente.visualizzaProiezione(proiezioneSelezionata);
 
-                        System.out.print("\nVuoi fare una prenotazione? (si o no): ");
-                        String risposta = scanner.nextLine().trim();
+                        String risposta;
+                        while (true) {
+                            System.out.print("\nVuoi fare una prenotazione? (si o no): ");
+                            risposta = scanner.nextLine().trim();
+
+                            if (risposta.equalsIgnoreCase("si") || risposta.equalsIgnoreCase("no")) {
+                                break;
+                            } else {
+                                System.out.println("  Errore: Scelta non valida. Inserisci si o no . ");
+                            }
+                        }
 
                         if(risposta.equalsIgnoreCase("si")){
                             int postiDaPrenotare = 0;

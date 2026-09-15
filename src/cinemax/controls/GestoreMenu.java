@@ -374,49 +374,54 @@ public GestoreMenu(Scanner sc){
          * dell'utente tramite il {@link FileManager} e controlla la correttezza della password tramite hash.
          * In caso di successo, mostra un messaggio di benvenuto e invoca {@link #avviaSessioneUtente(Utente)}.
          */
-    public void gestisciLogin() {
-        boolean loginEffettuato = false;
+        public void gestisciLogin() {
+            while (true) {
+                System.out.println("\n=============================================");
+                System.out.println("                 LOG IN                      ");
+                System.out.println("=============================================");
+                System.out.print("Inserisci Username (o premi INVIO per tornare indietro): ");
+                String usernameLogin = sc.nextLine().trim();
 
-        while (!loginEffettuato) {
-            System.out.println("\n=============================================");
-            System.out.println("                 LOG IN                      ");
-            System.out.println("=============================================");
-            System.out.print("Inserisci Username (o premi INVIO per tornare indietro): ");
-            String usernameLogin = sc.nextLine().trim();
+                if (usernameLogin.isEmpty()) {
+                    System.out.println("Ritorno al menu principale...");
+                    return;
+                }
 
-            if (usernameLogin.isEmpty()) {
-                System.out.println("Ritorno al menu principale...");
-                return;
-            }
+                try {
+                    java.util.Optional<Utente> utenteOpt = FileManager.caricaUtentePerUsername(usernameLogin);
 
-            System.out.print("Inserisci Password: ");
-            String passwordLogin = sc.nextLine().trim();
+                    if (utenteOpt.isPresent()) {
+                        Utente u = utenteOpt.get();
 
-            try {
-                java.util.Optional<Utente> utenteOpt = FileManager.caricaUtentePerUsername(usernameLogin);
+                        while (true) {
+                            System.out.print("Inserisci Password (o premi INVIO per cambiare username): ");
+                            String passwordLogin = sc.nextLine().trim();
 
-                if (utenteOpt.isPresent()) {
-                    Utente u = utenteOpt.get();
+                            if (passwordLogin.isEmpty()) {
+                                System.out.println("Cambio username...");
+                                break;
+                            }
 
-                    if (FileManager.verificaPassword(passwordLogin, u.getPasswordHash())) {
-                        System.out.println("\n  Accesso effettuato con successo!");
-                        System.out.println("  Benvenuto, " + u.getNome() + " " + u.getCognome() + " (" + u.getClass().getSimpleName() + ").");
+                            if (FileManager.verificaPassword(passwordLogin, u.getPasswordHash())) {
+                                System.out.println("\n  Accesso effettuato con successo!");
+                                System.out.println("  Benvenuto, " + u.getNome() + " " + u.getCognome() + " (" + u.getClass().getSimpleName() + ").");
 
-                        avviaSessioneUtente(u);
-                        loginEffettuato = true;
+                                avviaSessioneUtente(u);
+                                return;
+                            } else {
+                                System.out.println("\n  [ERRORE] Password errata. Riprova.");
+                            }
+                        }
 
                     } else {
-                        System.out.println("\n  [ERRORE] Password errata. Riprova.");
+                        System.out.println("\n  [ERRORE] Nessun utente registrato con l'username '" + usernameLogin + "'. Riprova.");
                     }
-                } else {
-                    System.out.println("\n  [ERRORE] Nessun utente registrato con l'username '" + usernameLogin + "'. Riprova.");
+                } catch (IOException e) {
+                    System.err.println("\n  [ERRORE I/O] Impossibile completare il login: " + e.getMessage());
+                    break;
                 }
-            } catch (IOException e) {
-                System.err.println("\n  [ERRORE I/O] Impossibile completare il login: " + e.getMessage());
-                break;
             }
         }
-    }
 
 
 
